@@ -25,17 +25,16 @@ from __future__ import division
 from math import cos, sin, atan, pi, tan, sqrt, acos
 from numpy import array, dot, linspace, transpose, vstack, ndarray
 from numpy.linalg import solve
-
+import copy
 
 
 # dg...groundcircle
 # dw...pitch circle
 # df...? fußkreis
 # c... ? clearence
-
 class gearrack():
 
-    def __init__(self, m=5, z=21, shift = 0., alpha=15 * pi / 180, clearence = 0.12, beta = 0.):
+    def __init__(self, m=5, z=21, shift=0., alpha=15 * pi / 180, clearence=0.12, beta=0.):
         self.clearence = clearence
         self.alpha = alpha
         self.beta = beta
@@ -75,11 +74,11 @@ class gearrack():
 
 class gearwheel():
 
-    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence = 0.12, shift = 0.5, beta = 0., undercut = False, backslash = 0.01):
+    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backslash=0.01):
         self.alpha = alpha
         self.beta = beta
         self.m_n = m
-        self.z = z        
+        self.z = z
         self.undercut = undercut
         self.shift = shift
         self.clearence = clearence
@@ -91,7 +90,8 @@ class gearwheel():
         self.d = self.z * self.m
         self.dw = self.m * self.z
         self.da = self.dw + 2. * self.m_n + 2. * self.shift * self.m_n
-        self.df = self.dw - 2. * self.m_n - 2 * self.c + 2. * self.shift * self.m_n
+        self.df = self.dw - 2. * self.m_n - \
+            2 * self.c + 2. * self.shift * self.m_n
         self.dg = self.d * cos(self.alpha_t)
         self.phipart = 2 * pi / self.z
 
@@ -100,9 +100,11 @@ class gearwheel():
                             (self.c + self.m_n) * tan(self.alpha_t))) / self.df)))
 
         self.involute_end = sqrt(self.da ** 2 - self.dg ** 2) / self.dg
-        self.involute_rot1 = sqrt(-self.dg**2 + (self.dw)**2)/self.dg - atan(sqrt(-self.dg**2 + (self.dw)**2)/self.dg)
-        self.involute_rot2 = self.m /(self.d) * (pi / 2  + 2 * self.shift * tan(self.alpha_t))
-        self.involute_rot =  self.involute_rot1 + self.involute_rot2
+        self.involute_rot1 = sqrt(-self.dg ** 2 + (self.dw) ** 2) / self.dg - atan(
+            sqrt(-self.dg ** 2 + (self.dw) ** 2) / self.dg)
+        self.involute_rot2 = self.m / \
+            (self.d) * (pi / 2 + 2 * self.shift * tan(self.alpha_t))
+        self.involute_rot = self.involute_rot1 + self.involute_rot2
         self.involute_start = 0.
         if self.dg <= self.df:
             self.involute_start = sqrt(self.df ** 2 - self.dg ** 2) / self.dg
@@ -114,7 +116,8 @@ class gearwheel():
         fy = self.undercut_function_y()
         y = array(map(fy, pts))
         xy = transpose([x, y])
-        rotate = rotation(self.undercut_rot + self.phipart / 2)
+        rotate = rotation(
+            self.undercut_rot + self.phipart / 2 - self.backslash / 4)
         xy = rotate(xy)
         return(array(xy))
 
@@ -124,7 +127,6 @@ class gearwheel():
         x = array(map(fx, pts))
         fy = self.involute_function_y()
         y = array(map(fy, pts))
-        print(self.backslash / self.d / 4)
         rot = rotation(self.involute_rot - self.backslash / 4)
         xy = rot(transpose(array([x, y])))
         return(xy)
@@ -135,13 +137,14 @@ class gearwheel():
         s = trimfunc(l1, l2[::-1])
         if self.undercut:
             if isinstance(s, ndarray):
-                u1,e1 = s
+                u1, e1 = s
             else:
-                u1,e1 = nearestpts(l2,l1)
+                u1, e1 = nearestpts(l2, l1)
         else:
             u1 = False
             if self.dg > self.df:
-                u1 = vstack([[l2[0] * self.df / (norm(l2[0],[0,0]) * 2)], [l2[0]]])
+                u1 = vstack(
+                    [[l2[0] * self.df / (norm(l2[0], [0, 0]) * 2)], [l2[0]]])
                 e1 = l2
             else:
                 e1 = l2
@@ -150,13 +153,24 @@ class gearwheel():
         e2 = reflect(e1)[::-1]
         rot = rotation(-self.phipart)
         if isinstance(u1, bool):
-            u2=False
+            u2 = False
             pend = rot([e1[0]])[0]
-            return([e1, [e1[-1],e2[0]], e2,[e2[-1], pend]])
+            one_tooth = [e1, [e1[-1], e2[0]], e2]
         else:
             u2 = reflect(u1)[::-1]
             pend = rot([u1[0]])[0]
-            return([u1, e1, [e1[-1],e2[0]], e2, u2, [u2[-1], pend]])
+            one_tooth = [u1, e1, [e1[-1], e2[0]], e2, u2]
+        all_teeth = copy.copy(one_tooth)
+        last_tooth = copy.copy(one_tooth)
+        for i in range(self.z - 1):
+            rot = rotation(-self.phipart * (i + 1))
+            temp_tooth = map(rot, one_tooth)
+            join_seg = [array([last_tooth[-1][-1], temp_tooth[0][0]])]
+            all_teeth += join_seg
+            all_teeth += temp_tooth
+            last_tooth = copy.copy(temp_tooth)
+        all_teeth += [[all_teeth[0][0], all_teeth[-1][-1]]]
+        return(all_teeth)
 
 
     def gearfunc(self, x):
@@ -169,7 +183,7 @@ class gearwheel():
                cos(psi - (self.df * tan(psi)) / self.dw) * sqrt(self.df ** 2 / 4 +
                                                                 (self.df ** 2 * tan(psi) ** 2) / 4.))
         return(func)
-            
+
 
     def undercut_function_y(self):
         def func(psi):
@@ -190,7 +204,7 @@ class gearwheel():
 
     def _update(self):
         self.__init__(m = self.m_n, z = self.z,
-                alpha = self.alpha, clearence = self.clearence, shift = self.shift, 
+                alpha = self.alpha, clearence = self.clearence, shift = self.shift,
                 beta = self.beta, undercut = self.undercut, backslash = self.backslash)
 
 
@@ -235,7 +249,7 @@ class cycloidegear():
 
     def inner_end(self):
         return(
-            -((self.d1*acos((2*self.d1**2 - self.di**2 - 
+            -((self.d1*acos((2*self.d1**2 - self.di**2 -
                 2*self.d1*self.d + self.d**2)/(2.*self.d1*
                 (self.d1 - self.d))))/self.d)
             )
@@ -274,7 +288,8 @@ class cycloidegear():
         return(pts)
 
     def _update(self):
-        self.__init__(m = self.m, z = self.z, d1 = self.d1, d2 = self.d2, clearence = self.clearence, backslash = self.backslash)
+        self.__init__(m = self.m, z = self.z, d1 = self.d1, d2 = self.d2,
+                      clearence = self.clearence, backslash = self.backslash)
 
 
 class bevelgear(object):
@@ -286,23 +301,24 @@ class bevelgear(object):
         self.module = module
 
         self.involute_end = acos(
-            0.7071067811865475 * sqrt((42. + 16.*cos(2.*self.alpha) + 
-            6.*cos(4.*self.alpha) + cos(4.*self.alpha - 4.*self.gamma) - 8.*cos(2.*self.alpha - 2.*self.gamma) - 
-            4.*cos(4.*self.alpha - 2.*self.gamma) + 24.*cos(2.*self.gamma) - 2.*cos(4.*self.gamma) - 
-            8.*cos(2.*(self.alpha + self.gamma)) + cos(4.*(self.alpha + self.gamma)) - 
-            4.*cos(4.*self.alpha + 2.*self.gamma) + 24.*cos((4.*sin(self.gamma))/self.z) + 
-            4.*cos(2.*self.alpha - (4.*sin(self.gamma))/self.z) + 4.*cos(2.*self.alpha - 
-            4.*self.gamma - (4.*sin(self.gamma))/self.z) - 8.*cos(2.*self.alpha - 2.*self.gamma - 
-            (4.*sin(self.gamma))/self.z) + 24.*cos(4.*(self.gamma + sin(self.gamma)/self.z)) - 
-            8.*cos(2.*(self.alpha + self.gamma + (2.*sin(self.gamma))/self.z)) + 4.*cos(2.*self.alpha + 
-            (4.*sin(self.gamma))/self.z) + 16.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z) + 
-            4.*cos(2.*self.alpha + 4.*self.gamma + (4.*sin(self.gamma))/self.z) + 32.*abs(cos(self.gamma + 
-            (2.*sin(self.gamma))/self.z))*cos(self.alpha)*sqrt(4.*cos(2.*self.alpha) - 
-            2.*(-2. + cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)) + 
-            4.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z)))*sin(2.*self.gamma))/(-6. - 2.*cos(2.*self.alpha) + 
+            0.7071067811865475 * sqrt((42. + 16.*cos(2.*self.alpha) +
+            6.*cos(4.*self.alpha) + cos(4.*self.alpha - 4.*self.gamma) - 8.*cos(2.*self.alpha - 2.*self.gamma) -
+            4.*cos(4.*self.alpha - 2.*self.gamma) + 24.*cos(2.*self.gamma) - 2.*cos(4.*self.gamma) -
+            8.*cos(2.*(self.alpha + self.gamma)) + cos(4.*(self.alpha + self.gamma)) -
+            4.*cos(4.*self.alpha + 2.*self.gamma) + 24.*cos((4.*sin(self.gamma))/self.z) +
+            4.*cos(2.*self.alpha - (4.*sin(self.gamma))/self.z) + 4.*cos(2.*self.alpha -
+            4.*self.gamma - (4.*sin(self.gamma))/self.z) - 8.*cos(2.*self.alpha - 2.*self.gamma -
+            (4.*sin(self.gamma))/self.z) + 24.*cos(4.*(self.gamma + sin(self.gamma)/self.z)) -
+            8.*cos(2.*(self.alpha + self.gamma + (2.*sin(self.gamma))/self.z)) + 4.*cos(2.*self.alpha +
+            (4.*sin(self.gamma))/self.z) + 16.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z) +
+            4.*cos(2.*self.alpha + 4.*self.gamma + (4.*sin(self.gamma))/self.z) + 32.*abs(cos(self.gamma +
+            (2.*sin(self.gamma))/self.z))*cos(self.alpha)*sqrt(4.*cos(2.*self.alpha) -
+            2.*(-2. + cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)) +
+            4.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z)))*sin(2.*self.gamma))/(-6. - 2.*cos(2.*self.alpha) +
             cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)))**2))
-        
-        self.involute_start = -pi/2. + atan(1/tan(self.gamma)*1/cos(self.alpha))
+
+        self.involute_start = -pi/2. + \
+            atan(1/tan(self.gamma)*1/cos(self.alpha))
         self.involute_start_radius = self.getradius(self.involute_start)
         self.r_f = sin(self.gamma - sin(gamma) * 2 / self.z)
         self.z_f = cos(self.gamma - sin(gamma) * 2 / self.z)
@@ -311,28 +327,28 @@ class bevelgear(object):
         if self.involute_start_radius < self.r_f:
             self.add_foot = False
             self.involute_start = -acos(
-                sqrt((42 + 16*cos(2*self.alpha) + 6*cos(4*self.alpha) - 
-                4*cos(4*self.alpha - 2*self.gamma) - 8*cos(2*(self.alpha - self.gamma)) + 
-                cos(4*(self.alpha - self.gamma)) + 24*cos(2*self.gamma) - 2*cos(4*self.gamma) - 
-                8*cos(2*(self.alpha + self.gamma)) + cos(4*(self.alpha + self.gamma)) - 
-                4*cos(2*(2*self.alpha + self.gamma)) + 24*cos((4*sin(self.gamma))/self.z) + 
-                4*cos(2*self.alpha - (4*sin(self.gamma))/self.z) + 16*cos(2*self.gamma - 
-                (4*sin(self.gamma))/self.z) + 24*cos(4*self.gamma - (4*sin(self.gamma))/self.z) + 
-                4*cos(2*self.alpha + 4*self.gamma - (4*sin(self.gamma))/self.z) - 
-                8*cos(2*(self.alpha + self.gamma - (2*sin(self.gamma))/self.z)) + 
-                4*cos(2*self.alpha + (4*sin(self.gamma))/self.z) + 4*cos(2*self.alpha - 
-                4*self.gamma + (4*sin(self.gamma))/self.z) - 8*cos(2*self.alpha - 2*self.gamma + 
+                sqrt((42 + 16*cos(2*self.alpha) + 6*cos(4*self.alpha) -
+                4*cos(4*self.alpha - 2*self.gamma) - 8*cos(2*(self.alpha - self.gamma)) +
+                cos(4*(self.alpha - self.gamma)) + 24*cos(2*self.gamma) - 2*cos(4*self.gamma) -
+                8*cos(2*(self.alpha + self.gamma)) + cos(4*(self.alpha + self.gamma)) -
+                4*cos(2*(2*self.alpha + self.gamma)) + 24*cos((4*sin(self.gamma))/self.z) +
+                4*cos(2*self.alpha - (4*sin(self.gamma))/self.z) + 16*cos(2*self.gamma -
+                (4*sin(self.gamma))/self.z) + 24*cos(4*self.gamma - (4*sin(self.gamma))/self.z) +
+                4*cos(2*self.alpha + 4*self.gamma - (4*sin(self.gamma))/self.z) -
+                8*cos(2*(self.alpha + self.gamma - (2*sin(self.gamma))/self.z)) +
+                4*cos(2*self.alpha + (4*sin(self.gamma))/self.z) + 4*cos(2*self.alpha -
+                4*self.gamma + (4*sin(self.gamma))/self.z) - 8*cos(2*self.alpha - 2*self.gamma +
                 (4*sin(self.gamma))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.alpha)**2*
-                (-2 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) - 
-                2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)) + 
+                (-2 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
+                2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)) +
                 4*cos(2*self.gamma - (4*sin(self.gamma))/self.z))*cos(self.gamma - (2*sin(self.gamma))/self.z)**2*
-                sin(2*self.gamma)**2)))/(-6 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) - 
+                sin(2*self.gamma)**2)))/(-6 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
                 2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)))**2)/sqrt(2))
-        
+
     def involute_function_x(self):
         def func(s):
             return((
-                -(cos(s*1/sin(self.alpha)*1/sin(self.gamma))*sin(self.alpha)*sin(s)) + 
+                -(cos(s*1/sin(self.alpha)*1/sin(self.gamma))*sin(self.alpha)*sin(s)) +
                 (cos(s)*sin(self.gamma) + cos(self.alpha)*cos(self.gamma)*sin(s))*
                 sin(s*1/sin(self.alpha)*1/sin(self.gamma))))
         return(func)
@@ -340,7 +356,7 @@ class bevelgear(object):
     def involute_function_y(self):
         def func(s):
             return((
-                cos(s*1/sin(self.alpha)*1/sin(self.gamma))*(cos(s)*sin(self.gamma) + 
+                cos(s*1/sin(self.alpha)*1/sin(self.gamma))*(cos(s)*sin(self.gamma) +
                 cos(self.alpha)*cos(self.gamma)*sin(s)) + sin(self.alpha)*sin(s)*
                 sin(s*1/sin(self.alpha)*1/sin(self.gamma))))
         return(func)
@@ -355,7 +371,7 @@ class bevelgear(object):
         x = self.involute_function_x()
         y = self.involute_function_y()
         rx = x(s)
-        ry = y(s)        
+        ry = y(s)
         return(sqrt(rx**2 + ry**2))
 
 
@@ -390,7 +406,7 @@ class bevelgear(object):
             return(array([
                 [pts[0],pts[1]],
                 pts[1:],
-                [pts[-1], pts1[0]], 
+                [pts[-1], pts1[0]],
                 pts1[:-1],
                 [pts1[-2], pts1[-1]],
                 [pts1[-1],pt3]]))
@@ -405,13 +421,15 @@ class bevelgear(object):
 
 
 def reflection(alpha):
-    mat = array([[cos(2 * alpha), -sin(2 * alpha)],[-sin(2 * alpha), -cos(2 * alpha)]])
+    mat = array(
+        [[cos(2 * alpha), -sin(2 * alpha)],[-sin(2 * alpha), -cos(2 * alpha)]])
     def func(x):
         return(dot(x, mat))
     return(func)
 
 def reflection3D(alpha):
-    mat = array([[cos(2 * alpha), -sin(2 * alpha),0.],[-sin(2 * alpha), -cos(2 * alpha),0.],[0.,0.,1.]])
+    mat = array([[cos(2 * alpha), -sin(2 * alpha),0.],
+                [-sin(2 * alpha), -cos(2 * alpha),0.],[0.,0.,1.]])
     def func(x):
         return(dot(x, mat))
     return(func)
@@ -426,7 +444,8 @@ def rotation(alpha, midpoint=[0, 0]):
     return(func)
 
 def rotation3D(alpha):
-    mat = array([[cos(alpha), -sin(alpha),0.], [sin(alpha), cos(alpha),0.],[0.,0.,1.]])
+    mat = array(
+        [[cos(alpha), -sin(alpha),0.], [sin(alpha), cos(alpha),0.],[0.,0.,1.]])
     def func(xx):
         return(dot(xx, mat))
     return(func)
@@ -524,3 +543,9 @@ def nearestpts(evolv, underc):
             jk += 1
         ik += 1
     return([vstack([underc[:jout], evolv[iout]]), evolv[iout:]])
+
+
+if __name__ == "__main__":
+    a = gearwheel(undercut=True, backslash=0.01)
+    from openglider.graphics import Graphics2D, Line
+    Graphics2D(map(Line, a.points(10)[0:100]))
