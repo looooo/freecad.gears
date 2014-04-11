@@ -21,9 +21,11 @@
 
 from __future__ import division
 import FreeCAD as App
-from _shape2D import gearwheel, cycloidegear, bevelgear
-from Part import BSplineCurve, Shape, Wire, Face, makePolygon, BRepOffsetAPI, Shell, Solid, makeLoft, Compound
-from math import pi, cos, sin, tan
+from _involute_tooth import involute_tooth
+from _cycloide_tooth import cycloide_tooth
+from _bevel_tooth import bevel_tooth
+from Part import BSplineCurve, Shape, Wire, Face, makePolygon, BRepOffsetAPI, Shell, makeLoft, Solid, Line
+from numpy import pi, cos, sin, tan
 
 
 def fcvec(x):
@@ -39,7 +41,7 @@ class involute_gear():
     """FreeCAD gear"""
 
     def __init__(self, obj):
-        self.gearwheel = gearwheel()
+        self.involute_tooth = involute_tooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -61,7 +63,7 @@ class involute_gear():
         obj.addProperty(
             "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
-        obj.gear = self.gearwheel
+        obj.gear = self.involute_tooth
         obj.teeth = 15
         obj.module = '0.25 mm'
         obj.undercut = True
@@ -91,18 +93,23 @@ class involute_gear():
             out = BSplineCurve()
             out.interpolate(map(fcvec, i))
             wi.append(out)
-            App.Console.PrintWarning(str(i[0]) + "\n")
-            App.Console.PrintWarning(str(i[-1]) + "\n\n")
-        wi = Wire(Shape(wi).Edges)
-        # wi = Shape(w1)
-        # wi0 = Wire(s.Edges)
-        # wi = []
-        # for i in range(fp.gear.z):
-        #     rot = App.Matrix()
-        #     rot.rotateZ(i * fp.gear.phipart)
-        #     wi.append(wi0.transformGeometry(rot))
-        # wi = Wire(wi)
-        # fp.Shape = wi
+        s = Wire(Shape(wi).Edges)
+        wi = []
+        for i in range(fp.gear.z):
+            rot = App.Matrix()
+            rot.rotateZ(-i * fp.gear.phipart)
+            tooth_rot = s.transformGeometry(rot)
+            if i != 0:
+                pt_0 = wi[-1].Vertexes[-1].Point
+                pt_1 = tooth_rot.Vertexes[1].Point
+                wi.append(Wire([Line(pt_0, pt_1).toShape()]))
+            wi.append(tooth_rot)
+        pt_0 = wi[-1].Vertexes[-1].Point
+        pt_1 = wi[0].Vertexes[1].Point
+        wi.append(Wire([Line(pt_0, pt_1).toShape()]))
+
+        wi = Wire(wi)
+        fp.Shape = wi
         if fp.beta.Value == 0:
             sh = Face(wi)
             fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
@@ -122,7 +129,7 @@ class cycloide_gear():
     """FreeCAD gear"""
 
     def __init__(self, obj):
-        self.cycloidegear = cycloidegear()
+        self.cycloide_tooth = cycloide_tooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -141,7 +148,7 @@ class cycloide_gear():
         obj.addProperty(
             "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
-        obj.gear = self.cycloidegear
+        obj.gear = self.cycloide_tooth
         obj.teeth = 15
         obj.module = '0.25 mm'
         obj.inner_diameter = '2 mm'
@@ -149,31 +156,40 @@ class cycloide_gear():
         obj.beta = '0. deg'
         obj.height = '1. mm'
         obj.clearence = '0.12 mm'
-        obj.numpoints = 6
+        obj.numpoints = 15
         obj.backslash = '0.01 mm'
         obj.Proxy = self
 
     def execute(self, fp):
+        pass
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
-        fp.gear.d1 = fp.inner_diameter.Value
-        fp.gear.d2 = fp.outer_diameter.Value
+        fp.gear.z1 = fp.inner_diameter.Value
+        fp.gear.z2 = fp.outer_diameter.Value
         fp.gear.clearence = fp.clearence.Value
         fp.gear.backslash = fp.backslash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        w1 = []
+        wi = []
         for i in pts:
             out = BSplineCurve()
             out.interpolate(map(fcvec, i))
-            w1.append(out)
-        s = Shape(w1)
-        wi0 = Wire(s.Edges)
+            wi.append(out)
+        s = Wire(Shape(wi).Edges)
         wi = []
         for i in range(fp.gear.z):
+            
             rot = App.Matrix()
-            rot.rotateZ(i * fp.gear.phipart)
-            wi.append(wi0.transformGeometry(rot))
+            rot.rotateZ(-i * fp.gear.phipart)
+            tooth_rot = s.transformGeometry(rot)
+            if i != 0:
+                pt_0 = wi[-1].Vertexes[-1].Point
+                pt_1 = tooth_rot.Vertexes[1].Point
+                wi.append(Wire([Line(pt_0, pt_1).toShape()]))
+            wi.append(tooth_rot)
+        pt_0 = wi[-1].Vertexes[-1].Point
+        pt_1 = wi[0].Vertexes[1].Point
+        wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         wi = Wire(wi)
         if fp.beta == 0:
             sh = Face(wi)
@@ -197,7 +213,7 @@ class bevel_gear():
     """
 
     def __init__(self, obj):
-        self.bevelgear = bevelgear()
+        self.bevel_tooth = bevel_tooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -214,7 +230,7 @@ class bevel_gear():
         obj.addProperty(
             "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
-        obj.gear = self.bevelgear
+        obj.gear = self.bevel_tooth
         obj.m = '0.25 mm'
         obj.teeth = 15
         obj.alpha = '70. deg'
@@ -246,15 +262,22 @@ class bevel_gear():
             out = BSplineCurve()
             out.interpolate(map(fcvec3, i_scale))
             w1.append(out)
-        s = Shape(w1)
-        wi0 = Wire(s.Edges)
+        s = Wire(Shape(w1).Edges)
         wi = []
         for i in range(teeth):
             rot = App.Matrix()
-            rot.rotateZ(-2 * i * pi / teeth)
-            wi.append(wi0.transformGeometry(rot))
+            rot.rotateZ(2 * i * pi / teeth)
+            tooth_rot = s.transformGeometry(rot)
+            if i != 0:
+                pt_0 = wi[-1].Vertexes[-1].Point
+                pt_1 = tooth_rot.Vertexes[1].Point
+                wi.append(Wire([Line(pt_0, pt_1).toShape()]))
+            wi.append(tooth_rot)
+        pt_0 = wi[-1].Vertexes[-1].Point
+        pt_1 = wi[0].Vertexes[1].Point
+        wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         return(Wire(wi))
-
+        
     def __getstate__(self):
         return None
 

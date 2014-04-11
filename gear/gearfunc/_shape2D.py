@@ -154,11 +154,9 @@ class gearwheel():
         rot = rotation(-self.phipart)
         if isinstance(u1, bool):
             u2 = False
-            pend = rot([e1[0]])[0]
             one_tooth = [e1, [e1[-1], e2[0]], e2]
         else:
             u2 = reflect(u1)[::-1]
-            pend = rot([u1[0]])[0]
             one_tooth = [u1, e1, [e1[-1], e2[0]], e2, u2]
         all_teeth = copy.copy(one_tooth)
         last_tooth = copy.copy(one_tooth)
@@ -209,7 +207,7 @@ class gearwheel():
 
 
 class cycloidegear():
-    def __init__(self, d1 = 10, d2 = 10, z = 14, m = 5, clearence = 0.12, backslash = 0.01):
+    def __init__(self, d1 = 10, d2 = 10, z = 14, m = 5, clearence = 0.12, backslash = 0.00):
         self.m = m
         self.z = z
         self.clearence = clearence
@@ -221,10 +219,7 @@ class cycloidegear():
         self.d = self.z * self.m
         self.da = self.d + 2*self.m
         self.di = self.d - 2*self.m - self.c
-
-        self.phipart = 2 * pi / z
-
-
+        self.phipart = 2 * pi / self.z
 
 
     def epicycloide_x(self):
@@ -282,10 +277,18 @@ class cycloidegear():
         pts1 = rot(pts1)
         ref = reflection(0.)
         pts2 = ref(pts1)[::-1]
-        rot1 = rotation(-self.phipart)
-        pend = rot1([pts1[0]])[0]
-        pts = [pts1,[pts1[-1],pts2[0]], pts2 ,[pts2[-1],pend]]
-        return(pts)
+        one_tooth = [pts1,array([pts1[-1],pts2[0]]), pts2]
+        all_teeth = copy.copy(one_tooth)
+        last_tooth = copy.copy(one_tooth)
+        for i in range(self.z - 1):
+            rot = rotation(-self.phipart * (i + 1))
+            temp_tooth = map(rot, one_tooth)
+            join_seg = [array([last_tooth[-1][-1], temp_tooth[0][0]])]
+            all_teeth += join_seg
+            all_teeth += temp_tooth
+            last_tooth = copy.copy(temp_tooth)
+        all_teeth += [array([all_teeth[0][0], all_teeth[-1][-1]])]
+        return(all_teeth)
 
     def _update(self):
         self.__init__(m = self.m, z = self.z, d1 = self.d1, d2 = self.d2,
@@ -420,132 +423,10 @@ class bevelgear(object):
 
 
 
-def reflection(alpha):
-    mat = array(
-        [[cos(2 * alpha), -sin(2 * alpha)],[-sin(2 * alpha), -cos(2 * alpha)]])
-    def func(x):
-        return(dot(x, mat))
-    return(func)
 
-def reflection3D(alpha):
-    mat = array([[cos(2 * alpha), -sin(2 * alpha),0.],
-                [-sin(2 * alpha), -cos(2 * alpha),0.],[0.,0.,1.]])
-    def func(x):
-        return(dot(x, mat))
-    return(func)
-
-def rotation(alpha, midpoint=[0, 0]):
-    mat = array([[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]])
-    midpoint = array(midpoint)
-    vec = midpoint - dot(midpoint, mat)
-    trans = translation(vec)
-    def func(xx):
-        return(trans(dot(xx, mat)))
-    return(func)
-
-def rotation3D(alpha):
-    mat = array(
-        [[cos(alpha), -sin(alpha),0.], [sin(alpha), cos(alpha),0.],[0.,0.,1.]])
-    def func(xx):
-        return(dot(xx, mat))
-    return(func)
-
-
-def translation(vec):
-    def trans(x):
-        return([x[0] + vec[0], x[1] + vec[1]])
-    def func(x):
-        return(array(map(trans, x)))
-    return(func)
-
-
-def trim(p1, p2, p3, p4):
-    a1 = array(p1)
-    a2 = array(p2)
-    a3 = array(p3)
-    a4 = array(p4)
-    if all(a1 == a2) or all(a3 == a4):
-        if all(a1 == a3):
-            return(a1)
-        else:
-            return(False)
-    elif all(a1 == a3):
-        if all(a2 == a4):
-            return((a1 + a2) / 2)
-        else:
-            return(a1)
-    elif all(a1 == a4):
-        if all(a2 == a3):
-            return((a1 + a2) / 2)
-        else:
-            return(a1)
-    elif all(a2 == a3) or all(a2 == a4):
-        return(p2)
-    try:
-        g, h = solve(transpose([-a2 + a1, a4 - a3]), a1 - a3)
-    except:
-        print(Exception)
-        return(False)
-    else:
-        if 0. < g < 1. and 0. < h < 1.:
-            return(a1 + g * (a2 - a1))
-        else:
-            return(False)
-    return(False)
-
-
-def trimfunc(l1, l2):
-    ik = 0
-    i0 = array(l1[0])
-    for i in array(l1[1:]):
-        jk = 0
-        j0 = array(l2[0])
-        for j in array(l2[1:]):
-            s = trim(j0, j, i0, i)
-            if isinstance(s, ndarray):
-                if ik == 0:
-                    l1 = [l1[0]]
-                else:
-                    l1 = l1[:ik]
-                if jk == 0:
-                    l2 == [l2[0]]
-                else:
-                    l2 = l2[jk::-1]
-                return(array([vstack([l1,[s]]), vstack([[s],l2])]))
-            j0 = j
-            jk += 1
-        i0 = i
-        ik += 1
-    return(False)
-
-def norm(vec1, vec2):
-    vec = array(vec2) - array(vec1)
-    out = 0
-    for i in vec:
-        out += i**2
-    return(sqrt(out))
-
-def nearestpts(evolv, underc):
-    ik = 0
-    iout = 0
-    jout = 0
-    outmin = 1000.
-    for i in array(evolv[1:]):
-        jk = 0
-        for j in array(underc[1:]):
-            l = norm(i,j)
-            if l < outmin:
-                re = norm(i,[0,0])
-                ru = norm(j,[0,0])
-                if re > ru:
-                    outmin = l
-                    iout,jout = [ik, jk]
-            jk += 1
-        ik += 1
-    return([vstack([underc[:jout], evolv[iout]]), evolv[iout:]])
 
 
 if __name__ == "__main__":
-    a = gearwheel(undercut=True, backslash=0.01)
+    a = cycloidegear(d1=4, d2=4, z=30)
     from openglider.graphics import Graphics2D, Line
-    Graphics2D(map(Line, a.points(10)[0:100]))
+    Graphics2D(map(Line, a.points(10)))
