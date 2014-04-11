@@ -100,12 +100,12 @@ class involute_gear():
             rot.rotateZ(-i * fp.gear.phipart)
             tooth_rot = s.transformGeometry(rot)
             if i != 0:
-                pt_0 = wi[-1].Vertexes[-1].Point
-                pt_1 = tooth_rot.Vertexes[1].Point
+                pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+                pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
                 wi.append(Wire([Line(pt_0, pt_1).toShape()]))
             wi.append(tooth_rot)
-        pt_0 = wi[-1].Vertexes[-1].Point
-        pt_1 = wi[0].Vertexes[1].Point
+        pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+        pt_1 = wi[0].Edges[0].Vertexes[-1].Point
         wi.append(Wire([Line(pt_0, pt_1).toShape()]))
 
         wi = Wire(wi)
@@ -178,17 +178,16 @@ class cycloide_gear():
         s = Wire(Shape(wi).Edges)
         wi = []
         for i in range(fp.gear.z):
-            
             rot = App.Matrix()
             rot.rotateZ(-i * fp.gear.phipart)
             tooth_rot = s.transformGeometry(rot)
             if i != 0:
-                pt_0 = wi[-1].Vertexes[-1].Point
-                pt_1 = tooth_rot.Vertexes[1].Point
+                pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+                pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
                 wi.append(Wire([Line(pt_0, pt_1).toShape()]))
             wi.append(tooth_rot)
-        pt_0 = wi[-1].Vertexes[-1].Point
-        pt_1 = wi[0].Vertexes[1].Point
+        pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+        pt_1 = wi[0].Edges[0].Vertexes[-1].Point
         wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         wi = Wire(wi)
         if fp.beta == 0:
@@ -269,12 +268,12 @@ class bevel_gear():
             rot.rotateZ(2 * i * pi / teeth)
             tooth_rot = s.transformGeometry(rot)
             if i != 0:
-                pt_0 = wi[-1].Vertexes[-1].Point
-                pt_1 = tooth_rot.Vertexes[1].Point
+                pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+                pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
                 wi.append(Wire([Line(pt_0, pt_1).toShape()]))
             wi.append(tooth_rot)
-        pt_0 = wi[-1].Vertexes[-1].Point
-        pt_1 = wi[0].Vertexes[1].Point
+        pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
+        pt_1 = wi[0].Edges[0].Vertexes[-1].Point
         wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         return(Wire(wi))
         
