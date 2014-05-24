@@ -23,32 +23,43 @@ from __future__ import division
 from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
 from numpy.linalg import solve
 
+
 def reflection(alpha):
     mat = array(
-        [[cos(2 * alpha), -sin(2 * alpha)],[-sin(2 * alpha), -cos(2 * alpha)]])
+        [[cos(2 * alpha), -sin(2 * alpha)], [-sin(2 * alpha), -cos(2 * alpha)]])
+
     def func(x):
         return(dot(x, mat))
     return(func)
 
+
 def reflection3D(alpha):
-    mat = array([[cos(2 * alpha), -sin(2 * alpha),0.],
-                [-sin(2 * alpha), -cos(2 * alpha),0.],[0.,0.,1.]])
+    mat = array([[cos(2 * alpha), -sin(2 * alpha), 0.],
+                 [-sin(2 * alpha), -cos(2 * alpha), 0.], [0., 0., 1.]])
+
     def func(x):
         return(dot(x, mat))
     return(func)
+
 
 def rotation(alpha, midpoint=[0, 0]):
     mat = array([[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
+
     def func(xx):
         return(trans(dot(xx, mat)))
     return(func)
 
+
 def rotation3D(alpha):
     mat = array(
-        [[cos(alpha), -sin(alpha),0.], [sin(alpha), cos(alpha),0.],[0.,0.,1.]])
+        [
+            [cos(alpha), -sin(alpha), 0.],
+            [sin(alpha), cos(alpha), 0.],
+            [0., 0., 1.]])
+
     def func(xx):
         return(dot(xx, mat))
     return(func)
@@ -57,6 +68,7 @@ def rotation3D(alpha):
 def translation(vec):
     def trans(x):
         return([x[0] + vec[0], x[1] + vec[1]])
+
     def func(x):
         return(array(map(trans, x)))
     return(func)
@@ -114,19 +126,21 @@ def trimfunc(l1, l2):
                     l2 == [l2[0]]
                 else:
                     l2 = l2[jk::-1]
-                return(array([vstack([l1,[s]]), vstack([[s],l2])]))
+                return(array([vstack([l1, [s]]), vstack([[s], l2])]))
             j0 = j
             jk += 1
         i0 = i
         ik += 1
     return(False)
 
+
 def norm(vec1, vec2):
     vec = array(vec2) - array(vec1)
     out = 0
     for i in vec:
-        out += i**2
+        out += i ** 2
     return(sqrt(out))
+
 
 def nearestpts(evolv, underc):
     ik = 0
@@ -136,13 +150,13 @@ def nearestpts(evolv, underc):
     for i in array(evolv[1:]):
         jk = 0
         for j in array(underc[1:]):
-            l = norm(i,j)
+            l = norm(i, j)
             if l < outmin:
-                re = norm(i,[0,0])
-                ru = norm(j,[0,0])
+                re = norm(i, [0, 0])
+                ru = norm(j, [0, 0])
                 if re > ru:
                     outmin = l
-                    iout,jout = [ik, jk]
+                    iout, jout = [ik, jk]
             jk += 1
         ik += 1
     return([vstack([underc[:jout], evolv[iout]]), evolv[iout:]])
