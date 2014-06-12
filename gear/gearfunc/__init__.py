@@ -20,6 +20,7 @@
 
 
 import FreeCAD
+import FreeCADGui as Gui
 from _Classes import involute_gear, cycloide_gear, bevel_gear
 
 
@@ -41,7 +42,7 @@ class CreateInvoluteGear():
         involute_gear(a)
         a.ViewObject.Proxy = 0.
         FreeCAD.ActiveDocument.recompute()
-
+        Gui.SendMsgToActiveView("ViewFit")
 
 class CreateCycloideGear():
     def __init__(self):
@@ -61,6 +62,7 @@ class CreateCycloideGear():
         cycloide_gear(a)
         a.ViewObject.Proxy = 0.
         FreeCAD.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
 
 class CreateBevelGear():
     def __init__(self):
@@ -80,3 +82,4 @@ class CreateBevelGear():
         bevel_gear(a)
         a.ViewObject.Proxy = 0.
         FreeCAD.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")

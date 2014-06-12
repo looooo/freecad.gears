@@ -24,7 +24,7 @@ from numpy import tan, cos, sin, sqrt, arctan, pi, array, linspace, transpose, v
 from _functions import nearestpts, rotation, reflection, trimfunc, norm
 
 class involute_tooth():
-    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backslash=0.01):
+    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backslash=0.00):
         self.alpha = alpha
         self.beta = beta
         self.m_n = m
@@ -57,6 +57,7 @@ class involute_tooth():
             sqrt(-self.dg ** 2 + (self.dw) ** 2) / self.dg)
         self.involute_rot2 = self.m / \
             (self.d) * (pi / 2 + 2 * self.shift * tan(self.alpha_t))
+        self.involute_rot2 = 1 / self.z * (pi / 2 + 2 * self.shift * tan(self.alpha_t))
         self.involute_rot = self.involute_rot1 + self.involute_rot2
         self.involute_start = 0.
         if self.dg <= self.df:

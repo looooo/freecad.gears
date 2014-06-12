@@ -27,7 +27,7 @@ from _functions import rotation3D, reflection3D
 
 
 class bevel_tooth(object):
-    def __init__(self, alpha = 70 * pi / 180, gamma = pi / 4 , z = 21, backslash = 0.01, module = 0.25):
+    def __init__(self, alpha = 70 * pi / 180, gamma = pi / 4 , z = 21, backslash = 0.00, module = 0.25):
         self.alpha = alpha
         self.gamma = gamma
         self.z = z

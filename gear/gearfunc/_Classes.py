@@ -24,16 +24,18 @@ import FreeCAD as App
 from _involute_tooth import involute_tooth
 from _cycloide_tooth import cycloide_tooth
 from _bevel_tooth import bevel_tooth
-from Part import BSplineCurve, Shape, Wire, Face, makePolygon, BRepOffsetAPI, Shell, makeLoft, Solid, Line
+from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
+    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface
 from numpy import pi, cos, sin, tan
+
+import numpy
 
 
 def fcvec(x):
-    return(App.Vector(x[0], x[1], 0))
-
-
-def fcvec3(x):
-    return(App.Vector(x[0], x[1], x[2]))
+    if len(x) == 2:
+        return(App.Vector(x[0], x[1], 0))
+    else:
+        return(App.Vector(x[0], x[1], x[2]))
 
 
 class involute_gear():
@@ -49,31 +51,31 @@ class involute_gear():
         obj.addProperty(
             "App::PropertyBool", "undercut", "gear_parameter", "undercut")
         obj.addProperty(
-            "App::PropertyLength", "shift", "gear_parameter", "shift")
+            "App::PropertyFloat", "shift", "gear_parameter", "shift")
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
             "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
         obj.addProperty(
-            "App::PropertyLength", "clearence", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
             "App::PropertyAngle", "beta", "gear_parameter", "beta ")
         obj.addProperty(
-            "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
+            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
         obj.gear = self.involute_tooth
         obj.teeth = 15
-        obj.module = '0.25 mm'
+        obj.module = '1. mm'
         obj.undercut = True
-        obj.shift = '0. mm'
+        obj.shift = 0.
         obj.alpha = '20. deg'
         obj.beta = '0. deg'
-        obj.height = '1. mm'
-        obj.clearence = '0.12 mm'
+        obj.height = '5. mm'
+        obj.clearence = 0.25
         obj.numpoints = 6
-        obj.backslash = '0.01 mm'
+        obj.backlash = '0.00 mm'
         self.obj = obj
         obj.Proxy = self
 
@@ -81,11 +83,11 @@ class involute_gear():
         fp.gear.m_n = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.undercut = fp.undercut
-        fp.gear.shift = fp.shift.Value
+        fp.gear.shift = fp.shift
         fp.gear.alpha = fp.alpha.Value * pi / 180.
         fp.gear.beta = fp.beta.Value * pi / 180
-        fp.gear.clearence = fp.clearence.Value
-        fp.gear.backslash = fp.backslash.Value
+        fp.gear.clearence = fp.clearence
+        fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         wi = []
@@ -141,23 +143,23 @@ class cycloide_gear():
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
-            "App::PropertyLength", "clearence", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
-            "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
+            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
         obj.gear = self.cycloide_tooth
         obj.teeth = 15
-        obj.module = '0.25 mm'
-        obj.inner_diameter = '2 mm'
-        obj.outer_diameter = '2 mm'
+        obj.module = '1. mm'
+        obj.inner_diameter = '5 mm'
+        obj.outer_diameter = '5 mm'
         obj.beta = '0. deg'
-        obj.height = '1. mm'
-        obj.clearence = '0.12 mm'
+        obj.height = '5. mm'
+        obj.clearence = 0.25
         obj.numpoints = 15
-        obj.backslash = '0.01 mm'
+        obj.backlash = '0.00 mm'
         obj.Proxy = self
 
     def execute(self, fp):
@@ -166,8 +168,8 @@ class cycloide_gear():
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value
         fp.gear.z2 = fp.outer_diameter.Value
-        fp.gear.clearence = fp.clearence.Value
-        fp.gear.backslash = fp.backslash.Value
+        fp.gear.clearence = fp.clearence
+        fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         wi = []
@@ -227,16 +229,16 @@ class bevel_gear():
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
-            "App::PropertyLength", "backslash", "gear_parameter", "backslash in mm")
+            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
         obj.gear = self.bevel_tooth
-        obj.m = '0.25 mm'
+        obj.m = '1. mm'
         obj.teeth = 15
         obj.alpha = '70. deg'
         obj.gamma = '45. deg'
-        obj.height = '1. mm'
+        obj.height = '5. mm'
         obj.numpoints = 6
-        obj.backslash = '0.01 mm'
+        obj.backlash = '0.00 mm'
         self.obj = obj
         obj.Proxy = self
 
@@ -244,14 +246,43 @@ class bevel_gear():
         fp.gear.z = fp.teeth
         fp.gear.alpha = fp.alpha.Value * pi / 180.
         fp.gear.gamma = fp.gamma.Value * pi / 180
-        fp.gear.backslash = fp.backslash.Value
+        fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        w1 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
-            fp.gamma.Value * pi / 180) + fp.height.Value / 2, fp.gear.z)
-        w2 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
-            fp.gamma.Value * pi / 180) - fp.height.Value / 2, fp.gear.z)
-        fp.Shape = makeLoft([w1, w2], True)
+        # w1 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
+        #     fp.gamma.Value * pi / 180) + fp.height.Value / 2, fp.gear.z)
+        # w2 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
+        #     fp.gamma.Value * pi / 180) - fp.height.Value / 2, fp.gear.z)
+        fpts = [map(fcvec, i) for i in pts]
+        l = []
+        for pt in fpts:
+            b = BSplineCurve()
+            b.interpolate(pt)
+            l.append(b)
+        fp.Shape = self.create_tooth()
+
+    def create_tooth(self):
+        w = []
+        scal1 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
+            self.obj.gamma.Value * pi / 180) - self.obj.height.Value / 2
+        scal2 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
+            self.obj.gamma.Value * pi / 180) + self.obj.height.Value / 2
+        s = [scal1, scal2]
+        pts = self.obj.gear.points(num=self.obj.numpoints)
+        for pos in s:
+            w1 = []
+            scale = lambda x: fcvec(x * pos)
+            for i in pts:
+                i_scale = map(scale, i)
+                w1.append(i_scale)
+            w.append(w1)
+        surfs = []
+        w_t = zip(*w)
+        for i in w_t:
+            b = BSplineSurface()
+            b.interpolate(i)
+            surfs.append(b)
+        return Shape(surfs)
 
     def createteeths(self, pts, pos, teeth):
         w1 = []
@@ -259,7 +290,7 @@ class bevel_gear():
             scale = lambda x: x * pos
             i_scale = map(scale, i)
             out = BSplineCurve()
-            out.interpolate(map(fcvec3, i_scale))
+            out.interpolate(map(fcvec, i_scale))
             w1.append(out)
         s = Wire(Shape(w1).Edges)
         wi = []
@@ -276,7 +307,7 @@ class bevel_gear():
         pt_1 = wi[0].Edges[0].Vertexes[-1].Point
         wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         return(Wire(wi))
-        
+
     def __getstate__(self):
         return None
 

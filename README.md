@@ -20,6 +20,7 @@ Add
 	-octoid for hobbed bevelgears 
 	-spiral bevelgears
 	-wormwheels
+	-constraints for assembling gears
 
 Extend
 	-Undercut for involute bevelgears
