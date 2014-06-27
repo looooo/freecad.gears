@@ -3,5 +3,6 @@
         <file>icons/gearworkbench.svg</file>
         <file>icons/involutegear.svg</file>
         <file>icons/cycloidegear.svg</file>
+	<file>icons/bevelgear.svg</file>
     </qresource>
 </RCC> 

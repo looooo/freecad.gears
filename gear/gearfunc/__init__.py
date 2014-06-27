@@ -69,7 +69,7 @@ class CreateBevelGear():
         pass
 
     def GetResources(self):
-        return {'Pixmap': 'involutegear.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute gear'}
+        return {'Pixmap': 'bevelgear.svg', 'MenuText': 'bevel gear', 'ToolTip': 'bevel gear'}
 
     def IsActive(self):
         if FreeCAD.ActiveDocument is None:
