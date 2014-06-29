@@ -21,7 +21,8 @@
 
 from __future__ import division
 from numpy import tan, cos, sin, sqrt, arctan, pi, array, linspace, transpose, vstack, ndarray
-from _functions import nearestpts, rotation, reflection, trimfunc, norm
+from _functions import nearestpts, rotation, reflection, trimfunc, norm, translation
+import numpy as np
 
 class involute_tooth():
     def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backslash=0.00):
@@ -36,7 +37,7 @@ class involute_tooth():
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-    	self.alpha_t = arctan(tan(self.alpha) / cos(self.beta))
+        self.alpha_t = arctan(tan(self.alpha) / cos(self.beta))
         self.m = self.m_n / cos(self.beta)
         self.c = self.clearence * self.m_n
         self.midpoint = [0., 0.]
@@ -147,15 +148,50 @@ class involute_tooth():
                 alpha = self.alpha, clearence = self.clearence, shift = self.shift,
                 beta = self.beta, undercut = self.undercut, backslash = self.backslash)
 
+
+class involute_rack(object):
+    def __init__(self, m=5, z=15, alpha=20 * pi / 180., thickness=5):
+        self.alpha = alpha
+        self.thickness = thickness
+        self.m = m
+        self.z = z
+
+    def _update(self):
+        self.__init__(m = self.m, z = self.z, alpha = self.alpha, thickness = self.thickness)
+
+    def points(self, num=10):
+        a = 2 * self.m * tan(self.alpha)
+        b = ((self.m * pi) / 2 - a) / 2
+        tooth= [
+            [self.m, -a - b],
+            [-self.m, -b],
+            [-self.m, b],
+            [self.m, a + b]
+            ]
+        teeth = [tooth]
+        trans = translation([0., self.m * pi, 0.])
+        for i in range(self.z):
+            teeth.append(trans(teeth[-1]))
+        teeth = list(np.vstack(teeth))
+        teeth.append(teeth[-1])
+        teeth[-1][0] += self.thickness
+        teeth.append(teeth[0])
+        teeth[-1][0] += self.thickness
+        teeth.append(teeth[0])
+        return(teeth)
+
+
+
+
+
 if __name__ == "__main__":
-	from matplotlib import pyplot
-	gear = involute_tooth(undercut=True, backslash=0.)
-	x = []
-	y = []
-	for i in gear.points(30):
-		for j in i:
-			x.append(j[0])
-			y.append(j[1])
-	pyplot.plot(x[:-4],y[:-4])
-	pyplot.show()
+    from matplotlib import pyplot
+    gear = involute_rack()
+    x = []
+    y = []
+    for i in gear.points(30):
+        x.append(i[0])
+        y.append(i[1])
+    pyplot.plot(x, y)
+    pyplot.show()
 

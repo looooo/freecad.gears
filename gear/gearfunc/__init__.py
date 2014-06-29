@@ -21,7 +21,7 @@
 
 import FreeCAD
 import FreeCADGui as Gui
-from _Classes import involute_gear, cycloide_gear, bevel_gear
+from _Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rack
 
 
 class CreateInvoluteGear():
@@ -43,6 +43,28 @@ class CreateInvoluteGear():
         a.ViewObject.Proxy = 0.
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
+
+
+class CreateInvoluteRack():
+    def __init__(self):
+        pass
+
+    def GetResources(self):
+        return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute rack'}
+
+    def IsActive(self):
+        if FreeCAD.ActiveDocument is None:
+            return False
+        else:
+            return True
+
+    def Activated(self):
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
+        involute_gear_rack(a)
+        a.ViewObject.Proxy = 0.
+        FreeCAD.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
+
 
 class CreateCycloideGear():
     def __init__(self):

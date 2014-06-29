@@ -21,7 +21,7 @@
 
 from __future__ import division
 import FreeCAD as App
-from _involute_tooth import involute_tooth
+from _involute_tooth import involute_tooth, involute_rack
 from _cycloide_tooth import cycloide_tooth
 from _bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
@@ -118,6 +118,49 @@ class involute_gear():
         else:
             fp.Shape = helicalextrusion(
                 wi, fp.height.Value, fp.height.Value * tan(fp.gear.beta) * 2 / fp.gear.d)
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
+
+
+class involute_gear_rack():
+
+    """FreeCAD gear rack"""
+
+    def __init__(self, obj):
+        self.involute_rack = involute_rack()
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "module", "gear_parameter", "module")
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty(
+            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
+        obj.addProperty(
+            "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
+        obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
+        obj.rack = self.involute_rack
+        obj.teeth = 15
+        obj.module = '1. mm'
+        obj.alpha = '20. deg'
+        obj.height = '5. mm'
+        obj.thickness = '5 mm'
+        self.obj = obj
+        obj.Proxy = self
+
+    def execute(self, fp):
+        fp.rack.m = fp.module.Value
+        fp.rack.z = fp.teeth
+        fp.rack.alpha = fp.alpha.Value * pi / 180.
+        fp.rack.thickness = fp.thickness.Value
+        fp.rack._update()
+        pts = fp.rack.points()
+        pol = Wire(makePolygon(map(fcvec, pts)))
+        fp.Shape = Face(Wire(pol)).extrude(fcvec([0., 0., fp.height]))
 
     def __getstate__(self):
         return None
