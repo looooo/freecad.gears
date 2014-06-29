@@ -1,4 +1,4 @@
-A Geargenerator for freecad
+a gearmodule for freecad
 ---------------------------
 
 * install:
