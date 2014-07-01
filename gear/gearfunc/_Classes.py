@@ -25,7 +25,8 @@ from _involute_tooth import involute_tooth, involute_rack
 from _cycloide_tooth import cycloide_tooth
 from _bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
-    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface
+    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
+     show, makePolygon
 from numpy import pi, cos, sin, tan
 
 import numpy
@@ -292,17 +293,31 @@ class bevel_gear():
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        # w1 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
-        #     fp.gamma.Value * pi / 180) + fp.height.Value / 2, fp.gear.z)
-        # w2 = self.createteeths(pts, fp.m.Value * fp.gear.z / 2 / tan(
-        #     fp.gamma.Value * pi / 180) - fp.height.Value / 2, fp.gear.z)
-        fpts = [map(fcvec, i) for i in pts]
-        l = []
-        for pt in fpts:
-            b = BSplineCurve()
-            b.interpolate(pt)
-            l.append(b)
-        fp.Shape = self.create_tooth()
+        tooth = self.create_tooth()
+        teeth = [tooth]
+        rot = App.Matrix()
+        rot.rotateZ(2  * pi / fp.teeth)
+        top_cap = [i.Edges[0] for i in tooth.Faces]
+        bottom_cap = [i.Edges[3] for i in tooth.Faces]
+        for i in range(fp.teeth - 1): 
+            new_tooth = teeth[-1].transformGeometry(rot)
+            edge1 = new_tooth.Faces[0].Edges[2]
+            edge2 = teeth[-1].Faces[-1].Edges[1]
+            face1 = make_face(edge1, edge2)
+            teeth.append(face1)
+            teeth.append(new_tooth)
+            top_cap.append(face1.Edges[3])
+            bottom_cap.append(face1.Edges[1])
+            top_cap += [i.Edges[0] for i in new_tooth.Faces]
+            bottom_cap += [i.Edges[3] for i in new_tooth.Faces]
+        edge1 = teeth[0].Faces[0].Edges[2]
+        edge2 = teeth[-1].Faces[-1].Edges[1]
+        face1 = make_face(edge1, edge2)
+        teeth.append(face1)
+        top_cap.append(face1.Edges[3])
+        bottom_cap.append(face1.Edges[1])
+        fp.Shape = Solid(Shell(Compound(teeth).Faces + [Face(Wire(top_cap)), Face(Wire(bottom_cap))]))
+
 
     def create_tooth(self):
         w = []
@@ -390,3 +405,10 @@ def helicalextrusion(wire, height, angle):
         solid.reverse()
     assert(solid.Volume >= 0)
     return(solid)
+
+def make_face(edge1, edge2):
+    v1, v2 = edge1.Vertexes
+    v3, v4 = edge2.Vertexes
+    pol = makePolygon([v1.Point, v2.Point, v4.Point, v3.Point, v1.Point])
+    return(Face(pol))
+

@@ -50,7 +50,7 @@ class CreateInvoluteRack():
         pass
 
     def GetResources(self):
-        return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute rack'}
+        return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute rack', 'ToolTip': 'involute rack'}
 
     def IsActive(self):
         if FreeCAD.ActiveDocument is None:
@@ -59,7 +59,7 @@ class CreateInvoluteRack():
             return True
 
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_rack")
         involute_gear_rack(a)
         a.ViewObject.Proxy = 0.
         FreeCAD.ActiveDocument.recompute()

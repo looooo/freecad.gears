@@ -173,9 +173,9 @@ class involute_rack(object):
         for i in range(self.z):
             teeth.append(trans(teeth[-1]))
         teeth = list(np.vstack(teeth))
-        teeth.append(teeth[-1])
+        teeth.append(list(teeth[-1]))
         teeth[-1][0] += self.thickness
-        teeth.append(teeth[0])
+        teeth.append(list(teeth[0]))
         teeth[-1][0] += self.thickness
         teeth.append(teeth[0])
         return(teeth)
