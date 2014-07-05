@@ -25,6 +25,7 @@ from _Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rac
 
 
 class CreateInvoluteGear():
+    """create an involute gear"""
     def __init__(self):
         pass
 

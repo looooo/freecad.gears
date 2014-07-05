@@ -26,7 +26,8 @@ from _cycloide_tooth import cycloide_tooth
 from _bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
-     show, makePolygon
+     show, makePolygon, makeLoft
+from _functions import rotation3D
 from numpy import pi, cos, sin, tan
 
 import numpy
@@ -319,6 +320,22 @@ class bevel_gear():
         fp.Shape = Solid(Shell(Compound(teeth).Faces + [Face(Wire(top_cap)), Face(Wire(bottom_cap))]))
 
 
+    def execute1(self, fp):
+        fp.gear.z = fp.teeth
+        fp.gear.module = fp.m.Value
+        fp.gear.alpha = fp.alpha.Value * pi / 180.
+        fp.gear.gamma = fp.gamma.Value * pi / 180
+        fp.gear.backlash = fp.backlash.Value
+        fp.gear._update()
+        pts = fp.gear.points(num=fp.numpoints)
+        pos1 = fp.gear.module * fp.gear.z / 2 / tan(
+            fp.gear.gamma * pi) - fp.height.Value / 2
+        pos2 = fp.gear.module * fp.gear.z / 2 / tan(
+            fp.gear.gamma * pi) + fp.height.Value / 2
+        # fp.Shape = makeLoft([self.createteeths(pts, pos1, fp.teeth), self.createteeths(pts, pos2, fp.teeth)])
+        fp.Shape = self.createteeths(pts, pos1, fp.teeth)
+
+
     def create_tooth(self):
         w = []
         scal1 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
@@ -327,7 +344,7 @@ class bevel_gear():
             self.obj.gamma.Value * pi / 180) + self.obj.height.Value / 2
         s = [scal1, scal2]
         pts = self.obj.gear.points(num=self.obj.numpoints)
-        for pos in s:
+        for j, pos in enumerate(s):
             w1 = []
             scale = lambda x: fcvec(x * pos)
             for i in pts:
@@ -352,7 +369,7 @@ class bevel_gear():
             w1.append(out)
         s = Wire(Shape(w1).Edges)
         wi = []
-        for i in range(teeth):
+        for i in range(teeth - 1):
             rot = App.Matrix()
             rot.rotateZ(2 * i * pi / teeth)
             tooth_rot = s.transformGeometry(rot)
@@ -409,6 +426,10 @@ def helicalextrusion(wire, height, angle):
 def make_face(edge1, edge2):
     v1, v2 = edge1.Vertexes
     v3, v4 = edge2.Vertexes
-    pol = makePolygon([v1.Point, v2.Point, v4.Point, v3.Point, v1.Point])
-    return(Face(pol))
+    e1 = Wire(edge1)
+    e2 = Line(v1.Point, v3.Point).toShape().Edges[0]
+    e3 = edge2
+    e4 = Line(v4.Point, v2.Point).toShape().Edges[0]
+    w = Wire([e3, e4, e1, e2])
+    return(Face(w))
 
