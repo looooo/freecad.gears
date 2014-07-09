@@ -26,7 +26,7 @@ from _cycloide_tooth import cycloide_tooth
 from _bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
-     show, makePolygon, makeLoft
+     show, makePolygon, makeLoft, makeHelix
 from _functions import rotation3D
 from numpy import pi, cos, sin, tan
 
@@ -237,10 +237,11 @@ class cycloide_gear():
         pt_1 = wi[0].Edges[0].Vertexes[-1].Point
         wi.append(Wire([Line(pt_0, pt_1).toShape()]))
         wi = Wire(wi)
-        if fp.beta == 0:
+        if fp.beta.Value == 0:
             sh = Face(wi)
             fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
         else:
+            pass
             fp.Shape = helicalextrusion(
                 wi, fp.height.Value, fp.height.Value * tan(fp.beta.Value * pi / 180) * 2 / fp.gear.d)
 
@@ -317,7 +318,11 @@ class bevel_gear():
         teeth.append(face1)
         top_cap.append(face1.Edges[3])
         bottom_cap.append(face1.Edges[1])
-        fp.Shape = Solid(Shell(Compound(teeth).Faces + [Face(Wire(top_cap)), Face(Wire(bottom_cap))]))
+        top_cap = Face(Wire(top_cap))
+        bottom_cap = Face(Wire(bottom_cap))
+        fcs = Compound(teeth).Faces
+        top_cap.reverse()
+        fp.Shape = Solid(Shell(fcs + [top_cap, bottom_cap]))
 
 
     def execute1(self, fp):
@@ -397,16 +402,8 @@ def helicalextrusion(wire, height, angle):
     face_transform.rotateZ(angle)
     face_transform.move(App.Vector(0, 0, height))
     face_b . transformShape(face_transform)
-    step = 2 + int(angle / pi * 4)
-    angleinc = angle / (step - 1)
-    zinc = height / (step - 1)
-    spine = makePolygon([(0, 0, i * zinc) for i in range(step)])
-    auxspine = makePolygon(
-        [
-            (cos(i * angleinc),
-             sin(i * angleinc),
-             i * height / (step - 1))for i in range(step)
-        ])
+    spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
+    auxspine = makeHelix(height * 2 * pi / angle, height, 1.)
     faces = [face_a, face_b]
     pipeshell = BRepOffsetAPI.MakePipeShell(spine)
     pipeshell.setSpineSupport(spine)
