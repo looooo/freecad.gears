@@ -27,11 +27,13 @@ from _functions import rotation3D, reflection3D
 
 
 class bevel_tooth(object):
-    def __init__(self, alpha = 70 * pi / 180, gamma = pi / 4 , z = 21, backslash = 0.00, module = 0.25):
+    def __init__(self, alpha=70 * pi / 180, gamma=pi / 4, clearence=0.1,
+                 z=21, backlash=0.00, module=0.25):
         self.alpha = alpha
         self.gamma = gamma
         self.z = z
-        self.backslash = backslash
+        self.clearence = clearence
+        self.backlash = backlash
         self.module = module
 
         self.involute_end = arccos(
@@ -54,7 +56,7 @@ class bevel_tooth(object):
         self.involute_start = -pi/2. + \
             arctan(1/tan(self.gamma)*1/cos(self.alpha))
         self.involute_start_radius = self.getradius(self.involute_start)
-        self.r_f = sin(self.gamma - sin(gamma) * 2 / self.z)
+        self.r_f = sin(self.gamma - sin(gamma) * 2 / self.z) - self.clearence * sin(self.gamma)
         self.z_f = cos(self.gamma - sin(gamma) * 2 / self.z)
         self.add_foot = True
 
@@ -108,7 +110,6 @@ class bevel_tooth(object):
         ry = y(s)
         return(sqrt(rx**2 + ry**2))
 
-
     def involute_points(self, num=10):
         pts = linspace(self.involute_start, self.involute_end, num=num)
         fx = self.involute_function_x()
@@ -119,13 +120,13 @@ class bevel_tooth(object):
         z = array(map(fz, pts))
         xyz = transpose(array([x, y,z]))
         if self.add_foot:
-            p = xyz[1]
+            p = xyz[0]
             p1 =map(lambda x: x * (self.r_f / sqrt(p[0]**2 + p[1]**2)), p)
             p1[2] = self.z_f
             xyz=vstack([[p1], xyz])
         xy = [[i[0]/i[2],i[1]/i[2],1.] for i in xyz]
-        backslash_rot = rotation3D(self.backslash / 4)
-        xy = backslash_rot(xy)
+        backlash_rot = rotation3D(self.backlash / 4)
+        xy = backlash_rot(xy)
         return(xy)
 
     def points(self, num=10):
@@ -148,9 +149,10 @@ class bevel_tooth(object):
         else:
             return(array([pts,[pts[-1],pts1[0]], pts1]))
 
+
     def _update(self):
-        self.__init__(z = self.z,
-                alpha = self.alpha,  gamma = self.gamma, backslash = self.backslash, module = self.module)
+        self.__init__(z = self.z, clearence = self.clearence,
+                alpha = self.alpha,  gamma = self.gamma, backlash = self.backlash, module = self.module)
 
 
 if __name__ == "__main__":

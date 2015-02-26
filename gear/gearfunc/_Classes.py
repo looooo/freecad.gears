@@ -71,10 +71,10 @@ class involute_gear():
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
         obj.gear = self.involute_tooth
-        obj.simple = True
+        obj.simple = False
+        obj.undercut = False
         obj.teeth = 15
         obj.module = '1. mm'
-        obj.undercut = True
         obj.shift = 0.
         obj.alpha = '20. deg'
         obj.beta = '0. deg'
@@ -282,7 +282,7 @@ class bevel_gear():
             "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
         obj.addProperty("App::PropertyLength", "m", "gear_parameter", "m")
         obj.addProperty(
-            "App::PropertyLength", "c", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
@@ -296,14 +296,15 @@ class bevel_gear():
         obj.height = '5. mm'
         obj.numpoints = 6
         obj.backlash = '0.00 mm'
+        obj.clearence = 0.1
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
+    def execute1(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.alpha = fp.alpha.Value * pi / 180.
         fp.gear.gamma = fp.gamma.Value * pi / 180
-        fp.gear.backlash = fp.backlash.Value
+        fp.gear.backlash = fp.backlash
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         tooth = self.create_tooth()
@@ -336,20 +337,21 @@ class bevel_gear():
         fp.Shape = Solid(Shell(fcs + [top_cap, bottom_cap]))
 
 
-    def execute1(self, fp):
+    def execute(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.module = fp.m.Value
         fp.gear.alpha = fp.alpha.Value * pi / 180.
         fp.gear.gamma = fp.gamma.Value * pi / 180
         fp.gear.backlash = fp.backlash.Value
+        fp.gear.clearence = fp.clearence
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        pos1 = fp.gear.module * fp.gear.z / 2 / tan(
-            fp.gear.gamma * pi) - fp.height.Value / 2
-        pos2 = fp.gear.module * fp.gear.z / 2 / tan(
-            fp.gear.gamma * pi) + fp.height.Value / 2
-        # fp.Shape = makeLoft([self.createteeths(pts, pos1, fp.teeth), self.createteeths(pts, pos2, fp.teeth)])
-        fp.Shape = self.createteeths(pts, pos1, fp.teeth)
+        scal1 = fp.m.Value * fp.gear.z / 2 / tan(
+            fp.gamma.Value * pi / 180) - fp.height.Value / 2
+        scal2 = fp.m.Value * fp.gear.z / 2 / tan(
+            fp.gamma.Value * pi / 180) + fp.height.Value / 2
+        fp.Shape = makeLoft([self.createteeths(pts, scal1, fp.teeth), self.createteeths(pts, scal2, fp.teeth)], True)
+        # fp.Shape = self.createteeths(pts, pos1, fp.teeth)
 
 
     def create_tooth(self):
@@ -385,7 +387,7 @@ class bevel_gear():
             w1.append(out)
         s = Wire(Shape(w1).Edges)
         wi = []
-        for i in range(teeth - 1):
+        for i in range(teeth):
             rot = App.Matrix()
             rot.rotateZ(2 * i * pi / teeth)
             tooth_rot = s.transformGeometry(rot)

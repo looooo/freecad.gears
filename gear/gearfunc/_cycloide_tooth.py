@@ -25,11 +25,11 @@ from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
 from _functions import rotation, reflection
 
 class cycloide_tooth():
-    def __init__(self, z1 = 5, z2 = 5, z = 14, m = 5, clearence = 0.12, backslash = 0.00):
+    def __init__(self, z1 = 5, z2 = 5, z = 14, m = 5, clearence = 0.12, backlash = 0.00):
         self.m = m
         self.z = z
         self.clearence = clearence
-        self.backslash = backslash
+        self.backlash = backlash
         self.z1 = z1
         self.z2 = z2
         self._calc_gear_factors()
@@ -37,11 +37,10 @@ class cycloide_tooth():
     def _calc_gear_factors(self):
     	self.d1 = self.z1 * self.m
         self.d2 = self.z2 * self.m
-        self.c = self.clearence * self.m
         self.phi = self.m * pi
         self.d = self.z * self.m
         self.da = self.d + 2*self.m
-        self.di = self.d - 2*self.m - self.c
+        self.di = self.d - 2*self.m - self.clearence * self.m
         self.phipart = 2 * pi / self.z
 
     def epicycloide_x(self):
@@ -95,7 +94,7 @@ class cycloide_tooth():
         pts_outer = transpose([pts_outer_x, pts_outer_y])
         pts_inner = transpose([pts_inner_x, pts_inner_y])
         pts1 = vstack([pts_inner[:-2],pts_outer])
-        rot =rotation(self.phipart / 4 - self.backslash)
+        rot =rotation(self.phipart / 4 - self.backlash)
         pts1 = rot(pts1)
         ref = reflection(0.)
         pts2 = ref(pts1)[::-1]
@@ -104,7 +103,7 @@ class cycloide_tooth():
 
     def _update(self):
         self.__init__(m = self.m, z = self.z, z1 = self.z1, z2 = self.z2,
-                      clearence = self.clearence, backslash = self.backslash)
+                      clearence = self.clearence, backlash = self.backlash)
 
 if __name__ == "__main__":
 	from matplotlib import pyplot

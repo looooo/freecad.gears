@@ -25,7 +25,7 @@ from _functions import nearestpts, rotation, reflection, trimfunc, norm, transla
 import numpy as np
 
 class involute_tooth():
-    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backslash=0.00):
+    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backlash=0.00):
         self.alpha = alpha
         self.beta = beta
         self.m_n = m
@@ -33,7 +33,7 @@ class involute_tooth():
         self.undercut = undercut
         self.shift = shift
         self.clearence = clearence
-        self.backslash = backslash
+        self.backlash = backlash
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
@@ -73,7 +73,7 @@ class involute_tooth():
         y = array(map(fy, pts))
         xy = transpose([x, y])
         rotate = rotation(
-            self.undercut_rot + self.phipart / 2 - self.backslash / 4)
+            self.undercut_rot + self.phipart / 2 - self.backlash / 4)
         xy = rotate(xy)
         return(array(xy))
 
@@ -83,7 +83,7 @@ class involute_tooth():
         x = array(map(fx, pts))
         fy = self.involute_function_y()
         y = array(map(fy, pts))
-        rot = rotation(self.involute_rot - self.backslash / 4)
+        rot = rotation(self.involute_rot - self.backlash / 4)
         xy = rot(transpose(array([x, y])))
         return(xy)
 
@@ -146,7 +146,7 @@ class involute_tooth():
     def _update(self):
         self.__init__(m = self.m_n, z = self.z,
                 alpha = self.alpha, clearence = self.clearence, shift = self.shift,
-                beta = self.beta, undercut = self.undercut, backslash = self.backslash)
+                beta = self.beta, undercut = self.undercut, backlash = self.backlash)
 
 
 class involute_rack(object):
