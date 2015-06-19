@@ -20,7 +20,7 @@
 
 import FreeCAD as App
 import FreeCADGui as Gui
-from gear.gearfunc._Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rack
+from freecad_gear.gearfunc._Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rack
 
 
 def createInvoluteGear(*args):
