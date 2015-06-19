@@ -18,37 +18,35 @@
 #*                                                                         *
 #***************************************************************************
 
+import FreeCAD as App
 import FreeCADGui as Gui
-import FreeCAD
-import gear_rc
+from gear.gearfunc._Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rack
 
 
-class gearWorkbench(Workbench):
-    """glider workbench"""
-    MenuText = "gear"
-    ToolTip = "gear workbench"
-    Icon = "gearworkbench.svg"
+def createInvoluteGear(*args):
+    a = App.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
+    involute_gear(a)
+    a.ViewObject.Proxy = 0.
+    App.ActiveDocument.recompute()
+    Gui.SendMsgToActiveView("ViewFit")
 
-    def GetClassName(self):
-        return "Gui::PythonWorkbench"
+def createInvoluteRack(*args):
+    a = App.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
+    involute_gear_rack(a)
+    a.ViewObject.Proxy = 0.
+    App.ActiveDocument.recompute()
+    Gui.SendMsgToActiveView("ViewFit")
 
-    def Initialize(self):
+def createBevelGear(*args):
+    a = App.ActiveDocument.addObject("Part::FeaturePython", "bevel_gear")
+    bevel_gear(a)
+    a.ViewObject.Proxy = 0.
+    App.ActiveDocument.recompute()
+    Gui.SendMsgToActiveView("ViewFit")
 
-        from gearfunc import CreateCycloideGear, CreateInvoluteGear, CreateBevelGear, CreateInvoluteRack
-
-        self.appendToolbar("Gear", ["CreateInvoluteGear", "CreateInvoluteRack", "CreateCycloideGear", "CreateBevelGear"])
-        self.appendMenu("Gear", ["CreateInvoluteGear", "CreateInvoluteRack", "CreateCycloideGear","CreateBevelGear"])
-        Gui.addIconPath(FreeCAD.getHomePath()+"Mod/gear/icons/")
-        Gui.addCommand('CreateInvoluteGear', CreateInvoluteGear())
-        Gui.addCommand('CreateCycloideGear', CreateCycloideGear())
-        Gui.addCommand('CreateBevelGear', CreateBevelGear())
-        Gui.addCommand('CreateInvoluteRack', CreateInvoluteRack())
-
-    def Activated(self):
-        pass
-
-
-    def Deactivated(self):
-        pass
-
-Gui.addWorkbench(gearWorkbench())
+def createCycloidGear(*args):
+    a = App.ActiveDocument.addObject("Part::FeaturePython", "cycloide_gear")
+    cycloide_gear(a)
+    a.ViewObject.Proxy = 0.
+    App.ActiveDocument.recompute()
+    Gui.SendMsgToActiveView("ViewFit")
