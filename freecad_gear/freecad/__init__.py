@@ -20,7 +20,7 @@
 
 
 import os
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 freecad_found = True
 
@@ -37,8 +37,22 @@ if freecad_found:
             createCycloidGear, createBevelGear, createInvoluteRack)
 
 
+class gearToolBox(object):
+    def __init__(self):
+        mw = Gui.getMainWindow()     
+        [
+            self.involuteGearAction,
+            self.involuteRackAction,
+            self.bevelGearAction,
+            self.cycloidGearAction] = [None, None, None, None]
+        self.add_gear_wb()
+        mw.workbenchActivated.connect(self.add_gear_wb)
+        timer = mw.findChild(QtCore.QTimer)
+        timer.connect(timer, QtCore.SIGNAL("timeout()"), self.checkDocument)
 
-    def add_gear_wb(*args):
+
+
+    def add_gear_wb(self, *args):
         print("Workbench_changed")
         try:
             wb = Gui.activeWorkbench()
@@ -60,30 +74,41 @@ if freecad_found:
 
             # create commands
             icon = QtGui.QIcon(this_path + "/Resources/icons/involutegear.svg")
-            involuteGearAction = QtGui.QAction(icon, "involute gear", App.gear.gear_toolbar)
-            involuteGearAction.setObjectName("GearToolbar")
-            involuteGearAction.triggered.connect(createInvoluteGear)
+            self.involuteGearAction = QtGui.QAction(icon, "involute gear", App.gear.gear_toolbar)
+            self.involuteGearAction.setObjectName("GearToolbar")
+            self.involuteGearAction.triggered.connect(createInvoluteGear)
 
             icon = QtGui.QIcon(this_path + "/Resources/icons/involuterack.svg")
-            involuteRackAction = QtGui.QAction(icon, "involute rack", App.gear.gear_toolbar)
-            involuteRackAction.setObjectName("GearToolbar")
-            involuteRackAction.triggered.connect(createInvoluteRack)
+            self.involuteRackAction = QtGui.QAction(icon, "involute rack", App.gear.gear_toolbar)
+            self.involuteRackAction.setObjectName("GearToolbar")
+            self.involuteRackAction.triggered.connect(createInvoluteRack)
 
             icon = QtGui.QIcon(this_path + "/Resources/icons/cycloidegear.svg")
-            cycloidGearAction = QtGui.QAction(icon, "cycloid gear", App.gear.gear_toolbar)
-            cycloidGearAction.setObjectName("GearToolbar")
-            cycloidGearAction.triggered.connect(createCycloidGear)
+            self.cycloidGearAction = QtGui.QAction(icon, "cycloid gear", App.gear.gear_toolbar)
+            self.cycloidGearAction.setObjectName("GearToolbar")
+            self.cycloidGearAction.triggered.connect(createCycloidGear)
 
             icon = QtGui.QIcon(this_path + "/Resources/icons/bevelgear.svg")
-            bevelGearAction = QtGui.QAction(icon, "bevel gear", App.gear.gear_toolbar)
-            bevelGearAction.setObjectName("GearToolbar")
-            bevelGearAction.triggered.connect(createBevelGear)
+            self.bevelGearAction = QtGui.QAction(icon, "bevel gear", App.gear.gear_toolbar)
+            self.bevelGearAction.setObjectName("GearToolbar")
+            self.bevelGearAction.triggered.connect(createBevelGear)
+            temp1 = App.gear.gear_toolbar.addAction(self.involuteGearAction)
+            temp2 = App.gear.gear_toolbar.addAction(self.involuteRackAction)
+            temp3 = App.gear.gear_toolbar.addAction(self.cycloidGearAction)
+            temp4 = App.gear.gear_toolbar.addAction(self.bevelGearAction)
+            
+            self.checkDocument()
 
-            temp1 = App.gear.gear_toolbar.addAction(involuteGearAction)
-            temp2 = App.gear.gear_toolbar.addAction(involuteRackAction)
-            temp3 = App.gear.gear_toolbar.addAction(cycloidGearAction)
-            temp4 = App.gear.gear_toolbar.addAction(bevelGearAction)
+    def checkDocument(self, *args):
+        print("hello")
+        enable = False
+        if App.ActiveDocument:
+            enable = True
+            print(App.ActiveDocument)
+        for action in [self.involuteGearAction, self.involuteRackAction,
+                       self.bevelGearAction, self.cycloidGearAction]:
+            if action:
+                action.setEnabled(enable)
 
-    mw = Gui.getMainWindow()
-    add_gear_wb()
-    mw.workbenchActivated.connect(add_gear_wb)
+if freecad_found:
+    a = gearToolBox()
