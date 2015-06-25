@@ -47,7 +47,7 @@ class gearToolBox(object):
             self.cycloidGearAction] = [None, None, None, None]
         self.add_gear_wb()
         mw.workbenchActivated.connect(self.add_gear_wb)
-        timer = mw.findChild(QtCore.QTimer)
+        timer = mw.findChild(QtCore.QTimer, "activityTimer")
         timer.connect(timer, QtCore.SIGNAL("timeout()"), self.checkDocument)
 
 
@@ -64,6 +64,11 @@ class gearToolBox(object):
             mainWindow = Gui.getMainWindow()
 
             # add the module to Freecad
+            try:
+                if App.gear.gear_toolbar:
+                    App.gear.gear_toolbar.show()
+            except:
+                pass
             App.gear = gear
 
             # create toolbar
