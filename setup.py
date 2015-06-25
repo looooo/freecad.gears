@@ -6,7 +6,7 @@ from distutils.core import setup
 setup(
     name = 'freecad_gear',
     packages = ['freecad_gear'],
-    version = '0.1',
+    version = '0.2',
     description = 'Some gears for freecad',
     author = 'Lorenz L',
     author_email = 'sppedflyer@gmail.com',
