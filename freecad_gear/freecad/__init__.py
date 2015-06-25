@@ -105,11 +105,9 @@ class gearToolBox(object):
             self.checkDocument()
 
     def checkDocument(self, *args):
-        print("hello")
         enable = False
         if App.ActiveDocument:
             enable = True
-            print(App.ActiveDocument)
         for action in [self.involuteGearAction, self.involuteRackAction,
                        self.bevelGearAction, self.cycloidGearAction]:
             if action:
