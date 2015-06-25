@@ -1,2 +1,0 @@
-include AUTHORS CHANGES README INSTALL LICENCE
-recursive-include freecad_gear *.py
