@@ -26,6 +26,7 @@ freecad_found = True
 
 try:
     import FreeCADGui as Gui
+    import Part
     import FreeCAD as App
 except ImportError:
     freecad_found = False
@@ -44,7 +45,9 @@ class gearToolBox(object):
             self.involuteGearAction,
             self.involuteRackAction,
             self.bevelGearAction,
-            self.cycloidGearAction] = [None, None, None, None]
+            self.cycloidGearAction,
+            self.dropdown_action] = [None, None, None, None, None]
+        self.defaultAction = createInvoluteGear
         self.add_gear_wb()
         mw.workbenchActivated.connect(self.add_gear_wb)
         timer = mw.findChild(QtCore.QTimer, "activityTimer")
@@ -65,51 +68,74 @@ class gearToolBox(object):
 
             # add the module to Freecad
             try:
-                if App.gear.gear_toolbar:
-                    App.gear.gear_toolbar.show()
+                if Gui.gear.gear_toolbar:
+                    Gui.gear.gear_toolbar.show()
             except:
                 pass
-            App.gear = gear
+            Gui.gear = gear.__class__("gear")
+            print(type(gear))
 
             # create toolbar
-            App.gear.gear_toolbar = mainWindow.addToolBar("Part: GearToolbar")
-            App.gear.gear_toolbar.setObjectName("GearToolbar")
+            Gui.gear.gear_toolbar = mainWindow.addToolBar("Part: GearToolbar")
+            Gui.gear.gear_toolbar.setObjectName("GearToolbar")
 
             this_path = os.path.dirname(os.path.realpath(__file__))
 
+
+
+            self.dropdown = QtGui.QMenu("gear_menu", Gui.gear.gear_toolbar)
+
             # create commands
             icon = QtGui.QIcon(this_path + "/icons/involutegear.svg")
-            self.involuteGearAction = QtGui.QAction(icon, "involute gear", App.gear.gear_toolbar)
+            self.involuteGearAction = QtGui.QAction(icon, "involute gear", self.dropdown)
             self.involuteGearAction.setObjectName("GearToolbar")
-            self.involuteGearAction.triggered.connect(createInvoluteGear)
+            self.involuteGearAction.triggered.connect(
+                self.set_default_action(self.involuteGearAction, createInvoluteGear))
 
             icon = QtGui.QIcon(this_path + "/icons/involuterack.svg")
-            self.involuteRackAction = QtGui.QAction(icon, "involute rack", App.gear.gear_toolbar)
-            self.involuteRackAction.setObjectName("GearToolbar")
-            self.involuteRackAction.triggered.connect(createInvoluteRack)
+            self.involuteRackAction = QtGui.QAction(icon, "involute rack", self.dropdown)
+            self.involuteRackAction.setObjectName("GearToolbar")            
+            self.involuteRackAction.triggered.connect(
+                self.set_default_action(self.involuteRackAction, createInvoluteRack))
 
             icon = QtGui.QIcon(this_path + "/icons/cycloidegear.svg")
-            self.cycloidGearAction = QtGui.QAction(icon, "cycloid gear", App.gear.gear_toolbar)
+            self.cycloidGearAction = QtGui.QAction(icon, "cycloid gear", self.dropdown)
             self.cycloidGearAction.setObjectName("GearToolbar")
-            self.cycloidGearAction.triggered.connect(createCycloidGear)
+            self.cycloidGearAction.triggered.connect(
+                self.set_default_action(self.cycloidGearAction, createCycloidGear))
 
             icon = QtGui.QIcon(this_path + "/icons/bevelgear.svg")
-            self.bevelGearAction = QtGui.QAction(icon, "bevel gear", App.gear.gear_toolbar)
+            self.bevelGearAction = QtGui.QAction(icon, "bevel gear", self.dropdown)
             self.bevelGearAction.setObjectName("GearToolbar")
-            self.bevelGearAction.triggered.connect(createBevelGear)
-            temp1 = App.gear.gear_toolbar.addAction(self.involuteGearAction)
-            temp2 = App.gear.gear_toolbar.addAction(self.involuteRackAction)
-            temp3 = App.gear.gear_toolbar.addAction(self.cycloidGearAction)
-            temp4 = App.gear.gear_toolbar.addAction(self.bevelGearAction)
-            
+            self.bevelGearAction.triggered.connect(
+                self.set_default_action(self.bevelGearAction, createBevelGear))
+
+
+            temp1 = self.dropdown.addAction(self.involuteGearAction)
+            temp2 = self.dropdown.addAction(self.involuteRackAction)
+            temp3 = self.dropdown.addAction(self.cycloidGearAction)
+            temp4 = self.dropdown.addAction(self.bevelGearAction)
+
+            self.dropdown.setIcon(self.involuteGearAction.icon())
+            temp5 = Gui.gear.gear_toolbar.addAction(self.dropdown.menuAction())
             self.checkDocument()
+
+            self.defaultCommand = createInvoluteGear
+            self.dropdown.menuAction().triggered.connect(self.defaultCommand)
+
+    def set_default_action(self, action, command):
+        def cb(*args):
+            self.dropdown.setIcon(action.icon())
+            self.defaultCommand = command
+            command()
+        return cb
 
     def checkDocument(self, *args):
         enable = False
         if App.ActiveDocument:
             enable = True
         for action in [self.involuteGearAction, self.involuteRackAction,
-                       self.bevelGearAction, self.cycloidGearAction]:
+                       self.bevelGearAction, self.cycloidGearAction, self.dropdown.menuAction()]:
             if action:
                 action.setEnabled(enable)
 
