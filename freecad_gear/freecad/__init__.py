@@ -78,22 +78,22 @@ class gearToolBox(object):
             this_path = os.path.dirname(os.path.realpath(__file__))
 
             # create commands
-            icon = QtGui.QIcon(this_path + "/Resources/icons/involutegear.svg")
+            icon = QtGui.QIcon(this_path + "/icons/involutegear.svg")
             self.involuteGearAction = QtGui.QAction(icon, "involute gear", App.gear.gear_toolbar)
             self.involuteGearAction.setObjectName("GearToolbar")
             self.involuteGearAction.triggered.connect(createInvoluteGear)
 
-            icon = QtGui.QIcon(this_path + "/Resources/icons/involuterack.svg")
+            icon = QtGui.QIcon(this_path + "/icons/involuterack.svg")
             self.involuteRackAction = QtGui.QAction(icon, "involute rack", App.gear.gear_toolbar)
             self.involuteRackAction.setObjectName("GearToolbar")
             self.involuteRackAction.triggered.connect(createInvoluteRack)
 
-            icon = QtGui.QIcon(this_path + "/Resources/icons/cycloidegear.svg")
+            icon = QtGui.QIcon(this_path + "/icons/cycloidegear.svg")
             self.cycloidGearAction = QtGui.QAction(icon, "cycloid gear", App.gear.gear_toolbar)
             self.cycloidGearAction.setObjectName("GearToolbar")
             self.cycloidGearAction.triggered.connect(createCycloidGear)
 
-            icon = QtGui.QIcon(this_path + "/Resources/icons/bevelgear.svg")
+            icon = QtGui.QIcon(this_path + "/icons/bevelgear.svg")
             self.bevelGearAction = QtGui.QAction(icon, "bevel gear", App.gear.gear_toolbar)
             self.bevelGearAction.setObjectName("GearToolbar")
             self.bevelGearAction.triggered.connect(createBevelGear)
