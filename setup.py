@@ -6,12 +6,7 @@ from setuptools import setup, find_packages
 setup(
     name = 'freecad_gear',
     version = '0.2.6',
-    packages = [
-        "freecad_gear",
-        "freecad_gear/freecad/",
-        "freecad_gear/gearfunc/",
-        "freecad_gear/freecad/icons/"],
-    package_data={'freecad_gear.freecad.icons': ['*']},     # All files from folder A
+    packages = ["freecad_gear", "freecad_gear/freecad/", "freecad_gear/gearfunc/"],
     include_package_data=True,
     description = 'Some gears for freecad',
     author = 'Lorenz L',
