@@ -22,6 +22,7 @@
 from __future__ import division
 from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
 from numpy.linalg import solve
+import numpy as np
 
 
 def reflection(alpha):
@@ -42,7 +43,8 @@ def reflection3D(alpha):
     return(func)
 
 
-def rotation(alpha, midpoint=[0, 0]):
+def rotation(alpha, midpoint=None):
+    midpoint = midpoint or [0, 0]
     mat = array([[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
@@ -98,8 +100,8 @@ def trim(p1, p2, p3, p4):
         return(p2)
     try:
         g, h = solve(transpose([-a2 + a1, a4 - a3]), a1 - a3)
-    except:
-        print(Exception)
+    except Exception as e:
+        print(e)
         return(False)
     else:
         if 0. < g < 1. and 0. < h < 1.:
@@ -136,10 +138,7 @@ def trimfunc(l1, l2):
 
 def norm(vec1, vec2):
     vec = array(vec2) - array(vec1)
-    out = 0
-    for i in vec:
-        out += i ** 2
-    return(sqrt(out))
+    return np.linalg.norm(vec)
 
 
 def nearestpts(evolv, underc):
@@ -160,3 +159,16 @@ def nearestpts(evolv, underc):
             jk += 1
         ik += 1
     return([vstack([underc[:jout], evolv[iout]]), evolv[iout:]])
+
+
+
+def intersection_line_circle(p1, p2, r):
+    """return the intersection point of a line from p1 to p2 and a sphere of radius 1 and 
+    midpoint 0,0,0"""
+    d = p2 - p1
+    d /= np.linalg.norm(d)
+    p_half = d.dot(p1)
+    q = p1.dot(p1) - r ** 2
+    t = -p_half + sqrt(p_half ** 2 - q)
+    print(t)
+    return p1 + d * t

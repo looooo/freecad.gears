@@ -129,6 +129,8 @@ class bevel_tooth(object):
             print(i)
             if point.dot(point) >= r_cut ** 2:
                 break;
+        if i > 0:
+            self.add_foot = False
         intersection_point = intersection_line_circle(xy[i], point, r_cut)
         print(intersection_point, xy[i], point)
         xy = array([intersection_point] + list(xy[i+1:]))
@@ -156,7 +158,7 @@ class bevel_tooth(object):
             return(array([pts,[pts[-1],pts1[0]], pts1]))
 
 
-    def update(self):
+    def _update(self):
         self.__init__(z = self.z, clearence = self.clearence,
                 alpha = self.alpha,  gamma = self.gamma, backlash = self.backlash, module = self.module)
 
