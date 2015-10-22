@@ -22,7 +22,8 @@
 from __future__ import division
 from __future__ import division
 from numpy import cos, sin, tan, arccos, arctan, pi, array, linspace, transpose, vstack, sqrt
-from _functions import rotation3D, reflection3D
+import numpy as np
+from _functions import rotation3D, reflection3D, intersection_line_circle
 
 
 
@@ -53,33 +54,32 @@ class bevel_tooth(object):
             4.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z)))*sin(2.*self.gamma))/(-6. - 2.*cos(2.*self.alpha) +
             cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)))**2))
 
-        self.involute_start = -pi/2. + \
-            arctan(1/tan(self.gamma)*1/cos(self.alpha))
-        self.involute_start_radius = self.getradius(self.involute_start)
+        self.involute_start = -pi/2. + arctan(1/tan(self.gamma)*1/cos(self.alpha))
+        self.involute_start_radius = self.get_radius(self.involute_start)
         self.r_f = sin(self.gamma - sin(gamma) * 2 / self.z) - self.clearence * sin(self.gamma)
         self.z_f = cos(self.gamma - sin(gamma) * 2 / self.z)
         self.add_foot = True
 
-        if self.involute_start_radius < self.r_f:
-            self.add_foot = False
-            self.involute_start = -arccos(
-                sqrt((42 + 16*cos(2*self.alpha) + 6*cos(4*self.alpha) -
-                4*cos(4*self.alpha - 2*self.gamma) - 8*cos(2*(self.alpha - self.gamma)) +
-                cos(4*(self.alpha - self.gamma)) + 24*cos(2*self.gamma) - 2*cos(4*self.gamma) -
-                8*cos(2*(self.alpha + self.gamma)) + cos(4*(self.alpha + self.gamma)) -
-                4*cos(2*(2*self.alpha + self.gamma)) + 24*cos((4*sin(self.gamma))/self.z) +
-                4*cos(2*self.alpha - (4*sin(self.gamma))/self.z) + 16*cos(2*self.gamma -
-                (4*sin(self.gamma))/self.z) + 24*cos(4*self.gamma - (4*sin(self.gamma))/self.z) +
-                4*cos(2*self.alpha + 4*self.gamma - (4*sin(self.gamma))/self.z) -
-                8*cos(2*(self.alpha + self.gamma - (2*sin(self.gamma))/self.z)) +
-                4*cos(2*self.alpha + (4*sin(self.gamma))/self.z) + 4*cos(2*self.alpha -
-                4*self.gamma + (4*sin(self.gamma))/self.z) - 8*cos(2*self.alpha - 2*self.gamma +
-                (4*sin(self.gamma))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.alpha)**2*
-                (-2 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
-                2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)) +
-                4*cos(2*self.gamma - (4*sin(self.gamma))/self.z))*cos(self.gamma - (2*sin(self.gamma))/self.z)**2*
-                sin(2*self.gamma)**2)))/(-6 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
-                2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)))**2)/sqrt(2))
+        # if self.involute_start_radius < self.r_f:
+        #     self.add_foot = False
+        #     self.involute_start = -arccos(
+        #         sqrt((42 + 16*cos(2*self.alpha) + 6*cos(4*self.alpha) -
+        #         4*cos(4*self.alpha - 2*self.gamma) - 8*cos(2*(self.alpha - self.gamma)) +
+        #         cos(4*(self.alpha - self.gamma)) + 24*cos(2*self.gamma) - 2*cos(4*self.gamma) -
+        #         8*cos(2*(self.alpha + self.gamma)) + cos(4*(self.alpha + self.gamma)) -
+        #         4*cos(2*(2*self.alpha + self.gamma)) + 24*cos((4*sin(self.gamma))/self.z) +
+        #         4*cos(2*self.alpha - (4*sin(self.gamma))/self.z) + 16*cos(2*self.gamma -
+        #         (4*sin(self.gamma))/self.z) + 24*cos(4*self.gamma - (4*sin(self.gamma))/self.z) +
+        #         4*cos(2*self.alpha + 4*self.gamma - (4*sin(self.gamma))/self.z) -
+        #         8*cos(2*(self.alpha + self.gamma - (2*sin(self.gamma))/self.z)) +
+        #         4*cos(2*self.alpha + (4*sin(self.gamma))/self.z) + 4*cos(2*self.alpha -
+        #         4*self.gamma + (4*sin(self.gamma))/self.z) - 8*cos(2*self.alpha - 2*self.gamma +
+        #         (4*sin(self.gamma))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.alpha)**2*
+        #         (-2 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
+        #         2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)) +
+        #         4*cos(2*self.gamma - (4*sin(self.gamma))/self.z))*cos(self.gamma - (2*sin(self.gamma))/self.z)**2*
+        #         sin(2*self.gamma)**2)))/(-6 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
+        #         2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)))**2)/sqrt(2))
 
     def involute_function_x(self):
         def func(s):
@@ -103,12 +103,13 @@ class bevel_tooth(object):
                 cos(self.gamma)*cos(s) - cos(self.alpha)*sin(self.gamma)*sin(s)))
         return(func)
 
-    def getradius(self, s):
+    def get_radius(self, s):
         x = self.involute_function_x()
         y = self.involute_function_y()
         rx = x(s)
         ry = y(s)
         return(sqrt(rx**2 + ry**2))
+
 
     def involute_points(self, num=10):
         pts = linspace(self.involute_start, self.involute_end, num=num)
@@ -118,16 +119,23 @@ class bevel_tooth(object):
         y = array(map(fy, pts))
         fz = self.involute_function_z()
         z = array(map(fz, pts))
-        xyz = transpose(array([x, y,z]))
-        if self.add_foot:
-            p = xyz[0]
-            p1 =map(lambda x: x * (self.r_f / sqrt(p[0]**2 + p[1]**2)), p)
-            p1[2] = self.z_f
-            xyz=vstack([[p1], xyz])
-        xy = [[i[0]/i[2],i[1]/i[2],1.] for i in xyz]
+        xyz = transpose(array([x, y, z]))
+        # conical projection to z=1
+        xy = [[i[0] / i[2], i[1] / i[2]] for i in xyz]
+        xy = array([[0, 0]] + xy)
+
+        r_cut = self.r_f / self.z_f
+        for i, point in enumerate(xy[1:]):
+            print(i)
+            if point.dot(point) >= r_cut ** 2:
+                break;
+        intersection_point = intersection_line_circle(xy[i], point, r_cut)
+        print(intersection_point, xy[i], point)
+        xy = array([intersection_point] + list(xy[i+1:]))
+        xyz = [[p[0], p[1], 1] for p in xy]
         backlash_rot = rotation3D(self.backlash / 4)
-        xy = backlash_rot(xy)
-        return(xy)
+        xyz = backlash_rot(xyz)
+        return(xyz)
 
     def points(self, num=10):
         pts = self.involute_points(num = num)
@@ -136,33 +144,26 @@ class bevel_tooth(object):
         ref = reflection3D(pi/2)
         pts1 = ref(pts)[::-1]
         rot = rotation3D(2*pi/self.z)
-        pt3 = rot(pts[0])
         if self.add_foot:
             return(array([
-                [pts[0],pts[1]],
+                [pts[0], pts[1]],
                 pts[1:],
                 [pts[-1], pts1[0]],
                 pts1[:-1],
                 [pts1[-2], pts1[-1]]
                 ]))
-            return(array([pts,[pts[-1],pts1[0]], pts1]))
         else:
             return(array([pts,[pts[-1],pts1[0]], pts1]))
 
 
-    def _update(self):
+    def update(self):
         self.__init__(z = self.z, clearence = self.clearence,
                 alpha = self.alpha,  gamma = self.gamma, backlash = self.backlash, module = self.module)
 
 
 if __name__ == "__main__":
-	from matplotlib import pyplot
-	gear = bevel_tooth()
-	x = []
-	y = []
-	for i in gear.points(30):
-		for j in i:
-			x.append(j[0])
-			y.append(j[1])
-	pyplot.plot(x,y)
-	pyplot.show()
+    from matplotlib import pyplot
+    gear = bevel_tooth(z=60, clearence=0.0, gamma=np.deg2rad(45))
+    x, y, z = gear.involute_points().T
+    pyplot.plot(x, y)
+    pyplot.show()
