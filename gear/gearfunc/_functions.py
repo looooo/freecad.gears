@@ -170,5 +170,4 @@ def intersection_line_circle(p1, p2, r):
     p_half = d.dot(p1)
     q = p1.dot(p1) - r ** 2
     t = -p_half + sqrt(p_half ** 2 - q)
-    print(t)
     return p1 + d * t

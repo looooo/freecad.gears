@@ -126,13 +126,11 @@ class bevel_tooth(object):
 
         r_cut = self.r_f / self.z_f
         for i, point in enumerate(xy[1:]):
-            print(i)
             if point.dot(point) >= r_cut ** 2:
                 break;
         if i > 0:
             self.add_foot = False
         intersection_point = intersection_line_circle(xy[i], point, r_cut)
-        print(intersection_point, xy[i], point)
         xy = array([intersection_point] + list(xy[i+1:]))
         xyz = [[p[0], p[1], 1] for p in xy]
         backlash_rot = rotation3D(self.backlash / 4)
