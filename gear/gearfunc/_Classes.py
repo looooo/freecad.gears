@@ -344,7 +344,7 @@ class bevel_gear():
         fp.gear.backlash = fp.backlash.Value
         scale = fp.m.Value * fp.gear.z / 2 / tan(fp.gamma.Value * pi / 180)
         fp.gear.clearence = fp.clearence / scale
-        fp.gear.update()
+        fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         scale1 = scale - fp.height.Value / 2
         scale2 = scale + fp.height.Value / 2
@@ -376,7 +376,7 @@ class bevel_gear():
             surfs.append(b)
         return Shape(surfs)
 
-    def createteeths(self, pts, pos, teeth):
+    def create_teeth(self, pts, pos, teeth):
         w1 = []
         for i in pts:
             scale = lambda x: x * pos
