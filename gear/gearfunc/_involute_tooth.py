@@ -25,40 +25,40 @@ from _functions import nearestpts, rotation, reflection, trimfunc, norm, transla
 import numpy as np
 
 class involute_tooth():
-    def __init__(self, m=5, z=15, alpha=20 * pi / 180., clearence=0.12, shift=0.5, beta=0., undercut=False, backlash=0.00):
-        self.alpha = alpha
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., clearance=0.12, shift=0.5, beta=0., undercut=False, backlash=0.00):
+        self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
         self.z = z
         self.undercut = undercut
         self.shift = shift
-        self.clearence = clearence
+        self.clearance = clearance
         self.backlash = backlash
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-        self.alpha_t = arctan(tan(self.alpha) / cos(self.beta))
+        self.pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
         self.m = self.m_n / cos(self.beta)
-        self.c = self.clearence * self.m_n
+        self.c = self.clearance * self.m_n
         self.midpoint = [0., 0.]
         self.d = self.z * self.m
         self.dw = self.m * self.z
         self.da = self.dw + 2. * self.m_n + 2. * self.shift * self.m_n
         self.df = self.dw - 2. * self.m_n - \
             2 * self.c + 2. * self.shift * self.m_n
-        self.dg = self.d * cos(self.alpha_t)
+        self.dg = self.d * cos(self.pressure_angle_t)
         self.phipart = 2 * pi / self.z
 
         self.undercut_end = sqrt(-self.df ** 2 + self.da ** 2) / self.da
         self.undercut_rot = (-self.df / self.dw * tan(arctan((2 * ((self.m * pi) / 4. -
-                            (self.c + self.m_n) * tan(self.alpha_t))) / self.df)))
+                            (self.c + self.m_n) * tan(self.pressure_angle_t))) / self.df)))
 
         self.involute_end = sqrt(self.da ** 2 - self.dg ** 2) / self.dg
         self.involute_rot1 = sqrt(-self.dg ** 2 + (self.dw) ** 2) / self.dg - arctan(
             sqrt(-self.dg ** 2 + (self.dw) ** 2) / self.dg)
         self.involute_rot2 = self.m / \
-            (self.d) * (pi / 2 + 2 * self.shift * tan(self.alpha_t))
-        self.involute_rot2 = 1 / self.z * (pi / 2 + 2 * self.shift * tan(self.alpha_t))
+            (self.d) * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
+        self.involute_rot2 = 1 / self.z * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
         self.involute_rot = self.involute_rot1 + self.involute_rot2
         self.involute_start = 0.
         if self.dg <= self.df:
@@ -145,22 +145,22 @@ class involute_tooth():
 
     def _update(self):
         self.__init__(m = self.m_n, z = self.z,
-                alpha = self.alpha, clearence = self.clearence, shift = self.shift,
+                pressure_angle = self.pressure_angle, clearance = self.clearance, shift = self.shift,
                 beta = self.beta, undercut = self.undercut, backlash = self.backlash)
 
 
 class involute_rack(object):
-    def __init__(self, m=5, z=15, alpha=20 * pi / 180., thickness=5):
-        self.alpha = alpha
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5):
+        self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
         self.z = z
 
     def _update(self):
-        self.__init__(m = self.m, z = self.z, alpha = self.alpha, thickness = self.thickness)
+        self.__init__(m = self.m, z = self.z, pressure_angle = self.pressure_angle, thickness = self.thickness)
 
     def points(self, num=10):
-        a = 2 * self.m * tan(self.alpha)
+        a = 2 * self.m * tan(self.pressure_angle)
         b = ((self.m * pi) / 2 - a) / 2
         tooth= [
             [self.m, -a - b],

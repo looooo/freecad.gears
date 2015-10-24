@@ -60,9 +60,9 @@ class involute_gear():
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
-            "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
@@ -76,10 +76,10 @@ class involute_gear():
         obj.teeth = 15
         obj.module = '1. mm'
         obj.shift = 0.
-        obj.alpha = '20. deg'
+        obj.pressure_angle = '20. deg'
         obj.beta = '0. deg'
         obj.height = '5. mm'
-        obj.clearence = 0.25
+        obj.clearance = 0.25
         obj.numpoints = 6
         obj.backlash = '0.00 mm'
         self.obj = obj
@@ -90,9 +90,9 @@ class involute_gear():
         fp.gear.z = fp.teeth
         fp.gear.undercut = fp.undercut
         fp.gear.shift = fp.shift
-        fp.gear.alpha = fp.alpha.Value * pi / 180.
+        fp.gear.pressure_angle = fp.pressure_angle.Value * pi / 180.
         fp.gear.beta = fp.beta.Value * pi / 180
-        fp.gear.clearence = fp.clearence
+        fp.gear.clearance = fp.clearance
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
@@ -154,12 +154,12 @@ class involute_gear_rack():
         obj.addProperty(
             "App::PropertyLength", "thickness", "gear_parameter", "thickness")
         obj.addProperty(
-            "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
         obj.module = '1. mm'
-        obj.alpha = '20. deg'
+        obj.pressure_angle = '20. deg'
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         self.obj = obj
@@ -168,7 +168,7 @@ class involute_gear_rack():
     def execute(self, fp):
         fp.rack.m = fp.module.Value
         fp.rack.z = fp.teeth
-        fp.rack.alpha = fp.alpha.Value * pi / 180.
+        fp.rack.pressure_angle = fp.pressure_angle.Value * pi / 180.
         fp.rack.thickness = fp.thickness.Value
         fp.rack._update()
         pts = fp.rack.points()
@@ -199,7 +199,7 @@ class cycloide_gear():
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
@@ -213,7 +213,7 @@ class cycloide_gear():
         obj.outer_diameter = '5 mm'
         obj.beta = '0. deg'
         obj.height = '5. mm'
-        obj.clearence = 0.25
+        obj.clearance = 0.25
         obj.numpoints = 15
         obj.backlash = '0.00 mm'
         obj.Proxy = self
@@ -224,7 +224,7 @@ class cycloide_gear():
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value
         fp.gear.z2 = fp.outer_diameter.Value
-        fp.gear.clearence = fp.clearence
+        fp.gear.clearance = fp.clearance
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
@@ -266,8 +266,8 @@ class cycloide_gear():
 class bevel_gear():
 
     """parameters:
-        alpha:  pressureangle,   10-30°
-        gamma:  cone angle,      0 < gamma < pi/4
+        pressure_angle:  pressureangle,   10-30°
+        pitch_angle:  cone angle,      0 < pitch_angle < pi/4
     """
 
     def __init__(self, obj):
@@ -277,12 +277,12 @@ class bevel_gear():
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
-            "App::PropertyAngle", "gamma", "involute_parameter", "gamma")
+            "App::PropertyAngle", "pitch_angle", "involute_parameter", "pitch_angle")
         obj.addProperty(
-            "App::PropertyAngle", "alpha", "involute_parameter", "alpha")
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure_angle")
         obj.addProperty("App::PropertyLength", "m", "gear_parameter", "m")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "clearence")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
@@ -291,19 +291,19 @@ class bevel_gear():
         obj.gear = self.bevel_tooth
         obj.m = '1. mm'
         obj.teeth = 15
-        obj.alpha = '20. deg'
-        obj.gamma = '45. deg'
+        obj.pressure_angle = '20. deg'
+        obj.pitch_angle = '45. deg'
         obj.height = '5. mm'
         obj.numpoints = 6
         obj.backlash = '0.00 mm'
-        obj.clearence = 0.1
+        obj.clearance = 0.1
         self.obj = obj
         obj.Proxy = self
 
     def execute1(self, fp):
         fp.gear.z = fp.teeth
-        fp.gear.alpha = fp.alpha.Value * pi / 180.
-        fp.gear.gamma = fp.gamma.Value * pi / 180
+        fp.gear.pressure_angle = fp.pressure_angle.Value * pi / 180.
+        fp.gear.pitch_angle = fp.pitch_angle.Value * pi / 180
         fp.gear.backlash = fp.backlash
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
@@ -339,11 +339,11 @@ class bevel_gear():
     def execute(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.module = fp.m.Value
-        fp.gear.alpha = (90 - fp.alpha.Value) * pi / 180.
-        fp.gear.gamma = fp.gamma.Value * pi / 180
+        fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * pi / 180.
+        fp.gear.pitch_angle = fp.pitch_angle.Value * pi / 180
         fp.gear.backlash = fp.backlash.Value
-        scale = fp.m.Value * fp.gear.z / 2 / tan(fp.gamma.Value * pi / 180)
-        fp.gear.clearence = fp.clearence / scale
+        scale = fp.m.Value * fp.gear.z / 2 / tan(fp.pitch_angle.Value * pi / 180)
+        fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         scale1 = scale - fp.height.Value / 2
@@ -356,9 +356,9 @@ class bevel_gear():
     def create_tooth(self):
         w = []
         scal1 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
-            self.obj.gamma.Value * pi / 180) - self.obj.height.Value / 2
+            self.obj.pitch_angle.Value * pi / 180) - self.obj.height.Value / 2
         scal2 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
-            self.obj.gamma.Value * pi / 180) + self.obj.height.Value / 2
+            self.obj.pitch_angle.Value * pi / 180) + self.obj.height.Value / 2
         s = [scal1, scal2]
         pts = self.obj.gear.points(num=self.obj.numpoints)
         for j, pos in enumerate(s):

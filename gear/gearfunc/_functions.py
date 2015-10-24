@@ -25,27 +25,27 @@ from numpy.linalg import solve
 import numpy as np
 
 
-def reflection(alpha):
+def reflection(pressure_angle):
     mat = array(
-        [[cos(2 * alpha), -sin(2 * alpha)], [-sin(2 * alpha), -cos(2 * alpha)]])
+        [[cos(2 * pressure_angle), -sin(2 * pressure_angle)], [-sin(2 * pressure_angle), -cos(2 * pressure_angle)]])
 
     def func(x):
         return(dot(x, mat))
     return(func)
 
 
-def reflection3D(alpha):
-    mat = array([[cos(2 * alpha), -sin(2 * alpha), 0.],
-                 [-sin(2 * alpha), -cos(2 * alpha), 0.], [0., 0., 1.]])
+def reflection3D(pressure_angle):
+    mat = array([[cos(2 * pressure_angle), -sin(2 * pressure_angle), 0.],
+                 [-sin(2 * pressure_angle), -cos(2 * pressure_angle), 0.], [0., 0., 1.]])
 
     def func(x):
         return(dot(x, mat))
     return(func)
 
 
-def rotation(alpha, midpoint=None):
+def rotation(pressure_angle, midpoint=None):
     midpoint = midpoint or [0, 0]
-    mat = array([[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]])
+    mat = array([[cos(pressure_angle), -sin(pressure_angle)], [sin(pressure_angle), cos(pressure_angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
@@ -55,11 +55,11 @@ def rotation(alpha, midpoint=None):
     return(func)
 
 
-def rotation3D(alpha):
+def rotation3D(pressure_angle):
     mat = array(
         [
-            [cos(alpha), -sin(alpha), 0.],
-            [sin(alpha), cos(alpha), 0.],
+            [cos(pressure_angle), -sin(pressure_angle), 0.],
+            [sin(pressure_angle), cos(pressure_angle), 0.],
             [0., 0., 1.]])
 
     def func(xx):

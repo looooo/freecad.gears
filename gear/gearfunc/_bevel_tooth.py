@@ -28,79 +28,79 @@ from _functions import rotation3D, reflection3D, intersection_line_circle
 
 
 class bevel_tooth(object):
-    def __init__(self, alpha=70 * pi / 180, gamma=pi / 4, clearence=0.1,
+    def __init__(self, pressure_angle=70 * pi / 180, pitch_angle=pi / 4, clearance=0.1,
                  z=21, backlash=0.00, module=0.25):
-        self.alpha = alpha
-        self.gamma = gamma
+        self.pressure_angle = pressure_angle
+        self.pitch_angle = pitch_angle
         self.z = z
-        self.clearence = clearence
+        self.clearance = clearance
         self.backlash = backlash
         self.module = module
 
         self.involute_end = arccos(
-            1 / sqrt(2) * sqrt((42. + 16.*cos(2.*self.alpha) +
-            6.*cos(4.*self.alpha) + cos(4.*self.alpha - 4.*self.gamma) - 8.*cos(2.*self.alpha - 2.*self.gamma) -
-            4.*cos(4.*self.alpha - 2.*self.gamma) + 24.*cos(2.*self.gamma) - 2.*cos(4.*self.gamma) -
-            8.*cos(2.*(self.alpha + self.gamma)) + cos(4.*(self.alpha + self.gamma)) -
-            4.*cos(4.*self.alpha + 2.*self.gamma) + 24.*cos((4.*sin(self.gamma))/self.z) +
-            4.*cos(2.*self.alpha - (4.*sin(self.gamma))/self.z) + 4.*cos(2.*self.alpha -
-            4.*self.gamma - (4.*sin(self.gamma))/self.z) - 8.*cos(2.*self.alpha - 2.*self.gamma -
-            (4.*sin(self.gamma))/self.z) + 24.*cos(4.*(self.gamma + sin(self.gamma)/self.z)) -
-            8.*cos(2.*(self.alpha + self.gamma + (2.*sin(self.gamma))/self.z)) + 4.*cos(2.*self.alpha +
-            (4.*sin(self.gamma))/self.z) + 16.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z) +
-            4.*cos(2.*self.alpha + 4.*self.gamma + (4.*sin(self.gamma))/self.z) + 32.*abs(cos(self.gamma +
-            (2.*sin(self.gamma))/self.z))*cos(self.alpha)*sqrt(4.*cos(2.*self.alpha) -
-            2.*(-2. + cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)) +
-            4.*cos(2.*self.gamma + (4.*sin(self.gamma))/self.z)))*sin(2.*self.gamma))/(-6. - 2.*cos(2.*self.alpha) +
-            cos(2.*self.alpha - 2.*self.gamma) - 2.*cos(2.*self.gamma) + cos(2.*(self.alpha + self.gamma)))**2))
+            1 / sqrt(2) * sqrt((42. + 16.*cos(2.*self.pressure_angle) +
+            6.*cos(4.*self.pressure_angle) + cos(4.*self.pressure_angle - 4.*self.pitch_angle) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle) -
+            4.*cos(4.*self.pressure_angle - 2.*self.pitch_angle) + 24.*cos(2.*self.pitch_angle) - 2.*cos(4.*self.pitch_angle) -
+            8.*cos(2.*(self.pressure_angle + self.pitch_angle)) + cos(4.*(self.pressure_angle + self.pitch_angle)) -
+            4.*cos(4.*self.pressure_angle + 2.*self.pitch_angle) + 24.*cos((4.*sin(self.pitch_angle))/self.z) +
+            4.*cos(2.*self.pressure_angle - (4.*sin(self.pitch_angle))/self.z) + 4.*cos(2.*self.pressure_angle -
+            4.*self.pitch_angle - (4.*sin(self.pitch_angle))/self.z) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle -
+            (4.*sin(self.pitch_angle))/self.z) + 24.*cos(4.*(self.pitch_angle + sin(self.pitch_angle)/self.z)) -
+            8.*cos(2.*(self.pressure_angle + self.pitch_angle + (2.*sin(self.pitch_angle))/self.z)) + 4.*cos(2.*self.pressure_angle +
+            (4.*sin(self.pitch_angle))/self.z) + 16.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) +
+            4.*cos(2.*self.pressure_angle + 4.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) + 32.*abs(cos(self.pitch_angle +
+            (2.*sin(self.pitch_angle))/self.z))*cos(self.pressure_angle)*sqrt(4.*cos(2.*self.pressure_angle) -
+            2.*(-2. + cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)) +
+            4.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z)))*sin(2.*self.pitch_angle))/(-6. - 2.*cos(2.*self.pressure_angle) +
+            cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)))**2))
 
-        self.involute_start = -pi/2. + arctan(1/tan(self.gamma)*1/cos(self.alpha))
+        self.involute_start = -pi/2. + arctan(1/tan(self.pitch_angle)*1/cos(self.pressure_angle))
         self.involute_start_radius = self.get_radius(self.involute_start)
-        self.r_f = sin(self.gamma - sin(gamma) * 2 / self.z) - self.clearence * sin(self.gamma)
-        self.z_f = cos(self.gamma - sin(gamma) * 2 / self.z)
+        self.r_f = sin(self.pitch_angle - sin(pitch_angle) * 2 / self.z) - self.clearance * sin(self.pitch_angle)
+        self.z_f = cos(self.pitch_angle - sin(pitch_angle) * 2 / self.z)
         self.add_foot = True
 
         # if self.involute_start_radius < self.r_f:
         #     self.add_foot = False
         #     self.involute_start = -arccos(
-        #         sqrt((42 + 16*cos(2*self.alpha) + 6*cos(4*self.alpha) -
-        #         4*cos(4*self.alpha - 2*self.gamma) - 8*cos(2*(self.alpha - self.gamma)) +
-        #         cos(4*(self.alpha - self.gamma)) + 24*cos(2*self.gamma) - 2*cos(4*self.gamma) -
-        #         8*cos(2*(self.alpha + self.gamma)) + cos(4*(self.alpha + self.gamma)) -
-        #         4*cos(2*(2*self.alpha + self.gamma)) + 24*cos((4*sin(self.gamma))/self.z) +
-        #         4*cos(2*self.alpha - (4*sin(self.gamma))/self.z) + 16*cos(2*self.gamma -
-        #         (4*sin(self.gamma))/self.z) + 24*cos(4*self.gamma - (4*sin(self.gamma))/self.z) +
-        #         4*cos(2*self.alpha + 4*self.gamma - (4*sin(self.gamma))/self.z) -
-        #         8*cos(2*(self.alpha + self.gamma - (2*sin(self.gamma))/self.z)) +
-        #         4*cos(2*self.alpha + (4*sin(self.gamma))/self.z) + 4*cos(2*self.alpha -
-        #         4*self.gamma + (4*sin(self.gamma))/self.z) - 8*cos(2*self.alpha - 2*self.gamma +
-        #         (4*sin(self.gamma))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.alpha)**2*
-        #         (-2 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
-        #         2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)) +
-        #         4*cos(2*self.gamma - (4*sin(self.gamma))/self.z))*cos(self.gamma - (2*sin(self.gamma))/self.z)**2*
-        #         sin(2*self.gamma)**2)))/(-6 - 2*cos(2*self.alpha) + cos(2*(self.alpha - self.gamma)) -
-        #         2*cos(2*self.gamma) + cos(2*(self.alpha + self.gamma)))**2)/sqrt(2))
+        #         sqrt((42 + 16*cos(2*self.pressure_angle) + 6*cos(4*self.pressure_angle) -
+        #         4*cos(4*self.pressure_angle - 2*self.pitch_angle) - 8*cos(2*(self.pressure_angle - self.pitch_angle)) +
+        #         cos(4*(self.pressure_angle - self.pitch_angle)) + 24*cos(2*self.pitch_angle) - 2*cos(4*self.pitch_angle) -
+        #         8*cos(2*(self.pressure_angle + self.pitch_angle)) + cos(4*(self.pressure_angle + self.pitch_angle)) -
+        #         4*cos(2*(2*self.pressure_angle + self.pitch_angle)) + 24*cos((4*sin(self.pitch_angle))/self.z) +
+        #         4*cos(2*self.pressure_angle - (4*sin(self.pitch_angle))/self.z) + 16*cos(2*self.pitch_angle -
+        #         (4*sin(self.pitch_angle))/self.z) + 24*cos(4*self.pitch_angle - (4*sin(self.pitch_angle))/self.z) +
+        #         4*cos(2*self.pressure_angle + 4*self.pitch_angle - (4*sin(self.pitch_angle))/self.z) -
+        #         8*cos(2*(self.pressure_angle + self.pitch_angle - (2*sin(self.pitch_angle))/self.z)) +
+        #         4*cos(2*self.pressure_angle + (4*sin(self.pitch_angle))/self.z) + 4*cos(2*self.pressure_angle -
+        #         4*self.pitch_angle + (4*sin(self.pitch_angle))/self.z) - 8*cos(2*self.pressure_angle - 2*self.pitch_angle +
+        #         (4*sin(self.pitch_angle))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.pressure_angle)**2*
+        #         (-2 - 2*cos(2*self.pressure_angle) + cos(2*(self.pressure_angle - self.pitch_angle)) -
+        #         2*cos(2*self.pitch_angle) + cos(2*(self.pressure_angle + self.pitch_angle)) +
+        #         4*cos(2*self.pitch_angle - (4*sin(self.pitch_angle))/self.z))*cos(self.pitch_angle - (2*sin(self.pitch_angle))/self.z)**2*
+        #         sin(2*self.pitch_angle)**2)))/(-6 - 2*cos(2*self.pressure_angle) + cos(2*(self.pressure_angle - self.pitch_angle)) -
+        #         2*cos(2*self.pitch_angle) + cos(2*(self.pressure_angle + self.pitch_angle)))**2)/sqrt(2))
 
     def involute_function_x(self):
         def func(s):
             return((
-                -(cos(s*1/sin(self.alpha)*1/sin(self.gamma))*sin(self.alpha)*sin(s)) +
-                (cos(s)*sin(self.gamma) + cos(self.alpha)*cos(self.gamma)*sin(s))*
-                sin(s*1/sin(self.alpha)*1/sin(self.gamma))))
+                -(cos(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))*sin(self.pressure_angle)*sin(s)) +
+                (cos(s)*sin(self.pitch_angle) + cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s))*
+                sin(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))))
         return(func)
 
     def involute_function_y(self):
         def func(s):
             return((
-                cos(s*1/sin(self.alpha)*1/sin(self.gamma))*(cos(s)*sin(self.gamma) +
-                cos(self.alpha)*cos(self.gamma)*sin(s)) + sin(self.alpha)*sin(s)*
-                sin(s*1/sin(self.alpha)*1/sin(self.gamma))))
+                cos(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))*(cos(s)*sin(self.pitch_angle) +
+                cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s)) + sin(self.pressure_angle)*sin(s)*
+                sin(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))))
         return(func)
 
     def involute_function_z(self):
         def func(s):
             return((
-                cos(self.gamma)*cos(s) - cos(self.alpha)*sin(self.gamma)*sin(s)))
+                cos(self.pitch_angle)*cos(s) - cos(self.pressure_angle)*sin(self.pitch_angle)*sin(s)))
         return(func)
 
     def get_radius(self, s):
@@ -109,7 +109,6 @@ class bevel_tooth(object):
         rx = x(s)
         ry = y(s)
         return(sqrt(rx**2 + ry**2))
-
 
     def involute_points(self, num=10):
         pts = linspace(self.involute_start, self.involute_end, num=num)
@@ -127,7 +126,7 @@ class bevel_tooth(object):
         r_cut = self.r_f / self.z_f
         for i, point in enumerate(xy[1:]):
             if point.dot(point) >= r_cut ** 2:
-                break;
+                break
         if i > 0:
             self.add_foot = False
         intersection_point = intersection_line_circle(xy[i], point, r_cut)
@@ -138,7 +137,7 @@ class bevel_tooth(object):
         return(xyz)
 
     def points(self, num=10):
-        pts = self.involute_points(num = num)
+        pts = self.involute_points(num=num)
         rot = rotation3D(-pi/self.z/2)
         pts = rot(pts)
         ref = reflection3D(pi/2)
@@ -153,17 +152,18 @@ class bevel_tooth(object):
                 [pts1[-2], pts1[-1]]
                 ]))
         else:
-            return(array([pts,[pts[-1],pts1[0]], pts1]))
-
+            return(array([pts, [pts[-1], pts1[0]], pts1]))
 
     def _update(self):
-        self.__init__(z = self.z, clearence = self.clearence,
-                alpha = self.alpha,  gamma = self.gamma, backlash = self.backlash, module = self.module)
+        self.__init__(z=self.z, clearance=self.clearance,
+                      pressure_angle=self.pressure_angle,
+                      pitch_angle=self.pitch_angle,
+                      backlash=self.backlash, module=self.module)
 
 
 if __name__ == "__main__":
     from matplotlib import pyplot
-    gear = bevel_tooth(z=60, clearence=0.0, gamma=np.deg2rad(45))
+    gear = bevel_tooth(z=60, clearance=0.0, pitch_angle=np.deg2rad(45))
     x, y, z = gear.involute_points().T
     pyplot.plot(x, y)
     pyplot.show()
