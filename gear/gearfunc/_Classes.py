@@ -336,22 +336,21 @@ class bevel_gear():
         top_cap.reverse()
         fp.Shape = Solid(Shell(fcs + [top_cap, bottom_cap]))
 
-
     def execute(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.module = fp.m.Value
         fp.gear.alpha = (90 - fp.alpha.Value) * pi / 180.
         fp.gear.gamma = fp.gamma.Value * pi / 180
         fp.gear.backlash = fp.backlash.Value
-        fp.gear.clearence = fp.clearence
-        fp.gear._update()
+        scale = fp.m.Value * fp.gear.z / 2 / tan(fp.gamma.Value * pi / 180)
+        fp.gear.clearence = fp.clearence / scale
+        fp.gear.update()
         pts = fp.gear.points(num=fp.numpoints)
-        scal1 = fp.m.Value * fp.gear.z / 2 / tan(
-            fp.gamma.Value * pi / 180) - fp.height.Value / 2
-        scal2 = fp.m.Value * fp.gear.z / 2 / tan(
-            fp.gamma.Value * pi / 180) + fp.height.Value / 2
-        fp.Shape = makeLoft([self.createteeths(pts, scal1, fp.teeth), self.createteeths(pts, scal2, fp.teeth)], True)
-        # fp.Shape = self.createteeths(pts, pos1, fp.teeth)
+        scale1 = scale - fp.height.Value / 2
+        scale2 = scale + fp.height.Value / 2
+        fp.Shape = makeLoft([self.create_teeth(pts, scale1, fp.teeth),
+                             self.create_teeth(pts, scale2, fp.teeth)], True)
+        # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
 
 
     def create_tooth(self):
