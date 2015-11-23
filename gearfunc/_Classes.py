@@ -20,6 +20,7 @@
 #***************************************************************************
 
 from __future__ import division
+import os
 import FreeCAD as App
 from _involute_tooth import involute_tooth, involute_rack
 from _cycloide_tooth import cycloide_tooth
@@ -34,12 +35,38 @@ from numpy import pi, cos, sin, tan
 import numpy
 
 
+
+__all__=["involute_gear",
+         "cycloide_gear",
+         "bevel_gear", 
+         "involute_gear_rack",
+         "ViewProviderGear"]
+
+
+
 def fcvec(x):
     if len(x) == 2:
         return(App.Vector(x[0], x[1], 0))
     else:
         return(App.Vector(x[0], x[1], x[2]))
 
+class ViewProviderGear:
+    def __init__(self, obj):
+        ''' Set this object to the proxy object of the actual view provider '''
+        obj.Proxy = self
+
+    def attach(self, vobj):
+        self.vobj = vobj
+
+    def getIcon(self):
+        _dir = os.path.dirname(os.path.realpath(__file__))
+        return(_dir + "/../Resources/icons/involutegear.svg")
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
 
 class involute_gear():
 

@@ -21,7 +21,7 @@
 
 import FreeCAD
 import FreeCADGui as Gui
-from _Classes import involute_gear, cycloide_gear, bevel_gear, involute_gear_rack
+from _Classes import *
 
 
 class CreateInvoluteGear():
@@ -41,7 +41,7 @@ class CreateInvoluteGear():
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
         involute_gear(a)
-        a.ViewObject.Proxy = 0.
+        ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
@@ -62,7 +62,7 @@ class CreateInvoluteRack():
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_rack")
         involute_gear_rack(a)
-        a.ViewObject.Proxy = 0.
+        ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
@@ -83,7 +83,7 @@ class CreateCycloideGear():
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "cycloide_gear")
         cycloide_gear(a)
-        a.ViewObject.Proxy = 0.
+        ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
@@ -103,6 +103,6 @@ class CreateBevelGear():
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "bevel_gear")
         bevel_gear(a)
-        a.ViewObject.Proxy = 0.
+        ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
