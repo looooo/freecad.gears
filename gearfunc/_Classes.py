@@ -440,9 +440,9 @@ def helicalextrusion(wire, height, angle):
     face_transform = App.Matrix()
     face_transform.rotateZ(angle)
     face_transform.move(App.Vector(0, 0, height))
-    face_b . transformShape(face_transform)
+    face_b.transformShape(face_transform)
     spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
-    auxspine = makeHelix(height * 2 * pi / angle, height, 1.)
+    auxspine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, bool(angle < 0))
     faces = [face_a, face_b]
     pipeshell = BRepOffsetAPI.MakePipeShell(spine)
     pipeshell.setSpineSupport(spine)
