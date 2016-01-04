@@ -23,7 +23,7 @@ import FreeCAD
 import gear_rc
 
 
-class gearWorkbench(Workbench):
+class gearWorkbench(Gui.Workbench):
     """glider workbench"""
     MenuText = "gear"
     ToolTip = "gear workbench"
