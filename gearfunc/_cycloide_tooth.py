@@ -22,7 +22,7 @@
 from __future__ import division
 from __future__ import division
 from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
-from _functions import rotation, reflection
+from ._functions import rotation, reflection
 
 class cycloide_tooth():
     def __init__(self, z1 = 5, z2 = 5, z = 14, m = 5, clearance = 0.12, backlash = 0.00):
@@ -35,7 +35,7 @@ class cycloide_tooth():
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-    	self.d1 = self.z1 * self.m
+        self.d1 = self.z1 * self.m
         self.d2 = self.z2 * self.m
         self.phi = self.m * pi
         self.d = self.z * self.m

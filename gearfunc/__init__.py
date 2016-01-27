@@ -21,7 +21,7 @@
 
 import FreeCAD
 import FreeCADGui as Gui
-from _Classes import *
+from ._Classes import *
 
 
 class CreateInvoluteGear():

@@ -22,14 +22,14 @@
 from __future__ import division
 import os
 import FreeCAD as App
-from _involute_tooth import involute_tooth, involute_rack
-from _cycloide_tooth import cycloide_tooth
-from _bevel_tooth import bevel_tooth
+from ._involute_tooth import involute_tooth, involute_rack
+from ._cycloide_tooth import cycloide_tooth
+from ._bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
      show, makePolygon, makeLoft, makeHelix
 import Part
-from _functions import rotation3D
+from ._functions import rotation3D
 from numpy import pi, cos, sin, tan
 
 import numpy

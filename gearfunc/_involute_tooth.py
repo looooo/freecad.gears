@@ -21,7 +21,7 @@
 
 from __future__ import division
 from numpy import tan, cos, sin, sqrt, arctan, pi, array, linspace, transpose, vstack, ndarray
-from _functions import nearestpts, rotation, reflection, trimfunc, norm, translation
+from ._functions import nearestpts, rotation, reflection, trimfunc, norm, translation
 import numpy as np
 
 class involute_tooth():

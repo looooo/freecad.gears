@@ -21,7 +21,7 @@
 import FreeCADGui as Gui
 import FreeCAD
 import gear_rc
-
+import gearfunc
 
 class gearWorkbench(Gui.Workbench):
     """glider workbench"""
