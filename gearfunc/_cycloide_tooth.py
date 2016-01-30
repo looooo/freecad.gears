@@ -20,7 +20,6 @@
 #***************************************************************************
 
 from __future__ import division
-from __future__ import division
 from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
 from ._functions import rotation, reflection
 
