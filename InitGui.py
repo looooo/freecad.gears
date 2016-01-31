@@ -19,11 +19,17 @@
 #***************************************************************************
 
 import FreeCADGui as Gui
-import FreeCAD
+import FreeCAD as App
 import gear_rc
 import gearfunc
 
-class gearWorkbench(Gui.Workbench):
+try:
+    from FreeCADGui import Workbench
+except ImportError as e:
+    App.Console.Warning("you are using the GearWorkbench with an old version of FreeCAD (<0.16)")
+    App.Console.Warning("the class Workbench is loaded, allthough not imported: magic")
+
+class gearWorkbench(Workbench):
     """glider workbench"""
     MenuText = "gear"
     ToolTip = "gear workbench"
@@ -38,7 +44,7 @@ class gearWorkbench(Gui.Workbench):
 
         self.appendToolbar("Gear", ["CreateInvoluteGear", "CreateInvoluteRack", "CreateCycloideGear", "CreateBevelGear"])
         self.appendMenu("Gear", ["CreateInvoluteGear", "CreateInvoluteRack", "CreateCycloideGear","CreateBevelGear"])
-        Gui.addIconPath(FreeCAD.getHomePath()+"Mod/gear/icons/")
+        Gui.addIconPath(App.getHomePath()+"Mod/gear/icons/")
         Gui.addCommand('CreateInvoluteGear', CreateInvoluteGear())
         Gui.addCommand('CreateCycloideGear', CreateCycloideGear())
         Gui.addCommand('CreateBevelGear', CreateBevelGear())
