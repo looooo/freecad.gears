@@ -39,7 +39,7 @@ class CreateInvoluteGear():
             return True
 
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_gear")
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteGear")
         involute_gear(a)
         ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
@@ -60,7 +60,7 @@ class CreateInvoluteRack():
             return True
 
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "involute_rack")
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteRack")
         involute_gear_rack(a)
         ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
@@ -81,7 +81,7 @@ class CreateCycloideGear():
             return True
 
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "cycloide_gear")
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CycloideGear")
         cycloide_gear(a)
         ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()
@@ -101,7 +101,7 @@ class CreateBevelGear():
             return True
 
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "bevel_gear")
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BevelGear")
         bevel_gear(a)
         ViewProviderGear(a.ViewObject)
         FreeCAD.ActiveDocument.recompute()

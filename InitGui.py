@@ -31,8 +31,8 @@ except ImportError as e:
 
 class gearWorkbench(Workbench):
     """glider workbench"""
-    MenuText = "gear"
-    ToolTip = "gear workbench"
+    MenuText = "Gear"
+    ToolTip = "Gear Workbench"
     Icon = "gearworkbench.svg"
 
     def GetClassName(self):
