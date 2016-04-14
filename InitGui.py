@@ -26,13 +26,13 @@ import gearfunc
 try:
     from FreeCADGui import Workbench
 except ImportError as e:
-    App.Console.Warning("you are using the GearWorkbench with an old version of FreeCAD (<0.16)")
-    App.Console.Warning("the class Workbench is loaded, allthough not imported: magic")
+    App.Console.PrintWarning("you are using the GearWorkbench with an old version of FreeCAD (<0.16)")
+    App.Console.PrintWarning("the class Workbench is loaded, allthough not imported: magic")
 
 class gearWorkbench(Workbench):
     """glider workbench"""
-    MenuText = "gear"
-    ToolTip = "gear workbench"
+    MenuText = "Gear"
+    ToolTip = "Gear Workbench"
     Icon = "gearworkbench.svg"
 
     def GetClassName(self):
