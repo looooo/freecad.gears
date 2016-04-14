@@ -44,6 +44,7 @@ def reflection3D(pressure_angle):
 
 
 def rotation(pressure_angle, midpoint=None):
+    print(midpoint)
     midpoint = midpoint or [0, 0]
     mat = array([[cos(pressure_angle), -sin(pressure_angle)], [sin(pressure_angle), cos(pressure_angle)]])
     midpoint = array(midpoint)
@@ -72,7 +73,7 @@ def translation(vec):
         return([x[0] + vec[0], x[1] + vec[1]])
 
     def func(x):
-        return(array(map(trans, x)))
+        return(array(list(map(trans, x))))
     return(func)
 
 

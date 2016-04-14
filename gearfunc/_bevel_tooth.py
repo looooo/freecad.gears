@@ -113,11 +113,11 @@ class bevel_tooth(object):
     def involute_points(self, num=10):
         pts = linspace(self.involute_start, self.involute_end, num=num)
         fx = self.involute_function_x()
-        x = array(map(fx, pts))
+        x = array(list(map(fx, pts)))
         fy = self.involute_function_y()
-        y = array(map(fy, pts))
+        y = array(list(map(fy, pts)))
         fz = self.involute_function_z()
-        z = array(map(fz, pts))
+        z = array(list(map(fz, pts)))
         xyz = transpose(array([x, y, z]))
         # conical projection to z=1
         xy = [[i[0] / i[2], i[1] / i[2]] for i in xyz]

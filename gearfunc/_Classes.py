@@ -127,7 +127,7 @@ class involute_gear():
             wi = []
             for i in pts:
                 out = BSplineCurve()
-                out.interpolate(map(fcvec, i))
+                out.interpolate(list(map(fcvec, i)))
                 wi.append(out)
             s = Wire(Shape(wi).Edges)
             wi = []
@@ -199,7 +199,7 @@ class involute_gear_rack():
         fp.rack.thickness = fp.thickness.Value
         fp.rack._update()
         pts = fp.rack.points()
-        pol = Wire(makePolygon(map(fcvec, pts)))
+        pol = Wire(makePolygon(list(map(fcvec, pts))))
         fp.Shape = Face(Wire(pol)).extrude(fcvec([0., 0., fp.height]))
 
     def __getstate__(self):
@@ -258,7 +258,7 @@ class cycloide_gear():
         wi = []
         for i in pts:
             out = BSplineCurve()
-            out.interpolate(map(fcvec, i))
+            out.interpolate(list(map(fcvec, i)))
             wi.append(out)
         s = Wire(Shape(wi).Edges)
         wi = []
@@ -392,7 +392,7 @@ class bevel_gear():
             w1 = []
             scale = lambda x: fcvec(x * pos)
             for i in pts:
-                i_scale = map(scale, i)
+                i_scale = list(map(scale, i))
                 w1.append(i_scale)
             w.append(w1)
         surfs = []
@@ -407,9 +407,9 @@ class bevel_gear():
         w1 = []
         for i in pts:
             scale = lambda x: x * pos
-            i_scale = map(scale, i)
+            i_scale = list(map(scale, i))
             out = BSplineCurve()
-            out.interpolate(map(fcvec, i_scale))
+            out.interpolate(list(map(fcvec, i_scale)))
             w1.append(out)
         s = Wire(Shape(w1).Edges)
         wi = []

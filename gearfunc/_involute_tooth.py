@@ -68,9 +68,9 @@ class involute_tooth():
     def undercut_points(self, num=10):
         pts = linspace(0, self.undercut_end, num=num)
         fx = self.undercut_function_x()
-        x = array(map(fx, pts))
+        x = array(list(map(fx, pts)))
         fy = self.undercut_function_y()
-        y = array(map(fy, pts))
+        y = array(list(map(fy, pts)))
         xy = transpose([x, y])
         rotate = rotation(
             self.undercut_rot + self.phipart / 2 - self.backlash / 4)
@@ -80,9 +80,9 @@ class involute_tooth():
     def involute_points(self, num=10):
         pts = linspace(self.involute_start, self.involute_end, num=num)
         fx = self.involute_function_x()
-        x = array(map(fx, pts))
+        x = array(list(map(fx, pts)))
         fy = self.involute_function_y()
-        y = array(map(fy, pts))
+        y = array(list(map(fy, pts)))
         rot = rotation(self.involute_rot - self.backlash / 4)
         xy = rot(transpose(array([x, y])))
         return(xy)
