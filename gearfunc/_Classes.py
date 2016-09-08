@@ -27,9 +27,9 @@ from ._cycloide_tooth import cycloide_tooth
 from ._bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
-     show, makePolygon, makeLoft, makeHelix
+     show, makePolygon, makeHelix
 import Part
-from ._functions import rotation3D
+from ._functions import rotation3D, rotation
 from numpy import pi, cos, sin, tan
 
 import numpy
@@ -123,29 +123,20 @@ class involute_gear():
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
+        rotated_pts = pts
+        rot = rotation(-fp.gear.phipart)
+        for i in range(fp.gear.z - 1):
+            rotated_pts = map(rot, rotated_pts)
+            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts += rotated_pts
+        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
         if not fp.simple:
             wi = []
             for i in pts:
                 out = BSplineCurve()
                 out.interpolate(list(map(fcvec, i)))
-                wi.append(out)
-            s = Wire(Shape(wi).Edges)
-            wi = []
-            for i in range(fp.gear.z):
-                rot = App.Matrix()
-                rot.rotateZ(-i * fp.gear.phipart)
-                tooth_rot = s.transformGeometry(rot)
-                if i != 0:
-                    pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-                    pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
-                    wi.append(Wire([Line(pt_0, pt_1).toShape()]))
-                wi.append(tooth_rot)
-            pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-            pt_1 = wi[0].Edges[0].Vertexes[-1].Point
-            wi.append(Wire([Line(pt_0, pt_1).toShape()]))
-
+                wi.append(out.toShape())
             wi = Wire(wi)
-            fp.Shape = wi
             if fp.beta.Value == 0:
                 sh = Face(wi)
                 fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
@@ -255,25 +246,18 @@ class cycloide_gear():
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
+        rotated_pts = pts
+        rot = rotation(-fp.gear.phipart)
+        for i in range(fp.gear.z - 1):
+            rotated_pts = map(rot, rotated_pts)
+            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts += rotated_pts
+        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
         wi = []
         for i in pts:
             out = BSplineCurve()
             out.interpolate(list(map(fcvec, i)))
-            wi.append(out)
-        s = Wire(Shape(wi).Edges)
-        wi = []
-        for i in range(fp.gear.z):
-            rot = App.Matrix()
-            rot.rotateZ(-i * fp.gear.phipart)
-            tooth_rot = s.transformGeometry(rot)
-            if i != 0:
-                pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-                pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
-                wi.append(Wire([Line(pt_0, pt_1).toShape()]))
-            wi.append(tooth_rot)
-        pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-        pt_1 = wi[0].Edges[0].Vertexes[-1].Point
-        wi.append(Wire([Line(pt_0, pt_1).toShape()]))
+            wi.append(out.toShape())
         wi = Wire(wi)
         if fp.beta.Value == 0:
             sh = Face(wi)
@@ -372,11 +356,18 @@ class bevel_gear():
         scale = fp.m.Value * fp.gear.z / 2 / tan(fp.pitch_angle.Value * pi / 180)
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
-        pts = fp.gear.points(num=fp.numpoints)
+        pts = list(fp.gear.points(num=fp.numpoints))
+        rotated_pts = pts
+        rot = rotation3D(2  * pi / fp.teeth)
+        for i in range(fp.gear.z - 1):
+            rotated_pts = map(rot, rotated_pts)
+            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts += rotated_pts
+        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
         scale1 = scale - fp.height.Value / 2
         scale2 = scale + fp.height.Value / 2
-        fp.Shape = makeLoft([self.create_teeth(pts, scale1, fp.teeth),
-                             self.create_teeth(pts, scale2, fp.teeth)], True)
+        fp.Shape = makeLoft([makeBSplineWire([pt * scale1 for pt in pts]),
+                             makeBSplineWire([pt * scale2 for pt in pts])], True)
         # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
 
 
@@ -405,12 +396,13 @@ class bevel_gear():
 
     def create_teeth(self, pts, pos, teeth):
         w1 = []
-        for i in pts:
-            scale = lambda x: x * pos
-            i_scale = list(map(scale, i))
-            out = BSplineCurve()
-            out.interpolate(list(map(fcvec, i_scale)))
-            w1.append(out)
+        pts = [pt * pos for pt in pts]
+        rotated_pts = scaled_points
+        rot = rotation3D(- 2 * i * pi / teeth)
+        for i in range(teeth - 1):
+            rotated_pts = map(rot, rotated_pts)
+            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts += rotated_pts
         s = Wire(Shape(w1).Edges)
         wi = []
         for i in range(teeth):
@@ -469,3 +461,11 @@ def make_face(edge1, edge2):
     w = Wire([e3, e4, e1, e2])
     return(Face(w))
 
+
+def makeBSplineWire(pts):
+    wi = []
+    for i in pts:
+        out = BSplineCurve()
+        out.interpolate(list(map(fcvec, i)))
+        wi.append(out.toShape())
+    return Wire(wi)

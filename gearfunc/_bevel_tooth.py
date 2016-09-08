@@ -145,11 +145,11 @@ class bevel_tooth(object):
         rot = rotation3D(2*pi/self.z)
         if self.add_foot:
             return(array([
-                [pts[0], pts[1]],
+                array([pts[0], pts[1]]),
                 pts[1:],
-                [pts[-1], pts1[0]],
+                array([pts[-1], pts1[0]]),
                 pts1[:-1],
-                [pts1[-2], pts1[-1]]
+                array([pts1[-2], pts1[-1]])
                 ]))
         else:
             return(array([pts, [pts[-1], pts1[0]], pts1]))
