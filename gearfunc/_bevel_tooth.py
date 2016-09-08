@@ -152,7 +152,7 @@ class bevel_tooth(object):
                 array([pts1[-2], pts1[-1]])
                 ]))
         else:
-            return(array([pts, [pts[-1], pts1[0]], pts1]))
+            return(array([pts, array([pts[-1], pts1[0]]), pts1]))
 
     def _update(self):
         self.__init__(z=self.z, clearance=self.clearance,
