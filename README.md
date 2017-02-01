@@ -9,9 +9,7 @@ Use only with FreeCAD version > 0.16
 
 * install on Windows (7/8/8.1/10):
   * download ZIP-archive by clicking on button in top right corner
-  * go to FreeCAD-Macro-Folder (inside FreeCAD, choose "Edit > Preferences > General > Macro to see Macro Path)
-  * if you haven't changed the standard settings, it should be "C:\Users\Your_Windows_User_Name\AppData\Roaming\FreeCAD"
-  * \appdata is a HIDDEN folder, so you may have to change the settings of the file explorer to see it
+  * go to FreeCAD-Mod-Folder (eg.: C:\Program Files\FreeCAD 0.16\Mod\)
   * create a sub-folder called "FCGear"
   * make sure to copy files and folders EXACTLY as shown above to the just created sub-folder
   * restart FreeCAD and the workbench should appear in the pull-down menu
