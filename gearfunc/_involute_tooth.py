@@ -25,7 +25,8 @@ from ._functions import nearestpts, rotation, reflection, trimfunc, norm, transl
 import numpy as np
 
 class involute_tooth():
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., clearance=0.12, shift=0.5, beta=0., undercut=False, backlash=0.00):
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., clearance=0.12, shift=0.5, beta=0.,
+                       undercut=False, backlash=0.00, head=0.00):
         self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
@@ -34,16 +35,18 @@ class involute_tooth():
         self.shift = shift
         self.clearance = clearance
         self.backlash = backlash
+        self.head = head        # factor, rename!!!
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
+        print(self.head)
         self.pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
         self.m = self.m_n / cos(self.beta)
         self.c = self.clearance * self.m_n
         self.midpoint = [0., 0.]
         self.d = self.z * self.m
         self.dw = self.m * self.z
-        self.da = self.dw + 2. * self.m_n + 2. * self.shift * self.m_n
+        self.da = self.dw + 2. * self.m_n + 2. * (self.shift + self.head) * self.m_n
         self.df = self.dw - 2. * self.m_n - \
             2 * self.c + 2. * self.shift * self.m_n
         self.dg = self.d * cos(self.pressure_angle_t)
@@ -146,7 +149,7 @@ class involute_tooth():
     def _update(self):
         self.__init__(m = self.m_n, z = self.z,
                 pressure_angle = self.pressure_angle, clearance = self.clearance, shift = self.shift,
-                beta = self.beta, undercut = self.undercut, backlash = self.backlash)
+                beta = self.beta, undercut = self.undercut, backlash = self.backlash, head = self.head)
 
 
 class involute_rack(object):

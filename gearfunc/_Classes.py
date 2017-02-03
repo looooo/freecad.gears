@@ -95,8 +95,12 @@ class involute_gear():
         obj.addProperty(
             "App::PropertyAngle", "beta", "gear_parameter", "beta ")
         obj.addProperty(
-            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
+            "App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty(
+            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+        obj.addProperty("App::PropertyPythonObject", "gear", "gear_parameter", "test")
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -107,8 +111,10 @@ class involute_gear():
         obj.beta = '0. deg'
         obj.height = '5. mm'
         obj.clearance = 0.25
+        obj.head = 0.
         obj.numpoints = 6
         obj.backlash = '0.00 mm'
+        obj.reversed_backlash = False
         self.obj = obj
         obj.Proxy = self
 
@@ -120,7 +126,8 @@ class involute_gear():
         fp.gear.pressure_angle = fp.pressure_angle.Value * pi / 180.
         fp.gear.beta = fp.beta.Value * pi / 180
         fp.gear.clearance = fp.clearance
-        fp.gear.backlash = fp.backlash.Value
+        fp.gear.backlash = fp.backlash.Value * (-fp.reversed_backlash + 0.5) * 2.
+        fp.gear.head = fp.head
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
@@ -223,7 +230,7 @@ class cycloide_gear():
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
+        obj.addProperty("App::PropertyPythonObject", "gear", "gear_parameter", "test")
         obj.gear = self.cycloide_tooth
         obj.teeth = 15
         obj.module = '1. mm'
@@ -298,7 +305,7 @@ class bevel_gear():
                         "gear_parameter", "number of points for spline")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyPythonObject", "gear", "test", "test")
+        obj.addProperty("App::PropertyPythonObject", "gear", "gear_paramenter", "test")
         obj.gear = self.bevel_tooth
         obj.m = '1. mm'
         obj.teeth = 15
