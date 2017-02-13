@@ -133,7 +133,7 @@ class involute_gear():
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
         for i in range(fp.gear.z - 1):
-            rotated_pts = map(rot, rotated_pts)
+            rotated_pts = list(map(rot, rotated_pts))
             pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
         pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
@@ -256,7 +256,7 @@ class cycloide_gear():
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
         for i in range(fp.gear.z - 1):
-            rotated_pts = map(rot, rotated_pts)
+            rotated_pts = list(map(rot, rotated_pts))
             pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
         pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
