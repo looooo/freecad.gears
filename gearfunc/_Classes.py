@@ -27,7 +27,7 @@ from ._cycloide_tooth import cycloide_tooth
 from ._bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
-     show, makePolygon, makeHelix
+     show, makePolygon, makeHelix, makeSweepSurface
 import Part
 from ._functions import rotation3D, rotation
 from numpy import pi, cos, sin, tan
@@ -367,7 +367,7 @@ class bevel_gear():
         rotated_pts = pts
         rot = rotation3D(2  * pi / fp.teeth)
         for i in range(fp.gear.z - 1):
-            rotated_pts = map(rot, rotated_pts)
+            rotated_pts = list(map(rot, rotated_pts))
             pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
         pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
@@ -434,29 +434,11 @@ class bevel_gear():
 
 
 def helicalextrusion(wire, height, angle):
-    face_a = Face(wire)
-    face_b = face_a.copy()
-    face_transform = App.Matrix()
-    face_transform.rotateZ(angle)
-    face_transform.move(App.Vector(0, 0, height))
-    face_b.transformShape(face_transform)
     spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
     auxspine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, bool(angle < 0))
-    faces = [face_a, face_b]
-    pipeshell = BRepOffsetAPI.MakePipeShell(spine)
-    pipeshell.setSpineSupport(spine)
-    pipeshell.add(wire)
-    pipeshell.setAuxiliarySpine(auxspine, True, False)
-    assert(pipeshell.isReady())
-    pipeshell.build()
-    faces.extend(pipeshell.shape().Faces)
+    solid = auxspine.makePipeShell([wire], True, True)
+    return solid
 
-    fullshell = Shell(faces)
-    solid = Solid(fullshell)
-    if solid.Volume < 0:
-        solid.reverse()
-    assert(solid.Volume >= 0)
-    return(solid)
 
 def make_face(edge1, edge2):
     v1, v2 = edge1.Vertexes
