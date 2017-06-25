@@ -440,7 +440,7 @@ class bevel_gear():
 def helicalextrusion(wire, height, angle, double_helix = False):
     if double_helix:
         direction = bool(angle < 0)
-        first_spine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, direction)
+        first_spine = makeHelix(height * 2 * pi / abs(angle), 0.5 * height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
         second_solid = first_solid.mirror(fcvec([0,0,0]), fcvec([0,0,1]))
         return first_solid.fuse(second_solid)
