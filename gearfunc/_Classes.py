@@ -95,6 +95,8 @@ class involute_gear():
         obj.addProperty(
             "App::PropertyAngle", "beta", "gear_parameter", "beta ")
         obj.addProperty(
+            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
+        obj.addProperty(
             "App::PropertyLength", "backlash", "tolerance", "backlash")
         obj.addProperty(
             "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
@@ -113,12 +115,14 @@ class involute_gear():
         obj.clearance = 0.25
         obj.head = 0.
         obj.numpoints = 6
+        obj.double_helix = False
         obj.backlash = '0.00 mm'
         obj.reversed_backlash = False
         self.obj = obj
         obj.Proxy = self
 
     def execute(self, fp):
+        fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.undercut = fp.undercut
@@ -149,7 +153,7 @@ class involute_gear():
                 fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
             else:
                 fp.Shape = helicalextrusion(
-                    wi, fp.height.Value, fp.height.Value * tan(fp.gear.beta) * 2 / fp.gear.d)
+                    wi, fp.height.Value, fp.height.Value * tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
         else:
             rw = fp.gear.dw / 2
             circle = Part.Circle(App.Vector(0, 0, 0), App.Vector(0, 0, 1), rw)
@@ -433,11 +437,19 @@ class bevel_gear():
         return None
 
 
-def helicalextrusion(wire, height, angle):
-    spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
-    auxspine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, bool(angle < 0))
-    solid = auxspine.makePipeShell([wire], True, True)
-    return solid
+def helicalextrusion(wire, height, angle, double_helix = False):
+    if double_helix:
+        direction = bool(angle < 0)
+        first_spine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, direction)
+        first_solid = first_spine.makePipeShell([wire], True, True)
+        second_solid = first_solid.mirror(fcvec([0,0,0]), fcvec([0,0,1]))
+        return first_solid.fuse(second_solid)
+    else:
+        spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
+        auxspine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, bool(angle < 0))
+        solid = auxspine.makePipeShell([wire], True, True)
+        return solid
+
 
 
 def make_face(edge1, edge2):
