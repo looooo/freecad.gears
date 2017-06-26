@@ -26,7 +26,7 @@ from ._involute_tooth import involute_tooth, involute_rack
 from ._cycloide_tooth import cycloide_tooth
 from ._bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
-    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, Compound,\
+    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, makeCompound,\
      show, makePolygon, makeHelix, makeSweepSurface
 import Part
 from ._functions import rotation3D, rotation
@@ -438,17 +438,14 @@ class bevel_gear():
 
 
 def helicalextrusion(wire, height, angle, double_helix = False):
+    direction = bool(angle < 0)
+    first_spine = makeHelix(height * 2 * pi / abs(angle), 0.5 * height, 10., 0, direction)
+    first_solid = first_spine.makePipeShell([wire], True, True)
     if double_helix:
-        direction = bool(angle < 0)
-        first_spine = makeHelix(height * 2 * pi / abs(angle), 0.5 * height, 10., 0, direction)
-        first_solid = first_spine.makePipeShell([wire], True, True)
         second_solid = first_solid.mirror(fcvec([0,0,0]), fcvec([0,0,1]))
-        return first_solid.fuse(second_solid)
+        return makeCompound([first_solid, second_solid])
     else:
-        spine = Wire(Line(fcvec([0., 0, 0]), fcvec([0, 0, height])).toShape())
-        auxspine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, bool(angle < 0))
-        solid = auxspine.makePipeShell([wire], True, True)
-        return solid
+        return first_solid
 
 
 
