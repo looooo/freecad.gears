@@ -27,7 +27,7 @@ from ._cycloide_tooth import cycloide_tooth
 from ._bevel_tooth import bevel_tooth
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, makeCompound,\
-     show, makePolygon, makeHelix, makeSweepSurface
+     show, makePolygon, makeHelix, makeSweepSurface, makeShell, makeSolid
 import Part
 from ._functions import rotation3D, rotation
 from numpy import pi, cos, sin, tan
@@ -461,10 +461,12 @@ class bevel_gear():
 def helicalextrusion(wire, height, angle, double_helix = False):
     direction = bool(angle < 0)
     if double_helix:
-        first_spine = makeHelix(height * 2 * pi / abs(angle), 0.5 * height, 10., 0, direction)
+        first_spine = makeHelix(height * 2. * pi / abs(angle), 0.5 * height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
         second_solid = first_solid.mirror(fcvec([0,0,0.5 * height]), fcvec([0,0,1]))
-        return makeCompound([first_solid, second_solid])
+        faces = first_solid.Faces + second_solid.Faces
+        faces = [f for f in faces if not on_mirror_plane(f, 0.5 * height, fcvec([0., 0., 1.]))]
+        return makeSolid(makeShell(faces))
     else:
         first_spine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
@@ -490,3 +492,8 @@ def makeBSplineWire(pts):
         out.interpolate(list(map(fcvec, i)))
         wi.append(out.toShape())
     return Wire(wi)
+
+def on_mirror_plane(face, z, direction, small_size=0.01):
+    # the tolerance is very high. Maybe there is a bug in Part.makeHelix.
+    return (face.normalAt(0, 0).cross(direction).Length < small_size and
+            abs(face.CenterOfMass.z - z)  < small_size)
