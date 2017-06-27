@@ -39,7 +39,6 @@ class involute_tooth():
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-        print(self.head)
         self.pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
         self.m = self.m_n / cos(self.beta)
         self.c = self.clearance * self.m_n
@@ -153,18 +152,22 @@ class involute_tooth():
 
 
 class involute_rack(object):
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5):
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
         self.z = z
+        self.beta = beta
 
     def _update(self):
-        self.__init__(m = self.m, z = self.z, pressure_angle = self.pressure_angle, thickness = self.thickness)
+        self.__init__(m = self.m, z = self.z, pressure_angle = self.pressure_angle, thickness = self.thickness, beta=self.beta)
 
     def points(self, num=10):
-        a = 2 * self.m * tan(self.pressure_angle)
-        b = ((self.m * pi) / 2 - a) / 2
+        pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
+        m = self.m / cos(self.beta)
+
+        a = 2 * self.m * tan(pressure_angle_t)
+        b = ((m * pi) / 2 - a) / 2
         tooth= [
             [self.m, -a - b],
             [-self.m, -b],
@@ -172,7 +175,7 @@ class involute_rack(object):
             [self.m, a + b]
             ]
         teeth = [tooth]
-        trans = translation([0., self.m * pi, 0.])
+        trans = translation([0., m * pi, 0.])
         for i in range(self.z):
             teeth.append(trans(teeth[-1]))
         teeth = list(np.vstack(teeth))

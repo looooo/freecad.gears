@@ -183,7 +183,11 @@ class involute_gear_rack():
         obj.addProperty(
             "App::PropertyLength", "thickness", "gear_parameter", "thickness")
         obj.addProperty(
+            "App::PropertyAngle", "beta", "gear_parameter", "beta ")
+        obj.addProperty(
             "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty(
+            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -191,6 +195,7 @@ class involute_gear_rack():
         obj.pressure_angle = '20. deg'
         obj.height = '5. mm'
         obj.thickness = '5 mm'
+        obj.beta = '0. deg'
         self.obj = obj
         obj.Proxy = self
 
@@ -199,10 +204,25 @@ class involute_gear_rack():
         fp.rack.z = fp.teeth
         fp.rack.pressure_angle = fp.pressure_angle.Value * pi / 180.
         fp.rack.thickness = fp.thickness.Value
+        fp.rack.beta = fp.beta.Value * pi / 180.
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))
-        fp.Shape = Face(Wire(pol)).extrude(fcvec([0., 0., fp.height]))
+        if fp.beta.Value == 0:
+            face = Face(Wire(pol))
+            fp.Shape = face.extrude(fcvec([0., 0., fp.height.Value]))
+        elif fp.double_helix:
+            beta = fp.beta.Value * pi / 180.
+            pol2 = Part.Wire(pol)
+            pol2.translate(fcvec([0., tan(beta) * fp.height.Value / 2, fp.height.Value / 2]))
+            pol3 = Part.Wire(pol)
+            pol3.translate(fcvec([0., 0., fp.height.Value]))
+            fp.Shape = makeLoft([pol, pol2, pol3], True, True)
+        else:
+            beta = fp.beta.Value * pi / 180.
+            pol2 = Part.Wire(pol)
+            pol2.translate(fcvec([0., tan(beta) * fp.height.Value, fp.height.Value]))
+            fp.Shape = makeLoft([pol, pol2], True)
 
     def __getstate__(self):
         return None
@@ -212,9 +232,7 @@ class involute_gear_rack():
 
 
 class cycloide_gear():
-
     """FreeCAD gear"""
-
     def __init__(self, obj):
         self.cycloide_tooth = cycloide_tooth()
         obj.addProperty("App::PropertyInteger",
@@ -236,7 +254,7 @@ class cycloide_gear():
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyPythonObject", "gear", "gear_parameter", "test")
+        obj.addProperty("App::PropertyPythonObject", "gear", "gear_parameter", "the python object")
         obj.gear = self.cycloide_tooth
         obj.teeth = 15
         obj.module = '1. mm'
