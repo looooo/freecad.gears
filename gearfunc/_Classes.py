@@ -228,6 +228,8 @@ class cycloide_gear():
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
+            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
+        obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
@@ -245,6 +247,7 @@ class cycloide_gear():
         obj.clearance = 0.25
         obj.numpoints = 15
         obj.backlash = '0.00 mm'
+        obj.double_helix = False
         obj.Proxy = self
 
     def execute(self, fp):
@@ -276,7 +279,7 @@ class cycloide_gear():
         else:
             pass
             fp.Shape = helicalextrusion(
-                wi, fp.height.Value, fp.height.Value * tan(fp.beta.Value * pi / 180) * 2 / fp.gear.d)
+                wi, fp.height.Value, fp.height.Value * tan(fp.beta.Value * pi / 180) * 2 / fp.gear.d, fp.double_helix)
 
     def __getstate__(self):
         return None
