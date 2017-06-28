@@ -463,10 +463,13 @@ def helicalextrusion(wire, height, angle, double_helix = False):
     if double_helix:
         first_spine = makeHelix(height * 2. * pi / abs(angle), 0.5 * height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
-        second_solid = first_solid.mirror(fcvec([0,0,0.5 * height]), fcvec([0,0,1]))
+        second_solid = first_solid.mirror(fcvec([0.,0.,0.]), fcvec([0,0,1]))
         faces = first_solid.Faces + second_solid.Faces
-        faces = [f for f in faces if not on_mirror_plane(f, 0.5 * height, fcvec([0., 0., 1.]))]
-        return makeSolid(makeShell(faces))
+        faces = [f for f in faces if not on_mirror_plane(f, 0., fcvec([0., 0., 1.]))]
+        solid = makeSolid(makeShell(faces))
+        mat = App.Matrix()
+        mat.move(fcvec([0, 0, 0.5 * height]))
+        return solid.transformGeometry(mat)
     else:
         first_spine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
@@ -493,7 +496,7 @@ def makeBSplineWire(pts):
         wi.append(out.toShape())
     return Wire(wi)
 
-def on_mirror_plane(face, z, direction, small_size=0.01):
+def on_mirror_plane(face, z, direction, small_size=0.000001):
     # the tolerance is very high. Maybe there is a bug in Part.makeHelix.
     return (face.normalAt(0, 0).cross(direction).Length < small_size and
             abs(face.CenterOfMass.z - z)  < small_size)
