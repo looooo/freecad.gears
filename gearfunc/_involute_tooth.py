@@ -152,27 +152,29 @@ class involute_tooth():
 
 
 class involute_rack(object):
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0):
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
         self.z = z
         self.beta = beta
+        self.head = head
 
     def _update(self):
-        self.__init__(m = self.m, z = self.z, pressure_angle = self.pressure_angle, thickness = self.thickness, beta=self.beta)
+        self.__init__(m = self.m, z = self.z, pressure_angle = self.pressure_angle,
+                      thickness=self.thickness, beta=self.beta, head=self.head)
 
     def points(self, num=10):
         pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
         m = self.m / cos(self.beta)
 
-        a = 2 * self.m * tan(pressure_angle_t)
-        b = ((m * pi) / 2 - a) / 2
+        a = (2 + self.head) * m * tan(pressure_angle_t)
+        b = (m * pi) / 4 - (1 + self.head) * m * tan(pressure_angle_t)
         tooth= [
-            [self.m, -a - b],
-            [-self.m, -b],
-            [-self.m, b],
-            [self.m, a + b]
+            [-self.m, -a - b],
+            [self.m * (1 + self.head), -b],
+            [self.m * (1 + self.head), b],
+            [-self.m, a + b]
             ]
         teeth = [tooth]
         trans = translation([0., m * pi, 0.])
@@ -180,9 +182,9 @@ class involute_rack(object):
             teeth.append(trans(teeth[-1]))
         teeth = list(np.vstack(teeth))
         teeth.append(list(teeth[-1]))
-        teeth[-1][0] += self.thickness
+        teeth[-1][0] -= self.thickness
         teeth.append(list(teeth[0]))
-        teeth[-1][0] += self.thickness
+        teeth[-1][0] -= self.thickness
         teeth.append(teeth[0])
         return(teeth)
 
