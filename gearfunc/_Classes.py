@@ -188,6 +188,8 @@ class involute_gear_rack():
             "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
         obj.addProperty(
             "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -205,6 +207,7 @@ class involute_gear_rack():
         fp.rack.pressure_angle = fp.pressure_angle.Value * pi / 180.
         fp.rack.thickness = fp.thickness.Value
         fp.rack.beta = fp.beta.Value * pi / 180.
+        fp.rack.head = fp.head
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))
