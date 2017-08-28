@@ -31,6 +31,7 @@ from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
 import Part
 from ._functions import rotation3D, rotation
 from numpy import pi, cos, sin, tan
+import numpy as np
 
 import numpy
 
@@ -68,7 +69,7 @@ class ViewProviderGear:
     def __setstate__(self, state):
         return None
 
-class involute_gear():
+class involute_gear(object):
 
     """FreeCAD gear"""
 
@@ -168,7 +169,7 @@ class involute_gear():
         return None
 
 
-class involute_gear_rack():
+class involute_gear_rack(object):
 
     """FreeCAD gear rack"""
 
@@ -234,7 +235,88 @@ class involute_gear_rack():
         return None
 
 
-class cycloide_gear():
+class crown_gear(object):
+    def __init__(self, obj):
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "module", "gear_parameter", "module")
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty(
+            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
+        obj.addProperty(
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty("App::PropertyInteger",
+                        "num_profiles", "accuracy", "number of profiles used for loft")
+        obj.teeth = 15
+        obj.module = '1. mm'
+        obj.pressure_angle = '20. deg'
+        obj.height = '5. mm'
+        obj.thickness = '5 mm'
+        obj.num_profiles = 4
+        self.obj = obj
+        obj.Proxy = self
+
+    def profile(self, r, m, t, z1, z2, alpha0, rm, x01):
+        y = r * np.cos(np.pi / 2. / t)
+        x = r * np.sin(np.pi / 2. / t)
+        alpha = np.arccos(np.cos(alpha0) * rm / r)
+        x1 = x01 * r / rm
+        z1_a = z1 * 0.1
+        x2 = x01 + (z1 + z2 + z1_a) * np.tan(alpha)
+
+        pts = [
+               [x1, y, -z1 - z2 - z1_a], 
+               [x2, y, 0],
+               [-x2, y, 0],
+               [-x1, y, -z1 - z2 - z1_a]
+              ]
+        pts.append(pts[0])
+        return pts
+
+    def execute(self, fp):
+        inner_diameter = fp.module * fp.teeth
+        outer_diameter = inner_diameter + fp.height.Value * 2
+        inner_circle = Part.Wire(Part.makeCircle(inner_diameter / 2.))
+        outer_circle = Part.Wire(Part.makeCircle(outer_diameter / 2.))
+        inner_circle.reverse()
+        face = Part.Face([outer_circle, inner_circle])
+        solid = face.extrude(App.Vector([0., 0., -fp.thickness.Value]))
+
+        ### cutting obj
+        alpha = np.deg2rad(fp.pressure_angle.Value)
+        m = fp.module.Value
+        t = fp.teeth
+        rm = m * t / 2.
+        z1 = m
+        z2 = m
+        r0 = inner_diameter / 2 * 0.99
+        r1 = outer_diameter / 2 * 1.01
+        x01 = rm * np.sin(np.pi / 2. / t) - z1 * np.tan(alpha)
+        polies = []
+        for r_i in np.linspace(r0, r1, fp.num_profiles):
+            pts = self.profile(r_i, m, t, z1, z2, alpha, rm, x01)
+            poly = Wire(makePolygon(list(map(fcvec, pts))))
+            polies.append(poly)
+        loft = makeLoft(polies, True)
+        rot = App.Matrix()
+        rot.rotateZ(2 * np.pi / t)
+        cut_shapes = []
+        for i in range(t):
+            loft = loft.transformGeometry(rot)
+            solid = solid.cut(loft)
+            print(str(i / t) + "%")
+        fp.Shape = solid
+
+    def __getstate__(self):
+        pass
+
+    def __setstate__(self, state):
+        pass
+
+
+class cycloide_gear(object):
     """FreeCAD gear"""
     def __init__(self, obj):
         self.cycloide_tooth = cycloide_tooth()
@@ -272,7 +354,6 @@ class cycloide_gear():
         obj.Proxy = self
 
     def execute(self, fp):
-        pass
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value

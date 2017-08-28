@@ -21,22 +21,25 @@
 
 import FreeCAD
 import FreeCADGui as Gui
-from ._Classes import *
+from ._Classes import ViewProviderGear, involute_gear, involute_gear_rack
+from ._Classes import cycloide_gear, bevel_gear, crown_gear
 
 
-class CreateInvoluteGear():
-    """create an involute gear"""
+class BaseCommand(object):
     def __init__(self):
         pass
-
-    def GetResources(self):
-        return {'Pixmap': 'involutegear.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute gear'}
 
     def IsActive(self):
         if FreeCAD.ActiveDocument is None:
             return False
         else:
             return True
+
+class CreateInvoluteGear(BaseCommand):
+    """create an involute gear"""
+
+    def GetResources(self):
+        return {'Pixmap': 'involutegear.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute gear'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteGear")
@@ -46,18 +49,10 @@ class CreateInvoluteGear():
         Gui.SendMsgToActiveView("ViewFit")
 
 
-class CreateInvoluteRack():
-    def __init__(self):
-        pass
-
+class CreateInvoluteRack(BaseCommand):
     def GetResources(self):
         return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute rack', 'ToolTip': 'involute rack'}
 
-    def IsActive(self):
-        if FreeCAD.ActiveDocument is None:
-            return False
-        else:
-            return True
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteRack")
@@ -67,18 +62,21 @@ class CreateInvoluteRack():
         Gui.SendMsgToActiveView("ViewFit")
 
 
-class CreateCycloideGear():
-    def __init__(self):
-        pass
+class CreateCrownGear(BaseCommand):
+    def GetResources(self):
+        return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute rack', 'ToolTip': 'involute rack'}
 
+    def Activated(self):
+        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CrownGear")
+        crown_gear(a)
+        ViewProviderGear(a.ViewObject)
+        FreeCAD.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
+
+
+class CreateCycloideGear(BaseCommand):
     def GetResources(self):
         return {'Pixmap': 'cycloidegear.svg', 'MenuText': 'cycloide gear', 'ToolTip': 'cycloide gear'}
-
-    def IsActive(self):
-        if FreeCAD.ActiveDocument is None:
-            return False
-        else:
-            return True
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CycloideGear")
@@ -87,18 +85,10 @@ class CreateCycloideGear():
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
-class CreateBevelGear():
-    def __init__(self):
-        pass
 
+class CreateBevelGear(BaseCommand):
     def GetResources(self):
         return {'Pixmap': 'bevelgear.svg', 'MenuText': 'bevel gear', 'ToolTip': 'bevel gear'}
-
-    def IsActive(self):
-        if FreeCAD.ActiveDocument is None:
-            return False
-        else:
-            return True
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BevelGear")
