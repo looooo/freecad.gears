@@ -276,7 +276,7 @@ class crown_gear(object):
         return pts
 
     def execute(self, fp):
-        inner_diameter = fp.module * fp.teeth
+        inner_diameter = fp.module.Value * fp.teeth
         outer_diameter = inner_diameter + fp.height.Value * 2
         inner_circle = Part.Wire(Part.makeCircle(inner_diameter / 2.))
         outer_circle = Part.Wire(Part.makeCircle(outer_diameter / 2.))
