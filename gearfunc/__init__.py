@@ -64,7 +64,7 @@ class CreateInvoluteRack(BaseCommand):
 
 class CreateCrownGear(BaseCommand):
     def GetResources(self):
-        return {'Pixmap': 'crowngear.svg', 'MenuText': 'crown gear', 'ToolTip': 'icrown gear'}
+        return {'Pixmap': 'crowngear.svg', 'MenuText': 'crown gear', 'ToolTip': 'not working yet!!!'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CrownGear")

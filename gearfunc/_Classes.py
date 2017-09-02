@@ -239,6 +239,8 @@ class crown_gear(object):
     def __init__(self, obj):
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty("App::PropertyInteger",
+                        "other_teeth", "gear_parameter", "number of teeth of other gear")
         obj.addProperty(
             "App::PropertyLength", "module", "gear_parameter", "module")
         obj.addProperty(
@@ -250,6 +252,7 @@ class crown_gear(object):
         obj.addProperty("App::PropertyInteger",
                         "num_profiles", "accuracy", "number of profiles used for loft")
         obj.teeth = 15
+        obj.other_teeth = 15
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
         obj.height = '5. mm'
@@ -258,20 +261,42 @@ class crown_gear(object):
         self.obj = obj
         obj.Proxy = self
 
-    def profile(self, r, m, t, z1, z2, alpha0, rm, x01):
-        y = r * np.cos(np.pi / 2. / t)
-        x = r * np.sin(np.pi / 2. / t)
-        alpha = np.arccos(np.cos(alpha0) * rm / r)
-        x1 = x01 * r / rm
-        z1_a = z1 * 0.1
-        x2 = x01 + (z1 + z2 + z1_a) * np.tan(alpha)
 
+    def profile(self, m, r, r0, t_c, t_i, alpha_w, y1, y2):
+        r_ew = m * t_i / 2
+
+        # 1: modifizierter Waelzkreisdurchmesser:
+        r_e = r / r0 * r_ew
+
+        # 2: modifizierter Schraegungswinkel:
+        alpha = np.arccos(r0 / r * np.cos(alpha_w))
+
+        # 3: winkel phi bei senkrechter stellung eines zahns:
+        phi = np.pi / t_i / 2 + (alpha - alpha_w) + (np.tan(alpha_w) - np.tan(alpha))
+
+        # 4: Position des Eingriffspunktes:
+        x_c = r_e * np.sin(phi)
+        dy = -r_e * np.cos(phi) + r_ew
+
+        # 5: oberer Punkt:
+        b = y1 - dy
+        a = np.tan(alpha) * b
+        x1 = a + x_c
+
+        # 6: unterer Punkt
+        d = y2 + dy
+        c = tan(alpha) * d
+        x2 = x_c - c
+
+        print("alpha_w: ", np.rad2deg(alpha_w))
+        print("alpha: ", np.rad2deg(alpha))
+        print("phi: ", np.rad2deg(phi))
         pts = [
-               [x1, y, -z1 - z2 - z1_a], 
-               [x2, y, 0],
-               [-x2, y, 0],
-               [-x1, y, -z1 - z2 - z1_a]
-              ]
+            [-x1, r, 0],
+            [-x2, r, -y1 - y2],
+            [x2, r, -y1 - y2],
+            [x1, r, 0]
+        ]
         pts.append(pts[0])
         return pts
 
@@ -285,18 +310,19 @@ class crown_gear(object):
         solid = face.extrude(App.Vector([0., 0., -fp.thickness.Value]))
 
         ### cutting obj
-        alpha = np.deg2rad(fp.pressure_angle.Value)
+        alpha_w = np.deg2rad(fp.pressure_angle.Value)
         m = fp.module.Value
         t = fp.teeth
-        rm = m * t / 2.
-        z1 = m
-        z2 = m
-        r0 = inner_diameter / 2 * 0.99
-        r1 = outer_diameter / 2 * 1.01
-        x01 = rm * np.sin(np.pi / 2. / t) - z1 * np.tan(alpha)
+        t_c = t
+        t_i = fp.other_teeth
+        rm = inner_diameter / 2
+        y1 = m * 1.1
+        y2 = m
+        r0 = inner_diameter / 2 * 0.95
+        r1 = outer_diameter / 2 * 1.05
         polies = []
         for r_i in np.linspace(r0, r1, fp.num_profiles):
-            pts = self.profile(r_i, m, t, z1, z2, alpha, rm, x01)
+            pts = self.profile(m, r_i, rm, t_c, t_i, alpha_w, y1, y2)
             poly = Wire(makePolygon(list(map(fcvec, pts))))
             polies.append(poly)
         loft = makeLoft(polies, True)
@@ -305,9 +331,11 @@ class crown_gear(object):
         cut_shapes = []
         for i in range(t):
             loft = loft.transformGeometry(rot)
+            # cut_shapes.append(loft)
             solid = solid.cut(loft)
             print(str(i / t) + "%")
         fp.Shape = solid
+        # fp.Shape = Part.Compound(cut_shapes)
 
     def __getstate__(self):
         pass
