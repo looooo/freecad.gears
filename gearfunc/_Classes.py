@@ -251,6 +251,8 @@ class crown_gear(object):
             "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
         obj.addProperty("App::PropertyInteger",
                         "num_profiles", "accuracy", "number of profiles used for loft")
+        obj.addProperty("App::PropertyBool",
+                        "construct", "accuracy", "number of profiles used for loft")
         obj.teeth = 15
         obj.other_teeth = 15
         obj.module = '1. mm'
@@ -258,11 +260,12 @@ class crown_gear(object):
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         obj.num_profiles = 4
+        obj.construct = True
         self.obj = obj
         obj.Proxy = self
 
 
-    def profile(self, m, r, r0, t_c, t_i, alpha_w, y1, y2):
+    def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):
         r_ew = m * t_i / 2
 
         # 1: modifizierter Waelzkreisdurchmesser:
@@ -291,11 +294,12 @@ class crown_gear(object):
         print("alpha_w: ", np.rad2deg(alpha_w))
         print("alpha: ", np.rad2deg(alpha))
         print("phi: ", np.rad2deg(phi))
+        r *= np.cos(phi)
         pts = [
-            [-x1, r, 0],
-            [-x2, r, -y1 - y2],
-            [x2, r, -y1 - y2],
-            [x1, r, 0]
+            [-x1, r, y0],
+            [-x2, r, y0 - y1 - y2],
+            [x2, r, y0 - y1 - y2],
+            [x1, r, y0]
         ]
         pts.append(pts[0])
         return pts
@@ -316,26 +320,32 @@ class crown_gear(object):
         t_c = t
         t_i = fp.other_teeth
         rm = inner_diameter / 2
-        y1 = m * 1.1
+        y0 = m * 0.5
+        y1 = m + y0
         y2 = m
-        r0 = inner_diameter / 2 * 0.95
-        r1 = outer_diameter / 2 * 1.05
+        r0 = inner_diameter / 2 - fp.height.Value * 0.1
+        r1 = outer_diameter / 2 + fp.height.Value * 0.3
         polies = []
         for r_i in np.linspace(r0, r1, fp.num_profiles):
-            pts = self.profile(m, r_i, rm, t_c, t_i, alpha_w, y1, y2)
+            pts = self.profile(m, r_i, rm, t_c, t_i, alpha_w, y0, y1, y2)
             poly = Wire(makePolygon(list(map(fcvec, pts))))
             polies.append(poly)
         loft = makeLoft(polies, True)
         rot = App.Matrix()
         rot.rotateZ(2 * np.pi / t)
-        cut_shapes = []
-        for i in range(t):
-            loft = loft.transformGeometry(rot)
-            # cut_shapes.append(loft)
-            solid = solid.cut(loft)
-            print(str(i / t) + "%")
-        fp.Shape = solid
-        # fp.Shape = Part.Compound(cut_shapes)
+        if fp.construct:
+            cut_shapes = [solid]
+            for i in range(t):
+                loft = loft.transformGeometry(rot)
+                cut_shapes.append(loft)
+            fp.Shape = Part.Compound(cut_shapes)
+        else:
+            for i in range(t):
+                loft = loft.transformGeometry(rot)
+                solid = solid.cut(loft)
+                print(str(i / t) + "%")
+            fp.Shape = solid
+        
 
     def __getstate__(self):
         pass
@@ -443,6 +453,7 @@ class bevel_gear():
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "gear_paramenter", "test")
+        obj.addProperty("App::PropertyAngle", "beta", "gear_paramenter", "test")
         obj.gear = self.bevel_tooth
         obj.m = '1. mm'
         obj.teeth = 15
@@ -452,6 +463,7 @@ class bevel_gear():
         obj.numpoints = 6
         obj.backlash = '0.00 mm'
         obj.clearance = 0.1
+        obj.beta = '0 deg'
         self.obj = obj
         obj.Proxy = self
 
@@ -501,17 +513,23 @@ class bevel_gear():
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
         pts = list(fp.gear.points(num=fp.numpoints))
-        rotated_pts = pts
         rot = rotation3D(2  * pi / fp.teeth)
+        if fp.beta != 0:
+            pts = [np.array([self.spherical_rot(j, fp.beta.Value * pi / 180.) for j in i]) for i in pts]
+
+        rotated_pts = pts
         for i in range(fp.gear.z - 1):
             rotated_pts = list(map(rot, rotated_pts))
             pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
         pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
-        scale1 = scale - fp.height.Value / 2
-        scale2 = scale + fp.height.Value / 2
-        fp.Shape = makeLoft([makeBSplineWire([pt * scale1 for pt in pts]),
-                             makeBSplineWire([pt * scale2 for pt in pts])], True)
+        wires = []
+        for scale_i  in np.linspace(scale - fp.height.Value / 2, scale + fp.height.Value / 2, 10):
+            print(scale_i)
+            beta_i = (scale_i / scale / np.cos(fp.gear.pitch_angle) - 1) * fp.beta.Value * pi / 180
+            rot = rotation3D(beta_i)
+            wires.append(makeBSplineWire([rot(pt) * scale_i for pt in pts]))
+        fp.Shape = makeLoft(wires, True)
         # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
 
 
@@ -537,6 +555,11 @@ class bevel_gear():
             b.interpolate(i)
             surfs.append(b)
         return Shape(surfs)
+
+    def spherical_rot(self, point, phi):
+        print(point)
+        new_phi = (np.linalg.norm(point) -1) * phi
+        return rotation3D(new_phi)(point)
 
     def create_teeth(self, pts, pos, teeth):
         w1 = []
