@@ -178,7 +178,7 @@ class involute_rack(object):
             ]
         teeth = [tooth]
         trans = translation([0., m * pi, 0.])
-        for i in range(self.z):
+        for i in range(self.z - 1):
             teeth.append(trans(teeth[-1]))
         teeth = list(np.vstack(teeth))
         teeth.append(list(teeth[-1]))
