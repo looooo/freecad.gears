@@ -1,1 +1,0 @@
-pyside-rcc gear.qrc -o ../gear_rc.py -py3

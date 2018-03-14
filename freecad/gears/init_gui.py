@@ -18,10 +18,10 @@
 #*                                                                         *
 #***************************************************************************
 
+import os
 import FreeCADGui as Gui
 import FreeCAD as App
-import gear_rc
-import gearfunc
+__dirname__ = os.path.dirname(__file__)
 
 try:
     from FreeCADGui import Workbench
@@ -33,7 +33,7 @@ class gearWorkbench(Workbench):
     """glider workbench"""
     MenuText = "Gear"
     ToolTip = "Gear Workbench"
-    Icon = "gearworkbench.svg"
+    Icon = os.path.join(__dirname__,  'icons', 'gearworkbench.svg')
     commands = [
                 "CreateInvoluteGear",
                 "CreateInvoluteRack",
@@ -45,8 +45,8 @@ class gearWorkbench(Workbench):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
-        from gearfunc import CreateCycloideGear, CreateInvoluteGear
-        from gearfunc import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
+        from .commands import CreateCycloideGear, CreateInvoluteGear
+        from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
         Gui.addIconPath(App.getHomePath()+"Mod/gear/icons/")

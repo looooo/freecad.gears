@@ -21,19 +21,20 @@
 
 from __future__ import division
 import os
+
+import numpy as np
+from pygears.involute_tooth import involute_tooth, involute_rack
+from pygears.cycloide_tooth import cycloide_tooth
+from pygears.bevel_tooth import bevel_tooth
+from pygears._functions import rotation3D, rotation
+
+
 import FreeCAD as App
-from ._involute_tooth import involute_tooth, involute_rack
-from ._cycloide_tooth import cycloide_tooth
-from ._bevel_tooth import bevel_tooth
+import Part
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, makeCompound,\
      show, makePolygon, makeHelix, makeSweepSurface, makeShell, makeSolid
-import Part
-from ._functions import rotation3D, rotation
-from numpy import pi, cos, sin, tan
-import numpy as np
 
-import numpy
 
 
 
@@ -42,8 +43,6 @@ __all__=["involute_gear",
          "bevel_gear", 
          "involute_gear_rack",
          "ViewProviderGear"]
-
-
 
 def fcvec(x):
     if len(x) == 2:
@@ -60,8 +59,8 @@ class ViewProviderGear:
         self.vobj = vobj
 
     def getIcon(self):
-        _dir = os.path.dirname(os.path.realpath(__file__))
-        return(_dir + "/../Resources/icons/involutegear.svg")
+        __dirname__ = os.path.dirname(__file__)
+        return(os.path.join(__dirname__, "icons", "involutegear.svg"))
 
     def __getstate__(self):
         return None
@@ -128,8 +127,8 @@ class involute_gear(object):
         fp.gear.z = fp.teeth
         fp.gear.undercut = fp.undercut
         fp.gear.shift = fp.shift
-        fp.gear.pressure_angle = fp.pressure_angle.Value * pi / 180.
-        fp.gear.beta = fp.beta.Value * pi / 180
+        fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
+        fp.gear.beta = fp.beta.Value * np.pi / 180
         fp.gear.clearance = fp.clearance
         fp.gear.backlash = fp.backlash.Value * (-fp.reversed_backlash + 0.5) * 2.
         fp.gear.head = fp.head
@@ -139,9 +138,9 @@ class involute_gear(object):
         rot = rotation(-fp.gear.phipart)
         for i in range(fp.gear.z - 1):
             rotated_pts = list(map(rot, rotated_pts))
-            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
-        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
+        pts.append(np.array([pts[-1][-1], pts[0][0]]))
         if not fp.simple:
             wi = []
             for i in pts:
@@ -154,7 +153,7 @@ class involute_gear(object):
                 fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
             else:
                 fp.Shape = helicalextrusion(
-                    wi, fp.height.Value, fp.height.Value * tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
+                    wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
         else:
             rw = fp.gear.dw / 2
             circle = Part.Circle(App.Vector(0, 0, 0), App.Vector(0, 0, 1), rw)
@@ -205,9 +204,9 @@ class involute_gear_rack(object):
     def execute(self, fp):
         fp.rack.m = fp.module.Value
         fp.rack.z = fp.teeth
-        fp.rack.pressure_angle = fp.pressure_angle.Value * pi / 180.
+        fp.rack.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
         fp.rack.thickness = fp.thickness.Value
-        fp.rack.beta = fp.beta.Value * pi / 180.
+        fp.rack.beta = fp.beta.Value * np.pi / 180.
         fp.rack.head = fp.head
         fp.rack._update()
         pts = fp.rack.points()
@@ -216,16 +215,16 @@ class involute_gear_rack(object):
             face = Face(Wire(pol))
             fp.Shape = face.extrude(fcvec([0., 0., fp.height.Value]))
         elif fp.double_helix:
-            beta = fp.beta.Value * pi / 180.
+            beta = fp.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
-            pol2.translate(fcvec([0., tan(beta) * fp.height.Value / 2, fp.height.Value / 2]))
+            pol2.translate(fcvec([0., np.tan(beta) * fp.height.Value / 2, fp.height.Value / 2]))
             pol3 = Part.Wire(pol)
             pol3.translate(fcvec([0., 0., fp.height.Value]))
             fp.Shape = makeLoft([pol, pol2, pol3], True, True)
         else:
-            beta = fp.beta.Value * pi / 180.
+            beta = fp.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
-            pol2.translate(fcvec([0., tan(beta) * fp.height.Value, fp.height.Value]))
+            pol2.translate(fcvec([0., np.tan(beta) * fp.height.Value, fp.height.Value]))
             fp.Shape = makeLoft([pol, pol2], True)
 
     def __getstate__(self):
@@ -288,12 +287,9 @@ class crown_gear(object):
 
         # 6: unterer Punkt
         d = y2 + dy
-        c = tan(alpha) * d
+        c = np.tan(alpha) * d
         x2 = x_c - c
 
-        print("alpha_w: ", np.rad2deg(alpha_w))
-        print("alpha: ", np.rad2deg(alpha))
-        print("phi: ", np.rad2deg(phi))
         r *= np.cos(phi)
         pts = [
             [-x1, r, y0],
@@ -343,7 +339,6 @@ class crown_gear(object):
             for i in range(t):
                 loft = loft.transformGeometry(rot)
                 solid = solid.cut(loft)
-                print(str(i / t) + "%")
             fp.Shape = solid
         
 
@@ -404,9 +399,9 @@ class cycloide_gear(object):
         rot = rotation(-fp.gear.phipart)
         for i in range(fp.gear.z - 1):
             rotated_pts = list(map(rot, rotated_pts))
-            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
-        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
+        pts.append(np.array([pts[-1][-1], pts[0][0]]))
         wi = []
         for i in pts:
             out = BSplineCurve()
@@ -419,7 +414,7 @@ class cycloide_gear(object):
         else:
             pass
             fp.Shape = helicalextrusion(
-                wi, fp.height.Value, fp.height.Value * tan(fp.beta.Value * pi / 180) * 2 / fp.gear.d, fp.double_helix)
+                wi, fp.height.Value, fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d, fp.double_helix)
 
     def __getstate__(self):
         return None
@@ -469,15 +464,15 @@ class bevel_gear():
 
     def execute1(self, fp):
         fp.gear.z = fp.teeth
-        fp.gear.pressure_angle = fp.pressure_angle.Value * pi / 180.
-        fp.gear.pitch_angle = fp.pitch_angle.Value * pi / 180
+        fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
+        fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
         fp.gear.backlash = fp.backlash
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         tooth = self.create_tooth()
         teeth = [tooth]
         rot = App.Matrix()
-        rot.rotateZ(2  * pi / fp.teeth)
+        rot.rotateZ(2  * np.pi / fp.teeth)
         top_cap = [i.Edges[0] for i in tooth.Faces]
         bottom_cap = [i.Edges[3] for i in tooth.Faces]
         for i in range(fp.teeth - 1): 
@@ -506,27 +501,26 @@ class bevel_gear():
     def execute(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.module = fp.m.Value
-        fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * pi / 180.
-        fp.gear.pitch_angle = fp.pitch_angle.Value * pi / 180
+        fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.
+        fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
         fp.gear.backlash = fp.backlash.Value
-        scale = fp.m.Value * fp.gear.z / 2 / tan(fp.pitch_angle.Value * pi / 180)
+        scale = fp.m.Value * fp.gear.z / 2 / np.tan(fp.pitch_angle.Value * np.pi / 180)
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
         pts = list(fp.gear.points(num=fp.numpoints))
-        rot = rotation3D(2  * pi / fp.teeth)
+        rot = rotation3D(2  * np.pi / fp.teeth)
         if fp.beta != 0:
-            pts = [np.array([self.spherical_rot(j, fp.beta.Value * pi / 180.) for j in i]) for i in pts]
+            pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
         rotated_pts = pts
         for i in range(fp.gear.z - 1):
             rotated_pts = list(map(rot, rotated_pts))
-            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
-        pts.append(numpy.array([pts[-1][-1], pts[0][0]]))
+        pts.append(np.array([pts[-1][-1], pts[0][0]]))
         wires = []
         for scale_i  in np.linspace(scale - fp.height.Value / 2, scale + fp.height.Value / 2, 10):
-            print(scale_i)
-            beta_i = (scale_i / scale / np.cos(fp.gear.pitch_angle) - 1) * fp.beta.Value * pi / 180
+            beta_i = (scale_i / scale / np.cos(fp.gear.pitch_angle) - 1) * fp.beta.Value * np.pi / 180
             rot = rotation3D(beta_i)
             wires.append(makeBSplineWire([rot(pt) * scale_i for pt in pts]))
         fp.Shape = makeLoft(wires, True)
@@ -535,10 +529,10 @@ class bevel_gear():
 
     def create_tooth(self):
         w = []
-        scal1 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
-            self.obj.pitch_angle.Value * pi / 180) - self.obj.height.Value / 2
-        scal2 = self.obj.m.Value * self.obj.gear.z / 2 / tan(
-            self.obj.pitch_angle.Value * pi / 180) + self.obj.height.Value / 2
+        scal1 = self.obj.m.Value * self.obj.gear.z / 2 / np.tan(
+            self.obj.pitch_angle.Value * np.pi / 180) - self.obj.height.Value / 2
+        scal2 = self.obj.m.Value * self.obj.gear.z / 2 / np.tan(
+            self.obj.pitch_angle.Value * np.pi / 180) + self.obj.height.Value / 2
         s = [scal1, scal2]
         pts = self.obj.gear.points(num=self.obj.numpoints)
         for j, pos in enumerate(s):
@@ -557,7 +551,6 @@ class bevel_gear():
         return Shape(surfs)
 
     def spherical_rot(self, point, phi):
-        print(point)
         new_phi = (np.linalg.norm(point) -1) * phi
         return rotation3D(new_phi)(point)
 
@@ -565,16 +558,16 @@ class bevel_gear():
         w1 = []
         pts = [pt * pos for pt in pts]
         rotated_pts = scaled_points
-        rot = rotation3D(- 2 * i * pi / teeth)
+        rot = rotation3D(- 2 * i * np.pi / teeth)
         for i in range(teeth - 1):
             rotated_pts = map(rot, rotated_pts)
-            pts.append(numpy.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
         s = Wire(Shape(w1).Edges)
         wi = []
         for i in range(teeth):
             rot = App.Matrix()
-            rot.rotateZ(2 * i * pi / teeth)
+            rot.rotateZ(2 * i * np.pi / teeth)
             tooth_rot = s.transformGeometry(rot)
             if i != 0:
                 pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
@@ -596,7 +589,7 @@ class bevel_gear():
 def helicalextrusion(wire, height, angle, double_helix = False):
     direction = bool(angle < 0)
     if double_helix:
-        first_spine = makeHelix(height * 2. * pi / abs(angle), 0.5 * height, 10., 0, direction)
+        first_spine = makeHelix(height * 2. * np.pi / abs(angle), 0.5 * height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
         second_solid = first_solid.mirror(fcvec([0.,0.,0.]), fcvec([0,0,1]))
         faces = first_solid.Faces + second_solid.Faces
@@ -606,7 +599,7 @@ def helicalextrusion(wire, height, angle, double_helix = False):
         mat.move(fcvec([0, 0, 0.5 * height]))
         return solid.transformGeometry(mat)
     else:
-        first_spine = makeHelix(height * 2 * pi / abs(angle), height, 10., 0, direction)
+        first_spine = makeHelix(height * 2 * np.pi / abs(angle), height, 10., 0, direction)
         first_solid = first_spine.makePipeShell([wire], True, True)
         return first_solid
 

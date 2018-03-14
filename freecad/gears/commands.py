@@ -18,11 +18,11 @@
 #*                                                                         *
 #***************************************************************************
 
-
+import os
 import FreeCAD
 import FreeCADGui as Gui
-from ._Classes import ViewProviderGear, involute_gear, involute_gear_rack
-from ._Classes import cycloide_gear, bevel_gear, crown_gear
+from .features import ViewProviderGear, involute_gear, involute_gear_rack
+from .features import cycloide_gear, bevel_gear, crown_gear
 
 
 class BaseCommand(object):
@@ -39,7 +39,9 @@ class CreateInvoluteGear(BaseCommand):
     """create an involute gear"""
 
     def GetResources(self):
-        return {'Pixmap': 'involutegear.svg', 'MenuText': 'involute gear', 'ToolTip': 'involute gear'}
+        return {'Pixmap': os.path.join(os.path.dirname(__file__),  'icons', 'involutegear.svg'), 
+                'MenuText': 'involute gear', 
+                'ToolTip': 'involute gear'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteGear")
@@ -51,7 +53,9 @@ class CreateInvoluteGear(BaseCommand):
 
 class CreateInvoluteRack(BaseCommand):
     def GetResources(self):
-        return {'Pixmap': 'involuterack.svg', 'MenuText': 'involute rack', 'ToolTip': 'involute rack'}
+        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'involuterack.svg'), 
+                'MenuText': 'involute rack', 
+                'ToolTip': 'involute rack'}
 
 
     def Activated(self):
@@ -64,7 +68,9 @@ class CreateInvoluteRack(BaseCommand):
 
 class CreateCrownGear(BaseCommand):
     def GetResources(self):
-        return {'Pixmap': 'crowngear.svg', 'MenuText': 'crown gear', 'ToolTip': 'not working yet!!!'}
+        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'crowngear.svg'),
+                'MenuText': 'crown gear',
+                'ToolTip': 'crown gear'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CrownGear")
@@ -76,7 +82,9 @@ class CreateCrownGear(BaseCommand):
 
 class CreateCycloideGear(BaseCommand):
     def GetResources(self):
-        return {'Pixmap': 'cycloidegear.svg', 'MenuText': 'cycloide gear', 'ToolTip': 'cycloide gear'}
+        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'cycloidegear.svg'), 
+                'MenuText': 'cycloide gear', 
+                'ToolTip': 'cycloide gear'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CycloideGear")
@@ -88,7 +96,9 @@ class CreateCycloideGear(BaseCommand):
 
 class CreateBevelGear(BaseCommand):
     def GetResources(self):
-        return {'Pixmap': 'bevelgear.svg', 'MenuText': 'bevel gear', 'ToolTip': 'bevel gear'}
+        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'bevelgear.svg'), 
+                'MenuText': 'bevel gear', 
+                'ToolTip': 'bevel gear'}
 
     def Activated(self):
         a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BevelGear")
