@@ -1,7 +1,7 @@
 A gear module for FreeCAD
 ---------------------------
 
-![gear](examples/spiral-gear.png)
+![gear](examples/spiral.png)
 
 Use only with FreeCAD version > 0.16
 
