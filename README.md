@@ -3,6 +3,25 @@ A gear module for FreeCAD
 
 ![gear](examples/spiral.png)
 
+## supported gear-types:
+- cylindric involute
+  - shifting
+  - helical
+  - double helical
+  - undercut
+
+- involute rack
+
+- cylindric cycloid
+  - helical
+  - double helical
+
+- spherical involute bevel-gear
+  - spiral
+
+- crown-gear
+
+
 Use only with FreeCAD version > 0.16
 
 * install on Linux:
