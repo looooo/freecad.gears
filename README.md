@@ -1,4 +1,4 @@
-A gear module for FreeCAD
+A gear module for FreeCAD > 0.16
 ---------------------------
 
 ![gear](examples/spiral.png)
@@ -21,8 +21,9 @@ A gear module for FreeCAD
 
 - crown-gear
 
+---------------------------
 
-Use only with FreeCAD version > 0.16
+## install
 
 * install on Linux:
   * git clone https://github.com/looooo/FCGear.git
@@ -40,6 +41,8 @@ Use only with FreeCAD version > 0.16
 * install on MAC (not tested):
   * Copy or unzip the FCgear-folder to the directory FreeCAD.app/Contents/Mod where FreeCAD.app is the folder where FreeCAD is installed.
   * as ALTERNATIVE method you can use FreeCAD-Addon-Installer macro from https://github.com/FreeCAD/FreeCAD-addons
+
+## useage
 
 * create a gear:
   * open freecad
