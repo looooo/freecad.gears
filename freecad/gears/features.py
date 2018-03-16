@@ -509,8 +509,8 @@ class bevel_gear():
         fp.gear._update()
         pts = list(fp.gear.points(num=fp.numpoints))
         rot = rotation3D(2  * np.pi / fp.teeth)
-        if fp.beta != 0:
-            pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
+        # if fp.beta.Value != 0:
+        #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
         rotated_pts = pts
         for i in range(fp.gear.z - 1):
@@ -519,10 +519,19 @@ class bevel_gear():
             pts += rotated_pts
         pts.append(np.array([pts[-1][-1], pts[0][0]]))
         wires = []
-        for scale_i  in np.linspace(scale - fp.height.Value / 2, scale + fp.height.Value / 2, 10):
-            beta_i = (scale_i / scale / np.cos(fp.gear.pitch_angle) - 1) * fp.beta.Value * np.pi / 180
-            rot = rotation3D(beta_i)
-            wires.append(makeBSplineWire([rot(pt) * scale_i for pt in pts]))
+        scale_0 = scale - fp.height.Value / 2
+        scale_1 = scale + fp.height.Value / 2
+        if fp.beta.Value == 0:
+            wires.append(makeBSplineWire([scale_0 * p for p in pts]))
+            wires.append(makeBSplineWire([scale_1 * p for p in pts]))
+        else:
+            for scale_i  in np.linspace(scale_0, scale_1, 20):
+                # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
+                # rot = rotation3D(beta_i)
+                # points = [rot(pt) * scale_i for pt in pts]
+                angle =  fp.beta.Value * np.pi / 180. * np.sin(np.pi / 4) / np.sin(fp.pitch_angle.Value * np.pi / 180.)
+                points = [np.array([self.spherical_rot(p, angle) for p in scale_i * pt]) for pt in pts]
+                wires.append(makeBSplineWire(points))
         fp.Shape = makeLoft(wires, True)
         # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
 
@@ -551,7 +560,7 @@ class bevel_gear():
         return Shape(surfs)
 
     def spherical_rot(self, point, phi):
-        new_phi = (np.linalg.norm(point) -1) * phi
+        new_phi = np.sqrt(np.linalg.norm(point)) * phi
         return rotation3D(new_phi)(point)
 
     def create_teeth(self, pts, pos, teeth):
