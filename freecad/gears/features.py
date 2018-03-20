@@ -445,6 +445,8 @@ class bevel_gear():
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "gear_parameter", "number of points for spline")
+        obj.addProperty("App::PropertyBool", "reset_origin", "gear_parameter",
+            "if value is true the gears outer face will match the z=0 plane")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear", "gear_paramenter", "test")
@@ -459,6 +461,7 @@ class bevel_gear():
         obj.backlash = '0.00 mm'
         obj.clearance = 0.1
         obj.beta = '0 deg'
+        obj.reset_origin = True
         self.obj = obj
         obj.Proxy = self
 
@@ -532,7 +535,13 @@ class bevel_gear():
                 angle =  fp.beta.Value * np.pi / 180. * np.sin(np.pi / 4) / np.sin(fp.pitch_angle.Value * np.pi / 180.)
                 points = [np.array([self.spherical_rot(p, angle) for p in scale_i * pt]) for pt in pts]
                 wires.append(makeBSplineWire(points))
-        fp.Shape = makeLoft(wires, True)
+        shape = makeLoft(wires, True)
+        if fp.reset_origin:
+            mat = App.Matrix()
+            mat.A33 = -1
+            mat.move(fcvec([0, 0, scale_1]))
+            shape = shape.transformGeometry(mat)
+        fp.Shape = shape
         # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
 
 
