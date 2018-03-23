@@ -156,10 +156,7 @@ class involute_gear(object):
                     wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
         else:
             rw = fp.gear.dw / 2
-            circle = Part.Circle(App.Vector(0, 0, 0), App.Vector(0, 0, 1), rw)
-            wire = Part.Wire(circle.toShape())
-            face = Part.Face(wire)
-            fp.Shape = face.extrude(App.Vector(0, 0, fp.height.Value))
+            fp.Shape=Part.makeCylinder(rw,fp.height.Value)
 
     def __getstate__(self):
         return None
