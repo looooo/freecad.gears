@@ -2,6 +2,7 @@ A gear module for FreeCAD > 0.16
 ---------------------------
 
 ![gear](examples/spiral.png)
+![gear1](examples/animated_spiral.gif)
 
 ## supported gear-types:
 - cylindric involute
@@ -49,4 +50,4 @@ A gear module for FreeCAD > 0.16
   * go to the gear workbench
   * create new document
   * create a gear (click on gear symbol)
-  * change parameters 
+  * change parameters
