@@ -253,7 +253,7 @@ class crown_gear(object):
         obj.other_teeth = 15
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
-        obj.height = '5. mm'
+        obj.height = '2. mm'
         obj.thickness = '5 mm'
         obj.num_profiles = 4
         obj.construct = True
