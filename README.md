@@ -26,7 +26,7 @@ A gear module for FreeCAD > 0.16
 
 ## install
 
-`pip install https://github.com/looooo/FCGear/archive/new_style_module.tar.gz`
+`pip install https://github.com/looooo/FCGear/archive/master.tar.gz`
 
 ## useage
 
