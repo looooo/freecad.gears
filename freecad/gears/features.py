@@ -33,7 +33,7 @@ import FreeCAD as App
 import Part
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, makeCompound,\
-     show, makePolygon, makeHelix, makeSweepSurface, makeShell, makeSolid
+    show, makePolygon, makeHelix, makeShell, makeSolid
 
 
 
@@ -50,7 +50,7 @@ def fcvec(x):
     else:
         return(App.Vector(x[0], x[1], x[2]))
 
-class ViewProviderGear:
+class ViewProviderGear(object):
     def __init__(self, obj):
         ''' Set this object to the proxy object of the actual view provider '''
         obj.Proxy = self
@@ -328,7 +328,7 @@ class crown_gear(object):
         rot.rotateZ(2 * np.pi / t)
         if fp.construct:
             cut_shapes = [solid]
-            for i in range(t):
+            for _ in range(t):
                 loft = loft.transformGeometry(rot)
                 cut_shapes.append(loft)
             fp.Shape = Part.Compound(cut_shapes)
@@ -409,7 +409,6 @@ class cycloide_gear(object):
             sh = Face(wi)
             fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
         else:
-            pass
             fp.Shape = helicalextrusion(
                 wi, fp.height.Value, fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d, fp.double_helix)
 
@@ -420,7 +419,7 @@ class cycloide_gear(object):
         return None
 
 
-class bevel_gear():
+class bevel_gear(object):
 
     """parameters:
         pressure_angle:  pressureangle,   10-30°
@@ -461,42 +460,6 @@ class bevel_gear():
         obj.reset_origin = True
         self.obj = obj
         obj.Proxy = self
-
-    def execute1(self, fp):
-        fp.gear.z = fp.teeth
-        fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
-        fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
-        fp.gear.backlash = fp.backlash
-        fp.gear._update()
-        pts = fp.gear.points(num=fp.numpoints)
-        tooth = self.create_tooth()
-        teeth = [tooth]
-        rot = App.Matrix()
-        rot.rotateZ(2  * np.pi / fp.teeth)
-        top_cap = [i.Edges[0] for i in tooth.Faces]
-        bottom_cap = [i.Edges[3] for i in tooth.Faces]
-        for i in range(fp.teeth - 1): 
-            new_tooth = teeth[-1].transformGeometry(rot)
-            edge1 = new_tooth.Faces[0].Edges[2]
-            edge2 = teeth[-1].Faces[-1].Edges[1]
-            face1 = make_face(edge1, edge2)
-            teeth.append(face1)
-            teeth.append(new_tooth)
-            top_cap.append(face1.Edges[3])
-            bottom_cap.append(face1.Edges[1])
-            top_cap += [i.Edges[0] for i in new_tooth.Faces]
-            bottom_cap += [i.Edges[3] for i in new_tooth.Faces]
-        edge1 = teeth[0].Faces[0].Edges[2]
-        edge2 = teeth[-1].Faces[-1].Edges[1]
-        face1 = make_face(edge1, edge2)
-        teeth.append(face1)
-        top_cap.append(face1.Edges[3])
-        bottom_cap.append(face1.Edges[1])
-        top_cap = Face(Wire(top_cap))
-        bottom_cap = Face(Wire(bottom_cap))
-        fcs = Compound(teeth).Faces
-        top_cap.reverse()
-        fp.Shape = Solid(Shell(fcs + [top_cap, bottom_cap]))
 
     def execute(self, fp):
         fp.gear.z = fp.teeth
