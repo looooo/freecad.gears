@@ -1,7 +1,7 @@
 from setuptools import setup
 from pygears import __version__
 
-setup(name='gears',
+setup(name='freecad.gears',
       version=str(__version__),
       packages=['freecad',
                 'freecad.gears',
