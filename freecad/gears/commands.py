@@ -26,6 +26,10 @@ from .features import cycloide_gear, bevel_gear, crown_gear
 
 
 class BaseCommand(object):
+    NAME = ""
+    GEAR_FUNCTION = None
+    ICONDIR = os.path.join(os.path.dirname(__file__), "icons")
+
     def __init__(self):
         pass
 
@@ -35,74 +39,56 @@ class BaseCommand(object):
         else:
             return True
 
-class CreateInvoluteGear(BaseCommand):
-    """create an involute gear"""
-
-    def GetResources(self):
-        return {'Pixmap': os.path.join(os.path.dirname(__file__),  'icons', 'involutegear.svg'), 
-                'MenuText': 'involute gear', 
-                'ToolTip': 'involute gear'}
-
     def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteGear")
-        involute_gear(a)
-        ViewProviderGear(a.ViewObject)
+        Gui.doCommandGui("import freecad.gears.commands")
+        Gui.doCommandGui("freecad.gears.commands.{}.create()".format(self.__class__.__name__))
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
+    @classmethod
+    def create(cls):
+        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
+        cls.GEAR_FUNCTION(obj)
+        ViewProviderGear(obj.ViewObject)
+        return obj
+
+    def GetResources(self):
+        return {'Pixmap': self.Pixmap, 
+                'MenuText': self.MenuText, 
+                'ToolTip': self.ToolTip}
+
+
+class CreateInvoluteGear(BaseCommand):
+    NAME = "InvoluteGear"
+    GEAR_FUNCTION = involute_gear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
+    MenuText = 'involute gear'
+    ToolTip = 'involute gear'
 
 class CreateInvoluteRack(BaseCommand):
-    def GetResources(self):
-        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'involuterack.svg'), 
-                'MenuText': 'involute rack', 
-                'ToolTip': 'involute rack'}
-
-
-    def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "InvoluteRack")
-        involute_gear_rack(a)
-        ViewProviderGear(a.ViewObject)
-        FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
-
+    NAME = "InvoluteRack"
+    GEAR_FUNCTION = involute_gear_rack
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
+    MenuText = 'involute rack'
+    ToolTip = 'involute rack'
 
 class CreateCrownGear(BaseCommand):
-    def GetResources(self):
-        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'crowngear.svg'),
-                'MenuText': 'crown gear',
-                'ToolTip': 'crown gear'}
-
-    def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CrownGear")
-        crown_gear(a)
-        ViewProviderGear(a.ViewObject)
-        FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
-
+    NAME = "CrownGear"
+    GEAR_FUNCTION = crown_gear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'crowngear.svg')
+    MenuText = 'crown gear'
+    ToolTip = 'crown gear'
 
 class CreateCycloideGear(BaseCommand):
-    def GetResources(self):
-        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'cycloidegear.svg'), 
-                'MenuText': 'cycloide gear', 
-                'ToolTip': 'cycloide gear'}
-
-    def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "CycloideGear")
-        cycloide_gear(a)
-        ViewProviderGear(a.ViewObject)
-        FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
-
+    NAME = "CycloidGear"
+    GEAR_FUNCTION = cycloide_gear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidegear.svg')
+    MenuText = 'cycloide gear'
+    ToolTip = 'cycloide gear'
 
 class CreateBevelGear(BaseCommand):
-    def GetResources(self):
-        return {'Pixmap':  os.path.join(os.path.dirname(__file__),  'icons', 'bevelgear.svg'), 
-                'MenuText': 'bevel gear', 
-                'ToolTip': 'bevel gear'}
-
-    def Activated(self):
-        a = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BevelGear")
-        bevel_gear(a)
-        ViewProviderGear(a.ViewObject)
-        FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
+    NAME = "BevelGear"
+    GEAR_FUNCTION = bevel_gear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
+    MenuText = 'bevel gear'
+    ToolTip = 'bevel gear'
