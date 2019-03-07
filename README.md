@@ -37,6 +37,19 @@ A gear module for FreeCAD > 0.16
   * create a gear (click on gear symbol)
   * change parameters
 
+## scripted gears:
+```python
+import FreeCAD as App
+import freecad.gears.commands
+gear = freecad.gears.commands.CreateInvoluteGear.create()
+gear.teeth = 20
+gear.beta = 20
+gear.height = 10
+gear.double_helix = True
+App.ActiveDocument.recompute()
+Gui.SendMsgToActiveView("ViewFit")
+```
+
 ## references:
 
 [very good document](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf)
