@@ -67,3 +67,4 @@ by browsing this repositories issue queue.
 * "FC Gears: Feedback thread" ([thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626))  
 
 # License
+GNU General Public License v2.0
