@@ -1,43 +1,47 @@
-A gear module for FreeCAD > 0.16
----------------------------
+# A Gear module for FreeCAD
 
+## Requirments
+FreeCAD > v0.16
+
+# Screenshots
 ![gear](examples/spiral.png)
 ![gear1](examples/animated_spiral.gif)
 
-## supported gear-types:
-- cylindric involute
-  - shifting
-  - helical
-  - double helical
-  - undercut
+## Supported gear-types
 
-- involute rack
+### Cylindric Involute
+#### Shifting
+#### Helical
+#### Double Helical
+#### Undercut
 
-- cylindric cycloid
-  - helical
-  - double helical
+### Involute Rack
 
-- spherical involute bevel-gear
-  - spiral
+### Cylindric Cycloid
+#### Helical
+#### Double Helical
 
-- crown-gear
+### Spherical Involute Bevel-Gear
+#### Spiral
+
+### Crown-Gear
 
 ---------------------------
 
-## install
+## Installation
 
 `pip install https://github.com/looooo/FCGear/archive/master.tar.gz`
 
-## useage
+## Usage
 
-* create a gear:
-  * open freecad
-  * go to the gear workbench
-  * create new document
-  * create a gear (click on gear symbol)
-  * change parameters
+### Create a gear manually
+* Open freecad
+* Switch to the gear workbench
+* Create new document
+* Create a gear (click on a gear symbol in the toolbar)
+* Change the gear parameters
 
-## scripted gears:
+## Scripted gears
 ```python
 import FreeCAD as App
 import freecad.gears.commands
@@ -50,12 +54,11 @@ App.ActiveDocument.recompute()
 Gui.SendMsgToActiveView("ViewFit")
 ```
 
-## references:
+## References
+* Elements of Metric Gear Technology ([PDF](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf))
 
-[very good document](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf)
-
-## forum topics:
-- https://forum.freecadweb.org/viewtopic.php?f=10&t=4829
-- https://forum.freecadweb.org/viewtopic.php?f=3&t=12878
-- https://forum.freecadweb.org/viewtopic.php?f=24&t=27381
-- https://forum.freecadweb.org/viewtopic.php?f=8&t=27626
+### FreeCAD Forum threads
+* "CONTINUED: involute gear generator preview !" ([thread](https://forum.freecadweb.org/viewtopic.php?f=10&t=4829))  
+* "Bevel gear - module/script/tutorial" ([thread](https://forum.freecadweb.org/viewtopic.php?f=3&t=12878))  
+* "Gears in FreeCAD: FC Gear" ([thread](https://forum.freecadweb.org/viewtopic.php?f=24&t=27381))  
+* "FC Gears: Feedback thread" ([thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626))  
