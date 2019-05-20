@@ -58,7 +58,12 @@ Gui.SendMsgToActiveView("ViewFit")
 * Elements of Metric Gear Technology ([PDF](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf))
 
 ### FreeCAD Forum threads
+These are forum threads where FreeCAD Gears has been discussed. If you want to give Feedback
+or repot a bug please use the below threads. Please make sure that the report hasn't been reported already
+by browsing this repositories issue queue.   
 * "CONTINUED: involute gear generator preview !" ([thread](https://forum.freecadweb.org/viewtopic.php?f=10&t=4829))  
 * "Bevel gear - module/script/tutorial" ([thread](https://forum.freecadweb.org/viewtopic.php?f=3&t=12878))  
 * "Gears in FreeCAD: FC Gear" ([thread](https://forum.freecadweb.org/viewtopic.php?f=24&t=27381))  
 * "FC Gears: Feedback thread" ([thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626))  
+
+# License
