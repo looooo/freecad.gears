@@ -1,6 +1,6 @@
 # A Gear module for FreeCAD
 
-## Requirments
+## Requirements
 FreeCAD > v0.16
 
 # Screenshots
