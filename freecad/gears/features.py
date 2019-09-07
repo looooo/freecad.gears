@@ -103,7 +103,7 @@ class involute_gear(object):
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "gear", "gear_parameter", "test")
-        obj.addProperty("App::PropertyFloat", "dw", "computed", "roll diameter", 1)
+        obj.addProperty("App::PropertyFloat", "dw", "computed", "pitch diameter", 1)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
