@@ -38,8 +38,7 @@ located in the `Tools` > `Addon Manager` dropdown menu.
 
 `pip install https://github.com/looooo/FCGear/archive/master.tar.gz`
 
-**Important note:** Make sure the `pip` you're using is used by FreeCAD as well. It's recomemnded to use it
-separately from your system's python/pip. 
+**Important note:** Most systems have multiple versions of python installed. Make sure the `pip` you're using is used by FreeCAD as well.
 
 ## Usage
 
