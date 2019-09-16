@@ -30,7 +30,16 @@ FreeCAD > v0.16
 
 ## Installation
 
+### Addon Manger  
+Starting from v0.17 it's possible to use the built-in FreeCAD [Addon Manager](https://github.com/FreeCAD/FreeCAD-addons#1-builtin-addon-manager)
+located in the `Tools` > `Addon Manager` dropdown menu.
+
+### pip
+
 `pip install https://github.com/looooo/FCGear/archive/master.tar.gz`
+
+**Important note:** Make sure the `pip` you're using is used by FreeCAD as well. It's recomemnded to use it
+separately from your system's python/pip. 
 
 ## Usage
 
@@ -42,6 +51,8 @@ FreeCAD > v0.16
 * Change the gear parameters
 
 ## Scripted gears
+Use the power of python to automate your gear modeling: 
+
 ```python
 import FreeCAD as App
 import freecad.gears.commands
