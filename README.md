@@ -70,8 +70,8 @@ Gui.SendMsgToActiveView("ViewFit")
 
 ### FreeCAD Forum threads
 These are forum threads where FreeCAD Gears has been discussed. If you want to give Feedback
-or repot a bug please use the below threads. Please make sure that the report hasn't been reported already
-by browsing this repositories issue queue.   
+or report a bug please use the below threads. Please make sure that the report hasn't been reported already
+by browsing this repositories [issue queue](https://github.com/looooo/freecad.gears/issues).   
 * "CONTINUED: involute gear generator preview !" ([thread](https://forum.freecadweb.org/viewtopic.php?f=10&t=4829))  
 * "Bevel gear - module/script/tutorial" ([thread](https://forum.freecadweb.org/viewtopic.php?f=3&t=12878))  
 * "Gears in FreeCAD: FC Gear" ([thread](https://forum.freecadweb.org/viewtopic.php?f=24&t=27381))  
