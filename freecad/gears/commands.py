@@ -22,7 +22,7 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 from .features import ViewProviderGear, involute_gear, involute_gear_rack
-from .features import cycloide_gear, bevel_gear, crown_gear
+from .features import cycloide_gear, bevel_gear, crown_gear, worm_gear
 
 
 class BaseCommand(object):
@@ -92,3 +92,10 @@ class CreateBevelGear(BaseCommand):
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
     MenuText = 'bevel gear'
     ToolTip = 'bevel gear'
+
+class CreateWormGear(BaseCommand):
+    NAME = "WormGear"
+    GEAR_FUNCTION = worm_gear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'wormgear.svg')
+    MenuText = 'worm gear'
+    ToolTip = 'worm gear'

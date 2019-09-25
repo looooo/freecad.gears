@@ -567,6 +567,103 @@ class bevel_gear(object):
         return None
 
 
+class worm_gear(object):
+
+    """FreeCAD gear rack"""
+
+    def __init__(self, obj):
+        self.involute_rack = involute_rack()
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "module", "gear_parameter", "module")
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty(
+            "App::PropertyLength", 'diameter', "gear_parameter", "diameter")
+        obj.addProperty(
+            "App::PropertyAngle", "beta", "gear_parameter", "beta ", 1)
+        obj.addProperty(
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
+        obj.rack = self.involute_rack
+        obj.teeth = 3
+        obj.module = '1. mm'
+        obj.pressure_angle = '20. deg'
+        obj.height = '5. mm'
+        obj.diameter = '5. mm'
+        self.obj = obj
+        obj.Proxy = self
+
+    def execute(self, fp):
+        m = fp.module.Value
+        d = fp.diameter.Value
+        t = fp.teeth
+        h = fp.height
+        alpha = fp.pressure_angle.Value
+        beta = np.arctan(m * t / d)
+        fp.beta = np.rad2deg(beta)
+        beta = np.pi / 2 - beta
+
+        r_1 = (d - 2 * m) / 2
+        r_2 = (d + 2 * m) / 2
+        z_a = 2 * m * np.tan(np.deg2rad(alpha))
+        z_4 = m * np.pi
+        z_2 = z_4 / 2
+        z_1 = z_2 - z_a
+        z_3 = z_4 - z_a
+
+        def helical_projection(r, z):
+            phi = 2 * z / m / t
+            x = r * np.cos(phi)
+            y = r * np.sin(phi)
+            z = 0 * y
+            return np.array([x, y, z]). T
+
+        # create a circle from phi=0 to phi_1 with r_1
+        phi_1 = 2 * z_1 / m / t
+        c1 = Part.makeCircle(r_1, App.Vector(0,0,0), App.Vector(0,0, 1), 0, np.rad2deg(phi_1))
+
+        # create first bspline
+        z_values = np.linspace(z_1, z_2, 10)
+        r_values = np.linspace(r_1, r_2, 10)
+        points = helical_projection(r_values, z_values)
+        bsp1 = Part.BSplineCurve()
+        bsp1.interpolate(list(map(fcvec, points)))
+        bsp1 = bsp1.toShape()
+
+        # create circle from phi_2 to phi_3
+        phi_2 = 2 * z_2 / m / t
+        phi_3 = 2 * z_3 / m / t
+        c2 = Part.makeCircle(r_2, App.Vector(0,0,0), App.Vector(0,0, 1), np.rad2deg(phi_2), np.rad2deg(phi_3))
+
+        # create second bspline
+        z_values = np.linspace(z_3, z_4, 10)
+        r_values = np.linspace(r_2, r_1, 10)
+        points = helical_projection(r_values, z_values)
+        bsp2 = Part.BSplineCurve()
+        bsp2.interpolate(list(map(fcvec, points)))
+        bsp2 = bsp2.toShape()
+
+        wire = Part.Wire([c1, bsp1, c2, bsp2])
+        w_all = [wire]
+
+        rot = App.Matrix()
+        rot.rotateZ(2 * np.pi / t)
+        for i in range(1, t):
+            w_all.append(w_all[-1].transformGeometry(rot))
+
+        full_wire = Part.Wire(Part.Wire(w_all))
+        shape = helicalextrusion(full_wire, h, h * np.tan(beta) * 2 / d)
+        fp.Shape = shape
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
+
+
 def helicalextrusion(wire, height, angle, double_helix = False):
     direction = bool(angle < 0)
     if double_helix:
