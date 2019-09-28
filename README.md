@@ -1,5 +1,7 @@
 # A Gear module for FreeCAD
 
+[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate)
+
 ## Requirements
 FreeCAD > v0.16
 
