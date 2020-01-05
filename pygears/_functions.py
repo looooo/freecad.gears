@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-#***************************************************************************
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   as published by the Free Software Foundation; either version 2 of     *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   as published by the Free Software Foundation; either version 2 of     *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 
 from __future__ import division
 from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
@@ -45,7 +45,8 @@ def reflection3D(pressure_angle):
 
 def rotation(pressure_angle, midpoint=None):
     midpoint = midpoint or [0., 0.]
-    mat = array([[cos(pressure_angle), -sin(pressure_angle)], [sin(pressure_angle), cos(pressure_angle)]])
+    mat = array([[cos(pressure_angle), -sin(pressure_angle)],
+                 [sin(pressure_angle), cos(pressure_angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
@@ -159,7 +160,6 @@ def nearestpts(evolv, underc):
             jk += 1
         ik += 1
     return([vstack([underc[:jout], evolv[iout]]), evolv[iout:]])
-
 
 
 def intersection_line_circle(p1, p2, r):

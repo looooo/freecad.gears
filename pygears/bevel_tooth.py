@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-#***************************************************************************
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   as published by the Free Software Foundation; either version 2 of     *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   as published by the Free Software Foundation; either version 2 of     *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 
 from __future__ import division
 from __future__ import division
@@ -26,8 +26,7 @@ import numpy as np
 from ._functions import rotation3D, reflection3D, intersection_line_circle
 
 
-
-class bevel_tooth(object):
+class BevelTooth(object):
     def __init__(self, pressure_angle=70 * pi / 180, pitch_angle=pi / 4, clearance=0.1,
                  z=21, backlash=0.00, module=0.25):
         self.pressure_angle = pressure_angle
@@ -39,24 +38,26 @@ class bevel_tooth(object):
 
         self.involute_end = arccos(
             1 / sqrt(2) * sqrt((42. + 16.*cos(2.*self.pressure_angle) +
-            6.*cos(4.*self.pressure_angle) + cos(4.*self.pressure_angle - 4.*self.pitch_angle) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle) -
-            4.*cos(4.*self.pressure_angle - 2.*self.pitch_angle) + 24.*cos(2.*self.pitch_angle) - 2.*cos(4.*self.pitch_angle) -
-            8.*cos(2.*(self.pressure_angle + self.pitch_angle)) + cos(4.*(self.pressure_angle + self.pitch_angle)) -
-            4.*cos(4.*self.pressure_angle + 2.*self.pitch_angle) + 24.*cos((4.*sin(self.pitch_angle))/self.z) +
-            4.*cos(2.*self.pressure_angle - (4.*sin(self.pitch_angle))/self.z) + 4.*cos(2.*self.pressure_angle -
-            4.*self.pitch_angle - (4.*sin(self.pitch_angle))/self.z) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle -
-            (4.*sin(self.pitch_angle))/self.z) + 24.*cos(4.*(self.pitch_angle + sin(self.pitch_angle)/self.z)) -
-            8.*cos(2.*(self.pressure_angle + self.pitch_angle + (2.*sin(self.pitch_angle))/self.z)) + 4.*cos(2.*self.pressure_angle +
-            (4.*sin(self.pitch_angle))/self.z) + 16.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) +
-            4.*cos(2.*self.pressure_angle + 4.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) + 32.*abs(cos(self.pitch_angle +
-            (2.*sin(self.pitch_angle))/self.z))*cos(self.pressure_angle)*sqrt(4.*cos(2.*self.pressure_angle) -
-            2.*(-2. + cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)) +
-            4.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z)))*sin(2.*self.pitch_angle))/(-6. - 2.*cos(2.*self.pressure_angle) +
-            cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)))**2))
+                                6.*cos(4.*self.pressure_angle) + cos(4.*self.pressure_angle - 4.*self.pitch_angle) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle) -
+                                4.*cos(4.*self.pressure_angle - 2.*self.pitch_angle) + 24.*cos(2.*self.pitch_angle) - 2.*cos(4.*self.pitch_angle) -
+                                8.*cos(2.*(self.pressure_angle + self.pitch_angle)) + cos(4.*(self.pressure_angle + self.pitch_angle)) -
+                                4.*cos(4.*self.pressure_angle + 2.*self.pitch_angle) + 24.*cos((4.*sin(self.pitch_angle))/self.z) +
+                                4.*cos(2.*self.pressure_angle - (4.*sin(self.pitch_angle))/self.z) + 4.*cos(2.*self.pressure_angle -
+                                                                                                            4.*self.pitch_angle - (4.*sin(self.pitch_angle))/self.z) - 8.*cos(2.*self.pressure_angle - 2.*self.pitch_angle -
+                                                                                                                                                                              (4.*sin(self.pitch_angle))/self.z) + 24.*cos(4.*(self.pitch_angle + sin(self.pitch_angle)/self.z)) -
+                                8.*cos(2.*(self.pressure_angle + self.pitch_angle + (2.*sin(self.pitch_angle))/self.z)) + 4.*cos(2.*self.pressure_angle +
+                                                                                                                                 (4.*sin(self.pitch_angle))/self.z) + 16.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) +
+                                4.*cos(2.*self.pressure_angle + 4.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z) + 32.*abs(cos(self.pitch_angle +
+                                                                                                                                       (2.*sin(self.pitch_angle))/self.z))*cos(self.pressure_angle)*sqrt(4.*cos(2.*self.pressure_angle) -
+                                                                                                                                                                                                         2.*(-2. + cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)) +
+                                                                                                                                                                                                             4.*cos(2.*self.pitch_angle + (4.*sin(self.pitch_angle))/self.z)))*sin(2.*self.pitch_angle))/(-6. - 2.*cos(2.*self.pressure_angle) +
+                                                                                                                                                                                                                                                                                                          cos(2.*self.pressure_angle - 2.*self.pitch_angle) - 2.*cos(2.*self.pitch_angle) + cos(2.*(self.pressure_angle + self.pitch_angle)))**2))
 
-        self.involute_start = -pi/2. + arctan(1/tan(self.pitch_angle)*1/cos(self.pressure_angle))
+        self.involute_start = -pi/2. + \
+            arctan(1/tan(self.pitch_angle)*1/cos(self.pressure_angle))
         self.involute_start_radius = self.get_radius(self.involute_start)
-        self.r_f = sin(self.pitch_angle - sin(pitch_angle) * 2 / self.z) - self.clearance * sin(self.pitch_angle)
+        self.r_f = sin(self.pitch_angle - sin(pitch_angle) * 2 /
+                       self.z) - self.clearance * sin(self.pitch_angle)
         self.z_f = cos(self.pitch_angle - sin(pitch_angle) * 2 / self.z)
         self.add_foot = True
 
@@ -85,7 +86,7 @@ class bevel_tooth(object):
         def func(s):
             return((
                 -(cos(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))*sin(self.pressure_angle)*sin(s)) +
-                (cos(s)*sin(self.pitch_angle) + cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s))*
+                (cos(s)*sin(self.pitch_angle) + cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s)) *
                 sin(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))))
         return(func)
 
@@ -93,7 +94,7 @@ class bevel_tooth(object):
         def func(s):
             return((
                 cos(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))*(cos(s)*sin(self.pitch_angle) +
-                cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s)) + sin(self.pressure_angle)*sin(s)*
+                                                                           cos(self.pressure_angle)*cos(self.pitch_angle)*sin(s)) + sin(self.pressure_angle)*sin(s) *
                 sin(s*1/sin(self.pressure_angle)*1/sin(self.pitch_angle))))
         return(func)
 
@@ -150,7 +151,7 @@ class bevel_tooth(object):
                 array([pts[-1], pts1[0]]),
                 pts1[:-1],
                 array([pts1[-2], pts1[-1]])
-                ]))
+            ]))
         else:
             return(array([pts, array([pts[-1], pts1[0]]), pts1]))
 
@@ -163,7 +164,7 @@ class bevel_tooth(object):
 
 if __name__ == "__main__":
     from matplotlib import pyplot
-    gear = bevel_tooth(z=60, clearance=0.0, pitch_angle=np.deg2rad(45))
+    gear = BevelTooth(z=60, clearance=0.0, pitch_angle=np.deg2rad(45))
     x, y, z = gear.involute_points().T
     pyplot.plot(x, y)
     pyplot.show()
