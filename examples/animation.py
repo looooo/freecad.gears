@@ -1,11 +1,12 @@
 # script for bevel-gear animation
 
 from PySide import QtGui, QtCore
-import FreeCADGui as Gui
+import FreeCAD as app
+import FreeCADGui as gui
 import numpy as np
 import imageio
 
-doc = App.ActiveDocument
+doc = app.ActiveDocument
 g2 = doc.Common
 g1 = doc.Common001
 
@@ -15,12 +16,9 @@ def make_pics():
     n = 30
     for i in range(n):
         phi = np.pi * 2 / 30 / n
-    	g1.Placement.Rotation.Angle += phi * 2
-    	g2.Placement.Rotation.Angle -= phi
-        Gui.activeDocument().activeView().saveImage('/home/lo/Schreibtisch/animated_gear/gear_{}.png'.format(i) ,300,300,'Current')
-
-def make_animated_gif():
-
+        g1.Placement.Rotation.Angle += phi * 2
+        g2.Placement.Rotation.Angle -= phi
+        gui.activeDocument().activeView().saveImage('/home/lo/Schreibtisch/animated_gear/gear_{}.png'.format(i) ,300,300,'Current')
 
 def update(*args):
     print("time")

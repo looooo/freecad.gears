@@ -36,10 +36,10 @@ from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
     show, makePolygon, makeHelix, makeShell, makeSolid
 
 
-__all__ = ["involute_gear",
-           "cycloide_gear",
-           "bevel_gear",
-           "involute_gear_rack",
+__all__ = ["InvoluteGear",
+           "CycloideGear",
+           "BevelGear",
+           "InvoluteGearRack",
            "ViewProviderGear"]
 
 
@@ -547,31 +547,6 @@ class BevelGear(object):
     def spherical_rot(self, point, phi):
         new_phi = np.sqrt(np.linalg.norm(point)) * phi
         return rotation3D(new_phi)(point)
-
-    def create_teeth(self, pts, pos, teeth):
-        w1 = []
-        pts = [pt * pos for pt in pts]
-        rotated_pts = scaled_points
-        rot = rotation3D(- 2 * i * np.pi / teeth)
-        for i in range(teeth - 1):
-            rotated_pts = map(rot, rotated_pts)
-            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
-            pts += rotated_pts
-        s = Wire(Shape(w1).Edges)
-        wi = []
-        for i in range(teeth):
-            rot = App.Matrix()
-            rot.rotateZ(2 * i * np.pi / teeth)
-            tooth_rot = s.transformGeometry(rot)
-            if i != 0:
-                pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-                pt_1 = tooth_rot.Edges[0].Vertexes[-1].Point
-                wi.append(Wire([Line(pt_0, pt_1).toShape()]))
-            wi.append(tooth_rot)
-        pt_0 = wi[-1].Edges[-1].Vertexes[0].Point
-        pt_1 = wi[0].Edges[0].Vertexes[-1].Point
-        wi.append(Wire([Line(pt_0, pt_1).toShape()]))
-        return(Wire(wi))
 
     def __getstate__(self):
         return None
