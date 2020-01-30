@@ -3,7 +3,8 @@
 [![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate)
 
 ## Requirements
-FreeCAD > v0.16
+FreeCAD > v0.16  
+__python > 3 (for python2 use branch py2)__
 
 # Screenshots
 ![gear](examples/spiral.png)
