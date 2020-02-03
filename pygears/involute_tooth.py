@@ -171,13 +171,14 @@ class InvoluteRack(object):
         pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
         m = self.m / cos(self.beta)
 
-        a = (2 + self.head) * m * tan(pressure_angle_t)
+        clearence = 0.25
+        a = (2 + self.head + clearence) * m * tan(pressure_angle_t)
         b = (m * pi) / 4 - (1 + self.head) * m * tan(pressure_angle_t)
         tooth = [
-            [-self.m, -a - b],
+            [-self.m * (1 + clearence), -a - b],
             [self.m * (1 + self.head), -b],
             [self.m * (1 + self.head), b],
-            [-self.m, a + b]
+            [-self.m * (1 + clearence), a + b]
         ]
         teeth = [tooth]
         trans = translation([0., m * pi, 0.])
