@@ -103,6 +103,9 @@ class InvoluteGear(object):
             "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyFloat", "dw",
@@ -122,6 +125,7 @@ class InvoluteGear(object):
         obj.double_helix = False
         obj.backlash = '0.00 mm'
         obj.reversed_backlash = False
+        obj.properties_from_tool = True
         self.obj = obj
         obj.Proxy = self
 
@@ -137,6 +141,9 @@ class InvoluteGear(object):
         fp.gear.backlash = fp.backlash.Value * \
             (-fp.reversed_backlash + 0.5) * 2.
         fp.gear.head = fp.head
+        # checksbackwardcompatibility:
+        if "properties_from_tool" in fp.PropertiesList:
+            fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
@@ -194,6 +201,11 @@ class InvoluteGearRack(object):
             "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+        obj.addProperty(
+            "App::PropertyFloat", "clearence", "gear_parameter", "head_value * modul_value = additional length of foot")
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -202,6 +214,9 @@ class InvoluteGearRack(object):
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         obj.beta = '0. deg'
+        obj.clearence = 0.25
+        obj.head = 0.
+        obj.properties_from_tool = True
         self.obj = obj
         obj.Proxy = self
 
@@ -212,6 +227,13 @@ class InvoluteGearRack(object):
         fp.rack.thickness = fp.thickness.Value
         fp.rack.beta = fp.beta.Value * np.pi / 180.
         fp.rack.head = fp.head
+        # checksbackwardcompatibility:
+        if "clearence" in fp.PropertiesList:
+            print(fp.clearence)
+            fp.rack.clearence = fp.clearence
+        if "properties_from_tool" in fp.PropertiesList:
+            print(fp.properties_from_tool)
+            fp.rack.properties_from_tool = fp.properties_from_tool
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))

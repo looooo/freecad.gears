@@ -27,7 +27,7 @@ import numpy as np
 
 class InvoluteTooth():
     def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., clearance=0.12, shift=0.5, beta=0.,
-                 undercut=False, backlash=0.00, head=0.00):
+                 undercut=False, backlash=0.00, head=0.00, properties_from_tool=False):
         self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
@@ -37,12 +37,17 @@ class InvoluteTooth():
         self.clearance = clearance
         self.backlash = backlash
         self.head = head        # factor, rename!!!
+        self.properties_from_tool = properties_from_tool
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-        self.pressure_angle_t = arctan(
-            tan(self.pressure_angle) / cos(self.beta))
-        self.m = self.m_n / cos(self.beta)
+        if self.properties_from_tool:
+            self.pressure_angle_t = arctan(
+                tan(self.pressure_angle) / cos(self.beta))
+            self.m = self.m_n / cos(self.beta)
+        else:
+            self.pressure_angle_t = self.pressure_angle
+            self.m = self.m_n
         self.c = self.clearance * self.m_n
         self.midpoint = [0., 0.]
         self.d = self.z * self.m
@@ -151,34 +156,41 @@ class InvoluteTooth():
     def _update(self):
         self.__init__(m=self.m_n, z=self.z,
                       pressure_angle=self.pressure_angle, clearance=self.clearance, shift=self.shift,
-                      beta=self.beta, undercut=self.undercut, backlash=self.backlash, head=self.head)
+                      beta=self.beta, undercut=self.undercut, backlash=self.backlash, head=self.head,
+                      properties_from_tool=self.properties_from_tool)
 
 
 class InvoluteRack(object):
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0):
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearence = 0.25, properties_from_tool=False):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
         self.z = z
         self.beta = beta
         self.head = head
+        self.clearence = clearence
+        self.properties_from_tool = properties_from_tool
 
     def _update(self):
         self.__init__(m=self.m, z=self.z, pressure_angle=self.pressure_angle,
-                      thickness=self.thickness, beta=self.beta, head=self.head)
+                      thickness=self.thickness, beta=self.beta, head=self.head, clearence=self.clearence, 
+                      properties_from_tool=self.properties_from_tool)
 
     def points(self, num=10):
-        pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
-        m = self.m / cos(self.beta)
+        if self.properties_from_tool:
+            pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
+            m = self.m / cos(self.beta)
+        else:
+            pressure_angle_t = self.pressure_angle
+            m = self.m
 
-        clearence = 0.25
-        a = (2 + self.head + clearence) * m * tan(pressure_angle_t)
+        a = (2 + self.head + self.clearence) * m * tan(pressure_angle_t)
         b = (m * pi) / 4 - (1 + self.head) * m * tan(pressure_angle_t)
         tooth = [
-            [-self.m * (1 + clearence), -a - b],
+            [-self.m * (1 + self.clearence), -a - b],
             [self.m * (1 + self.head), -b],
             [self.m * (1 + self.head), b],
-            [-self.m * (1 + clearence), a + b]
+            [-self.m * (1 + self.clearence), a + b]
         ]
         teeth = [tooth]
         trans = translation([0., m * pi, 0.])
