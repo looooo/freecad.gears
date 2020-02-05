@@ -177,6 +177,33 @@ class InvoluteRack(object):
                       properties_from_tool=self.properties_from_tool)
 
     def points(self, num=10):
+        m, m_n, pitch, pressure_angle_t = self.compute_properties()
+
+        a = (2 + self.head + self.clearence) * m_n * tan(pressure_angle_t)
+        b = pitch / 4 - (1 + self.head) * m_n * tan(pressure_angle_t)
+        tooth = [
+            [-m_n * (1 + self.clearence), -a - b],
+            [m_n * (1 + self.head), -b],
+            [m_n * (1 + self.head), b],
+            [-m_n * (1 + self.clearence), a + b]
+        ]
+        teeth = [tooth]
+        trans = translation([0., pitch, 0.])
+        for i in range(self.z - 1):
+            teeth.append(trans(teeth[-1]))
+        teeth = list(np.vstack(teeth))
+        ext1 = np.array(teeth[0]) + np.array([0., a + b - pitch / 2])
+        ext2 = np.array(teeth[-1]) - np.array([0., a + b - pitch / 2])
+        print(ext1, ext2)
+        teeth = [ext1.tolist(), ext1.tolist()] + teeth + [ext2.tolist(), ext2.tolist()]
+        #teeth.append(list(teeth[-1]))
+        teeth[0][0] -= self.thickness
+        #teeth.append(list(teeth[0]))
+        teeth[-1][0] -= self.thickness
+        teeth.append(teeth[0])
+        return(teeth)
+
+    def compute_properties(self):
         if self.properties_from_tool:
             pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
             m = self.m / cos(self.beta)
@@ -186,25 +213,9 @@ class InvoluteRack(object):
             m = self.m
             m_n  = self.m
 
-        a = (2 + self.head + self.clearence) * m_n * tan(pressure_angle_t)
-        b = (m * pi) / 4 - (1 + self.head) * m_n * tan(pressure_angle_t)
-        tooth = [
-            [-m_n * (1 + self.clearence), -a - b],
-            [m_n * (1 + self.head), -b],
-            [m_n * (1 + self.head), b],
-            [-m_n * (1 + self.clearence), a + b]
-        ]
-        teeth = [tooth]
-        trans = translation([0., m * pi, 0.])
-        for i in range(self.z - 1):
-            teeth.append(trans(teeth[-1]))
-        teeth = list(np.vstack(teeth))
-        teeth.append(list(teeth[-1]))
-        teeth[-1][0] -= self.thickness
-        teeth.append(list(teeth[0]))
-        teeth[-1][0] -= self.thickness
-        teeth.append(teeth[0])
-        return(teeth)
+        pitch = m * np.pi
+        return m, m_n, pitch, pressure_angle_t
+
 
 
 if __name__ == "__main__":

@@ -206,6 +206,8 @@ class InvoluteGearRack(object):
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+            "computed", "pitch in the transverse plane", 1)
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -229,10 +231,8 @@ class InvoluteGearRack(object):
         fp.rack.head = fp.head
         # checksbackwardcompatibility:
         if "clearence" in fp.PropertiesList:
-            print(fp.clearence)
             fp.rack.clearence = fp.clearence
         if "properties_from_tool" in fp.PropertiesList:
-            print(fp.properties_from_tool)
             fp.rack.properties_from_tool = fp.properties_from_tool
         fp.rack._update()
         pts = fp.rack.points()
@@ -254,6 +254,9 @@ class InvoluteGearRack(object):
             pol2.translate(
                 fcvec([0., np.tan(beta) * fp.height.Value, fp.height.Value]))
             fp.Shape = makeLoft([pol, pol2], True)
+        # computed properties
+        if "transverse_pitch" in fp.PropertiesList:
+            fp.transverse_pitch = "{} mm".format(fp.rack.compute_properties()[2])
 
     def __getstate__(self):
         return None
