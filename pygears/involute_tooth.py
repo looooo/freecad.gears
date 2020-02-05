@@ -194,7 +194,6 @@ class InvoluteRack(object):
         teeth = list(np.vstack(teeth))
         ext1 = np.array(teeth[0]) + np.array([0., a + b - pitch / 2])
         ext2 = np.array(teeth[-1]) - np.array([0., a + b - pitch / 2])
-        print(ext1, ext2)
         teeth = [ext1.tolist(), ext1.tolist()] + teeth + [ext2.tolist(), ext2.tolist()]
         #teeth.append(list(teeth[-1]))
         teeth[0][0] -= self.thickness

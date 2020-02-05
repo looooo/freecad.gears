@@ -108,7 +108,7 @@ class InvoluteGear(object):
             gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
-        obj.addProperty("App::PropertyFloat", "dw",
+        obj.addProperty("App::PropertyLength", "dw",
                         "computed", "pitch diameter", 1)
         obj.gear = self.involute_tooth
         obj.simple = False
@@ -170,7 +170,7 @@ class InvoluteGear(object):
             rw = fp.gear.dw / 2
             fp.Shape = Part.makeCylinder(rw, fp.height.Value)
 
-        fp.dw = fp.gear.dw
+        fp.dw = "{}mm".format(fp.gear.dw)
 
     def __getstate__(self):
         return None
