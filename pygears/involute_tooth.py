@@ -161,7 +161,8 @@ class InvoluteTooth():
 
 
 class InvoluteRack(object):
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearence = 0.25, properties_from_tool=False):
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearence=0.25, 
+                 properties_from_tool=False, add_endings=False):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
@@ -170,11 +171,12 @@ class InvoluteRack(object):
         self.head = head
         self.clearence = clearence
         self.properties_from_tool = properties_from_tool
+        self.add_endings = add_endings
 
     def _update(self):
         self.__init__(m=self.m, z=self.z, pressure_angle=self.pressure_angle,
                       thickness=self.thickness, beta=self.beta, head=self.head, clearence=self.clearence, 
-                      properties_from_tool=self.properties_from_tool)
+                      properties_from_tool=self.properties_from_tool, add_endings=self.add_endings)
 
     def points(self, num=10):
         m, m_n, pitch, pressure_angle_t = self.compute_properties()
@@ -191,16 +193,19 @@ class InvoluteRack(object):
         trans = translation([0., pitch, 0.])
         for i in range(self.z - 1):
             teeth.append(trans(teeth[-1]))
-        teeth = list(np.vstack(teeth))
-        ext1 = np.array(teeth[0]) + np.array([0., a + b - pitch / 2])
-        ext2 = np.array(teeth[-1]) - np.array([0., a + b - pitch / 2])
-        teeth = [ext1.tolist(), ext1.tolist()] + teeth + [ext2.tolist(), ext2.tolist()]
+        teeth = np.vstack(teeth)
+        if self.add_endings:
+            ext1 = teeth[0] + np.array([0., a + b - pitch / 2])
+            ext2 = teeth[-1] - np.array([0., a + b - pitch / 2])
+            teeth = [ext1.tolist(), ext1.tolist()] + teeth.tolist() + [ext2.tolist(), ext2.tolist()]
+        else:
+            teeth = [teeth[0].tolist()] + teeth.tolist() + [teeth[-1].tolist()]
         #teeth.append(list(teeth[-1]))
         teeth[0][0] -= self.thickness
         #teeth.append(list(teeth[0]))
         teeth[-1][0] -= self.thickness
         teeth.append(teeth[0])
-        return(teeth)
+        return np.array(teeth)
 
     def compute_properties(self):
         if self.properties_from_tool:

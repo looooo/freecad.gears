@@ -208,6 +208,8 @@ class InvoluteGearRack(object):
             gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyLength", "transverse_pitch",
             "computed", "pitch in the transverse plane", 1)
+        obj.addProperty("App::PropertyBool", "add_endings", "gear_parameter", "if enabled the total length of the rack is teeth x pitch, \
+            otherwise the rack starts with a tooth-flank")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -219,6 +221,7 @@ class InvoluteGearRack(object):
         obj.clearence = 0.25
         obj.head = 0.
         obj.properties_from_tool = True
+        obj.add_endings = True
         self.obj = obj
         obj.Proxy = self
 
@@ -234,6 +237,8 @@ class InvoluteGearRack(object):
             fp.rack.clearence = fp.clearence
         if "properties_from_tool" in fp.PropertiesList:
             fp.rack.properties_from_tool = fp.properties_from_tool
+        if "add_endings" in fp.PropertiesList:
+            fp.rack.add_endings = fp.add_endings
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))
