@@ -219,16 +219,3 @@ class InvoluteRack(object):
 
         pitch = m * np.pi
         return m, m_n, pitch, pressure_angle_t
-
-
-
-if __name__ == "__main__":
-    from matplotlib import pyplot
-    gear = InvoluteRack()
-    x = []
-    y = []
-    for i in gear.points(30):
-        x.append(i[0])
-        y.append(i[1])
-    pyplot.plot(x, y)
-    pyplot.show()

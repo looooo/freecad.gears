@@ -105,15 +105,3 @@ class CycloideTooth():
         self.__init__(m=self.m, z=self.z, z1=self.z1, z2=self.z2,
                       clearance=self.clearance, backlash=self.backlash)
 
-
-if __name__ == "__main__":
-    from matplotlib import pyplot
-    gear = CycloideTooth()
-    x = []
-    y = []
-    for i in gear.points(30):
-        for j in i:
-            x.append(j[0])
-            y.append(j[1])
-    pyplot.plot(x[-60:], y[-60:])
-    pyplot.show()

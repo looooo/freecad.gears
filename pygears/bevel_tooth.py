@@ -160,11 +160,3 @@ class BevelTooth(object):
                       pressure_angle=self.pressure_angle,
                       pitch_angle=self.pitch_angle,
                       backlash=self.backlash, module=self.module)
-
-
-if __name__ == "__main__":
-    from matplotlib import pyplot
-    gear = BevelTooth(z=60, clearance=0.0, pitch_angle=np.deg2rad(45))
-    x, y, z = gear.involute_points().T
-    pyplot.plot(x, y)
-    pyplot.show()
