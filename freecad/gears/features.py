@@ -210,6 +210,9 @@ class InvoluteGearRack(object):
             "computed", "pitch in the transverse plane", 1)
         obj.addProperty("App::PropertyBool", "add_endings", "gear_parameter", "if enabled the total length of the rack is teeth x pitch, \
             otherwise the rack starts with a tooth-flank")
+        obj.addProperty(
+            "App::PropertyBool", "simplified", "gear_parameter", "if enabled the rack is drawn with a constant number of \
+            teeth to avoid topologic renaming.")
         obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
         obj.rack = self.involute_rack
         obj.teeth = 15
@@ -222,6 +225,7 @@ class InvoluteGearRack(object):
         obj.head = 0.
         obj.properties_from_tool = True
         obj.add_endings = True
+        obj.simplified = False
         self.obj = obj
         obj.Proxy = self
 
@@ -239,6 +243,8 @@ class InvoluteGearRack(object):
             fp.rack.properties_from_tool = fp.properties_from_tool
         if "add_endings" in fp.PropertiesList:
             fp.rack.add_endings = fp.add_endings
+        if "simplified" in fp.PropertiesList:
+            fp.rack.simplified = fp.simplified
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))

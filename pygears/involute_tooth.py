@@ -154,15 +154,14 @@ class InvoluteTooth():
         return(func)
 
     def _update(self):
-        self.__init__(m=self.m_n, z=self.z,
-                      pressure_angle=self.pressure_angle, clearance=self.clearance, shift=self.shift,
-                      beta=self.beta, undercut=self.undercut, backlash=self.backlash, head=self.head,
-                      properties_from_tool=self.properties_from_tool)
+        if not hasattr(self, "properties_from_tool"):
+            self.properties_from_tool = True
+        self._calc_gear_factors()
 
 
 class InvoluteRack(object):
     def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearence=0.25, 
-                 properties_from_tool=False, add_endings=False):
+                 properties_from_tool=False, add_endings=False, simplified=False):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
@@ -172,13 +171,18 @@ class InvoluteRack(object):
         self.clearence = clearence
         self.properties_from_tool = properties_from_tool
         self.add_endings = add_endings
+        self.simplified = simplified
 
+
+# this is not good. Find better way to stay backward compatible -> versions
     def _update(self):
-        self.__init__(m=self.m, z=self.z, pressure_angle=self.pressure_angle,
-                      thickness=self.thickness, beta=self.beta, head=self.head, clearence=self.clearence, 
-                      properties_from_tool=self.properties_from_tool, add_endings=self.add_endings)
+        if not hasattr(self, "add_endings"):
+            self.add_endings = True
+        if not hasattr(self, "simplified"):
+            self.simplified = False
 
     def points(self, num=10):
+        import copy
         m, m_n, pitch, pressure_angle_t = self.compute_properties()
 
         a = (2 + self.head + self.clearence) * m_n * tan(pressure_angle_t)
@@ -192,12 +196,27 @@ class InvoluteRack(object):
         teeth = [tooth]
         trans = translation([0., pitch, 0.])
         for i in range(self.z - 1):
-            teeth.append(trans(teeth[-1]))
-        teeth = np.vstack(teeth)
+            if self.simplified and i > 2 and i < (self.z - 5):
+                tooth = trans(tooth).tolist()
+            else:
+                tooth = trans(tooth).tolist()
+                teeth.append(copy.deepcopy(tooth))
+                if self.simplified and (i == 2):
+                    teeth[-1].pop()
+                    teeth[-1].pop()
+                    teeth[-1][-1][0] = 0
+                    teeth[-1][-1][1] -= a / 2 
+                if self.simplified and (i == self.z - 5):
+                    teeth[-1].pop(0)
+                    teeth[-1].pop(0)
+                    teeth[-1][0][0] = 0
+                    teeth[-1][0][1] += a / 2
+
+        teeth = [v for t in teeth for v in t]  # flattening
         if self.add_endings:
             ext1 = teeth[0] + np.array([0., a + b - pitch / 2])
             ext2 = teeth[-1] - np.array([0., a + b - pitch / 2])
-            teeth = [ext1.tolist(), ext1.tolist()] + teeth.tolist() + [ext2.tolist(), ext2.tolist()]
+            teeth = [ext1.tolist(), ext1.tolist()] + teeth + [ext2.tolist(), ext2.tolist()]
         else:
             teeth = [teeth[0].tolist()] + teeth.tolist() + [teeth[-1].tolist()]
         #teeth.append(list(teeth[-1]))
