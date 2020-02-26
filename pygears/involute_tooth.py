@@ -196,17 +196,17 @@ class InvoluteRack(object):
         teeth = [tooth]
         trans = translation([0., pitch, 0.])
         for i in range(self.z - 1):
-            if self.simplified and i > 2 and i < (self.z - 5):
+            if self.simplified and i > 3 and i < (self.z - 6):
                 tooth = trans(tooth).tolist()
             else:
                 tooth = trans(tooth).tolist()
                 teeth.append(copy.deepcopy(tooth))
-                if self.simplified and (i == 2):
+                if self.simplified and (i == 3):
                     teeth[-1].pop()
                     teeth[-1].pop()
                     teeth[-1][-1][0] = 0
                     teeth[-1][-1][1] -= a / 2 
-                if self.simplified and (i == self.z - 5):
+                if self.simplified and (i == self.z - 6):
                     teeth[-1].pop(0)
                     teeth[-1].pop(0)
                     teeth[-1][0][0] = 0
