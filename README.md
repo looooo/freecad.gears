@@ -1,6 +1,5 @@
-# A Gear module for FreeCAD
-
-[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate)
+## A Gear module for FreeCAD
+[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate) [![Total alerts](https://img.shields.io/lgtm/alerts/g/looooo/freecad.gears.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/looooo/freecad.gears/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/looooo/freecad.gears.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/looooo/freecad.gears/context:python)  
 
 ## Requirements
 FreeCAD > v0.16  
