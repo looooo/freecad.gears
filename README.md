@@ -5,26 +5,26 @@
 FreeCAD > v0.16  
 __python > 3 (for python2 use branch py2)__
 
-# Screenshots
+## Screenshots
 ![gear](examples/spiral.png)
 ![gear1](examples/animated_spiral.gif)
 
 ## Supported gear-types
 
 ### Cylindric Involute
-#### Shifting
-#### Helical
-#### Double Helical
-#### Undercut
+* Shifting
+* Helical
+* Double Helical
+* Undercut
 
 ### Involute Rack
 
 ### Cylindric Cycloid
-#### Helical
-#### Double Helical
+* Helical
+* Double Helical
 
 ### Spherical Involute Bevel-Gear
-#### Spiral
+* Spiral
 
 ### Crown-Gear
 
