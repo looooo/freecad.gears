@@ -32,7 +32,7 @@ __python > 3 (for python2 use branch py2)__
 
 ## Installation
 
-### Addon Manger  
+### Addon Manager  
 Starting from v0.17 it's possible to use the built-in FreeCAD [Addon Manager](https://github.com/FreeCAD/FreeCAD-addons#1-builtin-addon-manager)
 located in the `Tools` > `Addon Manager` dropdown menu.
 

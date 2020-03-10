@@ -53,7 +53,7 @@ docs/_build/
 # PyBuilder
 target/
 
-#costum
+#custom
 *.kdev4
 *.lyx~
 .ipynb_checkpoints/
