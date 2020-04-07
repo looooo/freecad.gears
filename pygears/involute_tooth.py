@@ -212,7 +212,7 @@ class InvoluteRack(object):
                     teeth[-1][0][0] = 0
                     teeth[-1][0][1] += a / 2
 
-        teeth = [v for t in teeth for v in t]  # flattening
+        teeth = np.array([v for t in teeth for v in t])  # flattening
         if self.add_endings:
             ext1 = teeth[0] + np.array([0., a + b - pitch / 2])
             ext2 = teeth[-1] - np.array([0., a + b - pitch / 2])
