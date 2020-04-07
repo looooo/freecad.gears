@@ -64,45 +64,45 @@ class CreateInvoluteGear(BaseCommand):
     NAME = "InvoluteGear"
     GEAR_FUNCTION = InvoluteGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
-    MenuText = 'involute gear'
-    ToolTip = 'involute gear'
+    MenuText = 'Involute gear'
+    ToolTip = 'Create an Involute gear'
 
 
 class CreateInvoluteRack(BaseCommand):
     NAME = "InvoluteRack"
     GEAR_FUNCTION = InvoluteGearRack
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
-    MenuText = 'involute rack'
-    ToolTip = 'involute rack'
+    MenuText = 'Involute rack'
+    ToolTip = 'Create an Involute rack'
 
 
 class CreateCrownGear(BaseCommand):
     NAME = "CrownGear"
     GEAR_FUNCTION = CrownGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'crowngear.svg')
-    MenuText = 'crown gear'
-    ToolTip = 'crown gear'
+    MenuText = 'Crown gear'
+    ToolTip = 'Create a Crown gear'
 
 
 class CreateCycloideGear(BaseCommand):
     NAME = "CycloidGear"
     GEAR_FUNCTION = CycloideGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidegear.svg')
-    MenuText = 'cycloide gear'
-    ToolTip = 'cycloide gear'
+    MenuText = 'Cycloide gear'
+    ToolTip = 'Create a Cycloide gear'
 
 
 class CreateBevelGear(BaseCommand):
     NAME = "BevelGear"
     GEAR_FUNCTION = BevelGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
-    MenuText = 'bevel gear'
-    ToolTip = 'bevel gear'
+    MenuText = 'Bevel gear'
+    ToolTip = 'Create a Bevel gear'
 
 
 class CreateWormGear(BaseCommand):
     NAME = "WormGear"
     GEAR_FUNCTION = WormGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'wormgear.svg')
-    MenuText = 'worm gear'
-    ToolTip = 'worm gear'
+    MenuText = 'Worm gear'
+    ToolTip = 'Create a Worm gear'

@@ -1,31 +1,30 @@
-# A Gear module for FreeCAD
-
-[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate)
+## A Gear module for FreeCAD
+[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate) [![Total alerts](https://img.shields.io/lgtm/alerts/g/looooo/freecad.gears.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/looooo/freecad.gears/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/looooo/freecad.gears.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/looooo/freecad.gears/context:python)  
 
 ## Requirements
 FreeCAD > v0.16  
 __python > 3 (for python2 use branch py2)__
 
-# Screenshots
+## Screenshots
 ![gear](examples/spiral.png)
 ![gear1](examples/animated_spiral.gif)
 
 ## Supported gear-types
 
 ### Cylindric Involute
-#### Shifting
-#### Helical
-#### Double Helical
-#### Undercut
+* Shifting
+* Helical
+* Double Helical
+* Undercut
 
 ### Involute Rack
 
 ### Cylindric Cycloid
-#### Helical
-#### Double Helical
+* Helical
+* Double Helical
 
 ### Spherical Involute Bevel-Gear
-#### Spiral
+* Spiral
 
 ### Crown-Gear
 
@@ -33,7 +32,7 @@ __python > 3 (for python2 use branch py2)__
 
 ## Installation
 
-### Addon Manger  
+### Addon Manager  
 Starting from v0.17 it's possible to use the built-in FreeCAD [Addon Manager](https://github.com/FreeCAD/FreeCAD-addons#1-builtin-addon-manager)
 located in the `Tools` > `Addon Manager` dropdown menu.
 
