@@ -110,6 +110,8 @@ class InvoluteGear(object):
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
                         "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+                        "computed", "transverse_pitch", 1)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -170,7 +172,9 @@ class InvoluteGear(object):
             rw = fp.gear.dw / 2
             fp.Shape = Part.makeCylinder(rw, fp.height.Value)
 
+        # computed properties
         fp.dw = "{}mm".format(fp.gear.dw)
+        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
 
     def __getstate__(self):
         return None

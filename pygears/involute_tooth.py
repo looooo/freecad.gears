@@ -48,6 +48,8 @@ class InvoluteTooth():
         else:
             self.pressure_angle_t = self.pressure_angle
             self.m = self.m_n
+
+        self.pitch = self.m * np.pi
         self.c = self.clearance * self.m_n
         self.midpoint = [0., 0.]
         self.d = self.z * self.m
@@ -216,7 +218,7 @@ class InvoluteRack(object):
         if self.add_endings:
             ext1 = teeth[0] + np.array([0., a + b - pitch / 2])
             ext2 = teeth[-1] - np.array([0., a + b - pitch / 2])
-            teeth = [ext1.tolist(), ext1.tolist()] + teeth + [ext2.tolist(), ext2.tolist()]
+            teeth = [ext1.tolist(), ext1.tolist()] + teeth.tolist() + [ext2.tolist(), ext2.tolist()]
         else:
             teeth = [teeth[0].tolist()] + teeth.tolist() + [teeth[-1].tolist()]
         #teeth.append(list(teeth[-1]))
