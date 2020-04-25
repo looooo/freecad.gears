@@ -21,8 +21,7 @@
 
 from __future__ import division
 from numpy import tan, cos, sin, sqrt, arctan, pi, array, linspace, transpose, vstack, ndarray
-from ._functions import nearestpts, rotation, reflection, trimfunc, norm, translation
-import numpy as np
+from ._functions import nearestpts, rotation, reflection, trimfunc, diff_norm, translation
 
 
 class InvoluteTooth():
@@ -49,7 +48,7 @@ class InvoluteTooth():
             self.pressure_angle_t = self.pressure_angle
             self.m = self.m_n
 
-        self.pitch = self.m * np.pi
+        self.pitch = self.m * pi
         self.c = self.clearance * self.m_n
         self.midpoint = [0., 0.]
         self.d = self.z * self.m
@@ -112,7 +111,7 @@ class InvoluteTooth():
             u1 = False
             if self.dg > self.df:
                 u1 = vstack(
-                    [[l2[0] * self.df / (norm(l2[0], [0, 0]) * 2)], [l2[0]]])
+                    [[l2[0] * self.df / (diff_norm(l2[0], [0, 0]) * 2)], [l2[0]]])
                 e1 = l2
             else:
                 e1 = l2
@@ -120,7 +119,6 @@ class InvoluteTooth():
         reflect = reflection(0)
         e2 = reflect(e1)[::-1]
         if isinstance(u1, bool):
-            u2 = False
             one_tooth = [e1, [e1[-1], e2[0]], e2]
         else:
             u2 = reflect(u1)[::-1]
@@ -214,10 +212,10 @@ class InvoluteRack(object):
                     teeth[-1][0][0] = 0
                     teeth[-1][0][1] += a / 2
 
-        teeth = np.array([v for t in teeth for v in t])  # flattening
+        teeth = array([v for t in teeth for v in t])  # flattening
         if self.add_endings:
-            ext1 = teeth[0] + np.array([0., a + b - pitch / 2])
-            ext2 = teeth[-1] - np.array([0., a + b - pitch / 2])
+            ext1 = teeth[0] + array([0., a + b - pitch / 2])
+            ext2 = teeth[-1] - array([0., a + b - pitch / 2])
             teeth = [ext1.tolist(), ext1.tolist()] + teeth.tolist() + [ext2.tolist(), ext2.tolist()]
         else:
             teeth = [teeth[0].tolist()] + teeth.tolist() + [teeth[-1].tolist()]
@@ -226,7 +224,7 @@ class InvoluteRack(object):
         #teeth.append(list(teeth[0]))
         teeth[-1][0] -= self.thickness
         teeth.append(teeth[0])
-        return np.array(teeth)
+        return array(teeth)
 
     def compute_properties(self):
         if self.properties_from_tool:
@@ -238,5 +236,5 @@ class InvoluteRack(object):
             m = self.m
             m_n  = self.m
 
-        pitch = m * np.pi
+        pitch = m * pi
         return m, m_n, pitch, pressure_angle_t

@@ -32,8 +32,8 @@ from pygears._functions import rotation3D, rotation
 import FreeCAD as App
 import Part
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
-    BRepOffsetAPI, Shell, makeLoft, Solid, Line, BSplineSurface, makeCompound,\
-    show, makePolygon, makeHelix, makeShell, makeSolid
+    makeLoft, Line, BSplineSurface, \
+    makePolygon, makeHelix, makeShell, makeSolid
 
 
 __all__ = ["InvoluteGear",

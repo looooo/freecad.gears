@@ -22,7 +22,6 @@
 from __future__ import division
 from __future__ import division
 from numpy import cos, sin, tan, arccos, arctan, pi, array, linspace, transpose, vstack, sqrt
-import numpy as np
 from ._functions import rotation3D, reflection3D, intersection_line_circle
 
 
@@ -60,27 +59,6 @@ class BevelTooth(object):
                        self.z) - self.clearance * sin(self.pitch_angle)
         self.z_f = cos(self.pitch_angle - sin(pitch_angle) * 2 / self.z)
         self.add_foot = True
-
-        # if self.involute_start_radius < self.r_f:
-        #     self.add_foot = False
-        #     self.involute_start = -arccos(
-        #         sqrt((42 + 16*cos(2*self.pressure_angle) + 6*cos(4*self.pressure_angle) -
-        #         4*cos(4*self.pressure_angle - 2*self.pitch_angle) - 8*cos(2*(self.pressure_angle - self.pitch_angle)) +
-        #         cos(4*(self.pressure_angle - self.pitch_angle)) + 24*cos(2*self.pitch_angle) - 2*cos(4*self.pitch_angle) -
-        #         8*cos(2*(self.pressure_angle + self.pitch_angle)) + cos(4*(self.pressure_angle + self.pitch_angle)) -
-        #         4*cos(2*(2*self.pressure_angle + self.pitch_angle)) + 24*cos((4*sin(self.pitch_angle))/self.z) +
-        #         4*cos(2*self.pressure_angle - (4*sin(self.pitch_angle))/self.z) + 16*cos(2*self.pitch_angle -
-        #         (4*sin(self.pitch_angle))/self.z) + 24*cos(4*self.pitch_angle - (4*sin(self.pitch_angle))/self.z) +
-        #         4*cos(2*self.pressure_angle + 4*self.pitch_angle - (4*sin(self.pitch_angle))/self.z) -
-        #         8*cos(2*(self.pressure_angle + self.pitch_angle - (2*sin(self.pitch_angle))/self.z)) +
-        #         4*cos(2*self.pressure_angle + (4*sin(self.pitch_angle))/self.z) + 4*cos(2*self.pressure_angle -
-        #         4*self.pitch_angle + (4*sin(self.pitch_angle))/self.z) - 8*cos(2*self.pressure_angle - 2*self.pitch_angle +
-        #         (4*sin(self.pitch_angle))/self.z) + 32*sqrt(2)*sqrt(-(cos(self.pressure_angle)**2*
-        #         (-2 - 2*cos(2*self.pressure_angle) + cos(2*(self.pressure_angle - self.pitch_angle)) -
-        #         2*cos(2*self.pitch_angle) + cos(2*(self.pressure_angle + self.pitch_angle)) +
-        #         4*cos(2*self.pitch_angle - (4*sin(self.pitch_angle))/self.z))*cos(self.pitch_angle - (2*sin(self.pitch_angle))/self.z)**2*
-        #         sin(2*self.pitch_angle)**2)))/(-6 - 2*cos(2*self.pressure_angle) + cos(2*(self.pressure_angle - self.pitch_angle)) -
-        #         2*cos(2*self.pitch_angle) + cos(2*(self.pressure_angle + self.pitch_angle)))**2)/sqrt(2))
 
     def involute_function_x(self):
         def func(s):
@@ -143,7 +121,6 @@ class BevelTooth(object):
         pts = rot(pts)
         ref = reflection3D(pi/2)
         pts1 = ref(pts)[::-1]
-        rot = rotation3D(2*pi/self.z)
         if self.add_foot:
             return(array([
                 array([pts[0], pts[1]]),

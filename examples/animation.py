@@ -1,10 +1,9 @@
 # script for bevel-gear animation
 
-from PySide import QtGui, QtCore
+from PySide import QtCore
 import FreeCAD as app
 import FreeCADGui as gui
 import numpy as np
-import imageio
 
 doc = app.ActiveDocument
 g2 = doc.Common

@@ -28,7 +28,6 @@ class CycloideProfile(CycloideTooth, _GearProfile):
 
 class BevelProfile(BevelTooth, _GearProfile):
     rot3D = True
-    pass
 
 class InvoluteRackProfile(InvoluteRack):
     def profile(self):
