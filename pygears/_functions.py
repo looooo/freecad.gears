@@ -148,10 +148,10 @@ def nearestpts(evolv, underc):
     for i in array(evolv[1:]):
         jk = 0
         for j in array(underc[1:]):
-            l = norm(i, j)
+            l = diff_norm(i, j)
             if l < outmin:
-                re = norm(i, [0, 0])
-                ru = norm(j, [0, 0])
+                re = diff_norm(i, [0, 0])
+                ru = diff_norm(j, [0, 0])
                 if re > ru:
                     outmin = l
                     iout, jout = [ik, jk]
