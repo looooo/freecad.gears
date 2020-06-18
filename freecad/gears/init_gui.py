@@ -33,7 +33,7 @@ except ImportError as e:
         "the class Workbench is loaded, although not imported: magic")
 
 
-class gearWorkbench(Workbench):
+class GearWorkbench(Workbench):
     """glider workbench"""
     MenuText = "Gear"
     ToolTip = "Gear Workbench"
@@ -70,4 +70,4 @@ class gearWorkbench(Workbench):
         pass
 
 
-Gui.addWorkbench(gearWorkbench())
+Gui.addWorkbench(GearWorkbench())
