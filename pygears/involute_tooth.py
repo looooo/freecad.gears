@@ -160,7 +160,7 @@ class InvoluteTooth():
 
 
 class InvoluteRack(object):
-    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearence=0.25, 
+    def __init__(self, m=5, z=15, pressure_angle=20 * pi / 180., thickness=5, beta=0, head=0, clearance=0.25, 
                  properties_from_tool=False, add_endings=False, simplified=False):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
@@ -168,7 +168,7 @@ class InvoluteRack(object):
         self.z = z
         self.beta = beta
         self.head = head
-        self.clearence = clearence
+        self.clearance = clearance
         self.properties_from_tool = properties_from_tool
         self.add_endings = add_endings
         self.simplified = simplified
@@ -185,13 +185,13 @@ class InvoluteRack(object):
         import copy
         m, m_n, pitch, pressure_angle_t = self.compute_properties()
 
-        a = (2 + self.head + self.clearence) * m_n * tan(pressure_angle_t)
+        a = (2 + self.head + self.clearance) * m_n * tan(pressure_angle_t)
         b = pitch / 4 - (1 + self.head) * m_n * tan(pressure_angle_t)
         tooth = [
-            [-m_n * (1 + self.clearence), -a - b],
+            [-m_n * (1 + self.clearance), -a - b],
             [m_n * (1 + self.head), -b],
             [m_n * (1 + self.head), b],
-            [-m_n * (1 + self.clearence), a + b]
+            [-m_n * (1 + self.clearance), a + b]
         ]
         teeth = [tooth]
         trans = translation([0., pitch, 0.])

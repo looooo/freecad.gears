@@ -206,7 +206,7 @@ class InvoluteGearRack(object):
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "clearence * module = additional length of foot")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of foot")
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
@@ -225,7 +225,7 @@ class InvoluteGearRack(object):
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         obj.beta = '0. deg'
-        obj.clearence = 0.25
+        obj.clearance = 0.25
         obj.head = 0.
         obj.properties_from_tool = True
         obj.add_endings = True
@@ -241,8 +241,8 @@ class InvoluteGearRack(object):
         fp.rack.beta = fp.beta.Value * np.pi / 180.
         fp.rack.head = fp.head
         # checksbackwardcompatibility:
-        if "clearence" in fp.PropertiesList:
-            fp.rack.clearence = fp.clearence
+        if "clearance" in fp.PropertiesList:
+            fp.rack.clearance = fp.clearance
         if "properties_from_tool" in fp.PropertiesList:
             fp.rack.properties_from_tool = fp.properties_from_tool
         if "add_endings" in fp.PropertiesList:
@@ -615,14 +615,14 @@ class WormGear(object):
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "clearence * module = additional length of foot")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of foot")
 
         obj.teeth = 3
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
         obj.height = '5. mm'
         obj.diameter = '5. mm'
-        obj.clearence = 0.25
+        obj.clearance = 0.25
         obj.head = 0
 
         self.obj = obj
@@ -634,18 +634,18 @@ class WormGear(object):
         t = fp.teeth
         h = fp.height
 
-        clearence = fp.clearence
+        clearance = fp.clearance
         head = fp.head
         alpha = fp.pressure_angle.Value
         beta = np.arctan(m * t / d)
         fp.beta = np.rad2deg(beta)
         beta = np.pi / 2 - beta
 
-        r_1 = (d - (2 + 2 * clearence) * m) / 2
+        r_1 = (d - (2 + 2 * clearance) * m) / 2
         r_2 = (d + (2 + 2 * head) * m) / 2
-        z_a = (2 + head + clearence) * m * np.tan(np.deg2rad(alpha))
+        z_a = (2 + head + clearance) * m * np.tan(np.deg2rad(alpha))
         z_b = (m * np.pi - 4 * m * np.tan(np.deg2rad(alpha))) / 2
-        z_0 = clearence * m * np.tan(np.deg2rad(alpha))
+        z_0 = clearance * m * np.tan(np.deg2rad(alpha))
         z_1 = z_b - z_0
         z_2 = z_1 + z_a
         z_3 = z_2 + z_b - 2 * head * m * np.tan(np.deg2rad(alpha))
