@@ -641,13 +641,15 @@ class WormGear(object):
         fp.beta = np.rad2deg(beta)
         beta = np.pi / 2 - beta
 
-        r_1 = (d - (2 + clearence) * m) / 2
-        r_2 = (d + (2 + head) * m) / 2
+        r_1 = (d - (2 + 2 * clearence) * m) / 2
+        r_2 = (d + (2 + 2 * head) * m) / 2
         z_a = (2 + head + clearence) * m * np.tan(np.deg2rad(alpha))
-        z_4 = m * np.pi
-        z_2 = z_4 / 2 + head * m * np.tan(np.deg2rad(alpha))
-        z_1 = z_2 - z_a
-        z_3 = z_4 - z_a
+        z_b = (m * np.pi - 4 * m * np.tan(np.deg2rad(alpha))) / 2
+        z_0 = clearence * m * np.tan(np.deg2rad(alpha))
+        z_1 = z_b - z_0
+        z_2 = z_1 + z_a
+        z_3 = z_2 + z_b - 2 * head * m * np.tan(np.deg2rad(alpha))
+        z_4 = z_3 + z_a
 
         def helical_projection(r, z):
             phi = 2 * z / m / t
@@ -657,9 +659,10 @@ class WormGear(object):
             return np.array([x, y, z]). T
 
         # create a circle from phi=0 to phi_1 with r_1
+        phi_0 = 2 * z_0 / m / t
         phi_1 = 2 * z_1 / m / t
         c1 = Part.makeCircle(r_1, App.Vector(0, 0, 0),
-                             App.Vector(0, 0, 1), 0, np.rad2deg(phi_1))
+                             App.Vector(0, 0, 1), np.rad2deg(phi_0), np.rad2deg(phi_1))
 
         # create first bspline
         z_values = np.linspace(z_1, z_2, 10)
