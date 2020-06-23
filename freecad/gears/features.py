@@ -204,9 +204,9 @@ class InvoluteGearRack(object):
         obj.addProperty(
             "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
         obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
-            "App::PropertyFloat", "clearence", "gear_parameter", "head_value * modul_value = additional length of foot")
+            "App::PropertyFloat", "clearence", "gear_parameter", "clearence * module = additional length of foot")
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
@@ -612,11 +612,19 @@ class WormGear(object):
             "App::PropertyAngle", "beta", "gear_parameter", "beta ", 1)
         obj.addProperty(
             "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
+        obj.addProperty(
+            "App::PropertyFloat", "clearence", "gear_parameter", "clearence * module = additional length of foot")
+
         obj.teeth = 3
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
         obj.height = '5. mm'
         obj.diameter = '5. mm'
+        obj.clearence = 0.25
+        obj.head = 0
+
         self.obj = obj
         obj.Proxy = self
 
@@ -625,16 +633,19 @@ class WormGear(object):
         d = fp.diameter.Value
         t = fp.teeth
         h = fp.height
+
+        clearence = fp.clearence
+        head = fp.head
         alpha = fp.pressure_angle.Value
         beta = np.arctan(m * t / d)
         fp.beta = np.rad2deg(beta)
         beta = np.pi / 2 - beta
 
-        r_1 = (d - 2 * m) / 2
-        r_2 = (d + 2 * m) / 2
-        z_a = 2 * m * np.tan(np.deg2rad(alpha))
+        r_1 = (d - (2 + clearence) * m) / 2
+        r_2 = (d + (2 + head) * m) / 2
+        z_a = (2 + head + clearence) * m * np.tan(np.deg2rad(alpha))
         z_4 = m * np.pi
-        z_2 = z_4 / 2
+        z_2 = z_4 / 2 + head * m * np.tan(np.deg2rad(alpha))
         z_1 = z_2 - z_a
         z_3 = z_4 - z_a
 
