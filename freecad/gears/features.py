@@ -309,6 +309,9 @@ class CrownGear(object):
         self.obj = obj
         obj.Proxy = self
 
+        App.Console.PrintMessage("Gear module: Crown gear created, construct mode = true for improved performance. "\
+                                 "Set construct property to false when ready to cut teeth.")
+
     def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):
         r_ew = m * t_i / 2
 
