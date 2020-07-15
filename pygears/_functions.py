@@ -24,28 +24,28 @@ from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
 from numpy.linalg import solve, norm
 
 
-def reflection(pressure_angle):
+def reflection(angle):
     mat = array(
-        [[cos(2 * pressure_angle), -sin(2 * pressure_angle)], [-sin(2 * pressure_angle), -cos(2 * pressure_angle)]])
+        [[cos(2 * angle), -sin(2 * angle)], [-sin(2 * angle), -cos(2 * angle)]])
 
     def func(x):
         return(dot(x, mat))
     return(func)
 
 
-def reflection3D(pressure_angle):
-    mat = array([[cos(2 * pressure_angle), -sin(2 * pressure_angle), 0.],
-                 [-sin(2 * pressure_angle), -cos(2 * pressure_angle), 0.], [0., 0., 1.]])
+def reflection3D(angle):
+    mat = array([[cos(2 * angle), -sin(2 * angle), 0.],
+                 [-sin(2 * angle), -cos(2 * angle), 0.], [0., 0., 1.]])
 
     def func(x):
         return(dot(x, mat))
     return(func)
 
 
-def rotation(pressure_angle, midpoint=None):
+def rotation(angle, midpoint=None):
     midpoint = midpoint or [0., 0.]
-    mat = array([[cos(pressure_angle), -sin(pressure_angle)],
-                 [sin(pressure_angle), cos(pressure_angle)]])
+    mat = array([[cos(angle), -sin(angle)],
+                 [sin(angle), cos(angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
@@ -55,11 +55,11 @@ def rotation(pressure_angle, midpoint=None):
     return(func)
 
 
-def rotation3D(pressure_angle):
+def rotation3D(angle):
     mat = array(
         [
-            [cos(pressure_angle), -sin(pressure_angle), 0.],
-            [sin(pressure_angle), cos(pressure_angle), 0.],
+            [cos(angle), -sin(angle), 0.],
+            [sin(angle), cos(angle), 0.],
             [0., 0., 1.]])
 
     def func(xx):
@@ -169,3 +169,15 @@ def intersection_line_circle(p1, p2, r):
     q = p1.dot(p1) - r ** 2
     t = -p_half + sqrt(p_half ** 2 - q)
     return p1 + d * t
+
+
+def arc_from_points_and_center(p_1, p_2, m):
+    """return 3 points (x1, x12, x2) which can be used to create the arc"""
+    r = (norm(p_1 - m) + norm(p_2 - m)) / 2
+    p_12l = (p_1 + p_2) / 2
+    v = p_12l - m
+    v /= norm(v)
+    p_12 = m + v * r
+    return (p_1, p_12, p_2)
+
+    
