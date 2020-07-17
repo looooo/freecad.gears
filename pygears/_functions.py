@@ -48,6 +48,7 @@ def rotation(angle, midpoint=None):
                  [sin(angle), cos(angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
+    print(vec)
     trans = translation(vec)
 
     def func(xx):

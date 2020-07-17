@@ -145,7 +145,7 @@ class InvoluteTooth():
 
     def involute_function_x(self):
         def func(phi):
-            return(array(self.dg / 2 * cos(phi) + phi * self.dg / 2 * sin(phi)))
+            return(self.dg / 2 * cos(phi) + phi * self.dg / 2 * sin(phi))
         return(func)
 
     def involute_function_y(self):
