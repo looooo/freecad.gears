@@ -28,6 +28,13 @@ __python > 3 (for python2 use branch py2)__
 
 ### Crown-Gear
 
+### Worm-Gear
+
+### Timing-Gear
+
+### Latern-Gear
+![latern-gear](examples/latern-gear.png)
+
 ---------------------------
 
 ## Installation
