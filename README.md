@@ -28,6 +28,7 @@ __python > 3 (for python2 use branch py2)__
 ### Worm-Gear
 
 ### Timing-Gear
+![timing-gear](examples/timing-gear.png)
 
 ### Latern-Gear
 ![latern-gear](examples/latern-gear.png)
