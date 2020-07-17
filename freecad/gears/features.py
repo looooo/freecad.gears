@@ -308,7 +308,7 @@ class CrownGear(object):
         obj.pressure_angle = '20. deg'
         obj.height = '2. mm'
         obj.thickness = '5 mm'
-        obj.num_profiles = 10
+        obj.num_profiles = 4
         obj.construct = True
         self.obj = obj
         obj.Proxy = self
@@ -379,8 +379,7 @@ class CrownGear(object):
             pts = self.profile(m, r_i, rm, t_c, t_i, alpha_w, y0, y1, y2)
             poly = Wire(makePolygon(list(map(fcvec, pts))))
             polies.append(poly)
-        wire = Part.Wire(polies)
-        loft = makeLoft(wire, True)
+        loft = makeLoft(polies, True)
         rot = App.Matrix()
         rot.rotateZ(2 * np.pi / t)
         if fp.construct:
