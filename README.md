@@ -5,9 +5,6 @@
 FreeCAD > v0.16  
 __python > 3 (for python2 use branch py2)__
 
-## Screenshots
-![gear](examples/spiral.png)
-![gear1](examples/animated_spiral.gif)
 
 ## Supported gear-types
 
@@ -27,6 +24,13 @@ __python > 3 (for python2 use branch py2)__
 * Spiral
 
 ### Crown-Gear
+
+### Worm-Gear
+
+### Timing-Gear
+
+### Latern-Gear
+![latern-gear](examples/latern-gear.png)
 
 ---------------------------
 
@@ -79,4 +83,4 @@ by browsing this repositories [issue queue](https://github.com/looooo/freecad.ge
 * "FC Gears: Feedback thread" ([thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626))  
 
 # License
-GNU General Public License v2.0
+GNU General Public License v3.0

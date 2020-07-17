@@ -810,12 +810,9 @@ class TimingGear(object):
         m_34 = (r5 - r_34) * np.array([-np.sin(phi4), np.cos(phi4)])
 
 
-
-        x1 = np.array([0., r5 - h])
         x2 = np.array([-r_12 * np.sin(phi_12), m_12[1] - r_12 * np.cos(phi_12)])
         x3 = m_34 + r_34 / (r_34 + r_23) * (m_23 - m_34)
         x4 = r4 * np.array([-np.sin(phi4), np.cos(phi4)])
-        x5 = r5 * np.array([-np.sin(phi5), np.cos(phi5)])
 
 
         ref = reflection(-phi5 - np.pi / 2)
