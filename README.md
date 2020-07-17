@@ -5,9 +5,6 @@
 FreeCAD > v0.16  
 __python > 3 (for python2 use branch py2)__
 
-## Screenshots
-![gear](examples/spiral.png)
-![gear1](examples/animated_spiral.gif)
 
 ## Supported gear-types
 
