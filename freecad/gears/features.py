@@ -884,7 +884,22 @@ class LaternGear(object):
 
 
         phi_max = (r_r + np.sqrt(r_max**2 - r_0**2)) / r_0
-        phi_min = r_r / r_0
+
+        def find_phi_min(phi_min):
+            return r_0*(phi_min**2*r_0 - 2*phi_min*r_0*np.sin(phi_min) - \
+                   2*phi_min*r_r - 2*r_0*np.cos(phi_min) + 2*r_0 + 2*r_r*np.sin(phi_min))
+        try:
+            import scipy.optimize
+            phi_min = scipy.optimize.root(find_phi_min, (phi_max + r_r / r_0 * 4) / 5).x[0] # , r_r / r_0, phi_max)
+        except importError:
+            App.Console.Warning("scipy not available. Can't compute numerical root. Leads to a wrong bolt-radius")
+            phi_min = r_r / r_0
+
+    
+        print(phi_min)
+        print(r_r / r_0)
+        print(find_phi_min(phi_min))
+        # phi_min = 0 # r_r / r_0
         phi = np.linspace(phi_min, phi_max, fp.num_profiles)
         x = r_0 * (np.cos(phi) + phi * np.sin(phi)) - r_r * np.sin(phi)
         y = r_0 * (np.sin(phi) - phi * np.cos(phi)) + r_r * np.cos(phi)
