@@ -495,7 +495,7 @@ class BevelGear(object):
             "App::PropertyAngle", "pitch_angle", "involute_parameter", "pitch_angle")
         obj.addProperty(
             "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure_angle")
-        obj.addProperty("App::PropertyLength", "m", "gear_parameter", "m")
+        obj.addProperty("App::PropertyLength", "module", "gear_parameter", "module")
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
@@ -509,7 +509,7 @@ class BevelGear(object):
         obj.addProperty("App::PropertyAngle", "beta",
                         "gear_paramenter", "test")
         obj.gear = self.bevel_tooth
-        obj.m = '1. mm'
+        obj.module = '1. mm'
         obj.teeth = 15
         obj.pressure_angle = '20. deg'
         obj.pitch_angle = '45. deg'
@@ -524,11 +524,11 @@ class BevelGear(object):
 
     def execute(self, fp):
         fp.gear.z = fp.teeth
-        fp.gear.module = fp.m.Value
+        fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.
         fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
         fp.gear.backlash = fp.backlash.Value
-        scale = fp.m.Value * fp.gear.z / 2 / \
+        scale = fp.module.Value * fp.gear.z / 2 / \
             np.tan(fp.pitch_angle.Value * np.pi / 180)
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
