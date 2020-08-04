@@ -122,15 +122,15 @@ class BevelTooth(object):
         ref = reflection3D(pi/2)
         pts1 = ref(pts)[::-1]
         if self.add_foot:
-            return(array([
+            return([
                 array([pts[0], pts[1]]),
-                pts[1:],
+                array(pts[1:]),
                 array([pts[-1], pts1[0]]),
-                pts1[:-1],
+                array(pts1[:-1]),
                 array([pts1[-2], pts1[-1]])
-            ]))
+            ])
         else:
-            return(array([pts, array([pts[-1], pts1[0]]), pts1]))
+            return([pts, array([pts[-1], pts1[0]]), pts1])
 
     def _update(self):
         self.__init__(z=self.z, clearance=self.clearance,
