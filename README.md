@@ -22,6 +22,7 @@ __python > 3 (for python2 use branch py2)__
 
 ### Spherical Involute Bevel-Gear
 * Spiral
+![bevel-gear](examples/bevel-gear.png)
 
 ### Crown-Gear
 
