@@ -71,7 +71,7 @@ class BaseCommand(object):
 
 
 class CreateInvoluteGear(BaseCommand):
-    NAME = "InvoluteGear"
+    NAME = "involutegear"
     GEAR_FUNCTION = InvoluteGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
     MenuText = 'Involute gear'
@@ -79,7 +79,7 @@ class CreateInvoluteGear(BaseCommand):
 
 
 class CreateInvoluteRack(BaseCommand):
-    NAME = "InvoluteRack"
+    NAME = "involuterack"
     GEAR_FUNCTION = InvoluteGearRack
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
     MenuText = 'Involute rack'
@@ -87,7 +87,7 @@ class CreateInvoluteRack(BaseCommand):
 
 
 class CreateCrownGear(BaseCommand):
-    NAME = "CrownGear"
+    NAME = "crowngear"
     GEAR_FUNCTION = CrownGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'crowngear.svg')
     MenuText = 'Crown gear'
@@ -95,7 +95,7 @@ class CreateCrownGear(BaseCommand):
 
 
 class CreateCycloideGear(BaseCommand):
-    NAME = "CycloidGear"
+    NAME = "cycloidgear"
     GEAR_FUNCTION = CycloideGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidegear.svg')
     MenuText = 'Cycloide gear'
@@ -103,7 +103,7 @@ class CreateCycloideGear(BaseCommand):
 
 
 class CreateBevelGear(BaseCommand):
-    NAME = "BevelGear"
+    NAME = "bevelgear"
     GEAR_FUNCTION = BevelGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
     MenuText = 'Bevel gear'
@@ -111,7 +111,7 @@ class CreateBevelGear(BaseCommand):
 
 
 class CreateWormGear(BaseCommand):
-    NAME = "WormGear"
+    NAME = "wormgear"
     GEAR_FUNCTION = WormGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'wormgear.svg')
     MenuText = 'Worm gear'
@@ -119,14 +119,14 @@ class CreateWormGear(BaseCommand):
 
 
 class CreateTimingGear(BaseCommand):
-    NAME = "TimingGear"
+    NAME = "timinggear"
     GEAR_FUNCTION = TimingGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'timinggear.svg')
     MenuText = 'Timing gear'
     ToolTip = 'Create a Timing gear'
 
 class CreateLaternGear(BaseCommand):
-    NAME = "LaternGear"
+    NAME = "laterngear"
     GEAR_FUNCTION = LaternGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'laterngear.svg')
     MenuText = 'Latern gear'

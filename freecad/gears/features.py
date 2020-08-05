@@ -757,7 +757,7 @@ class TimingGear(object):
             "App::PropertyLength", "rs", "computed", "radius of third arc", 1)
         obj.addProperty(
             "App::PropertyLength", "offset", "computed", "x-offset of second arc-midpoint", 1)
-        obj.teeth = 20
+        obj.teeth = 15
         obj.type = ['gt2', 'gt3', 'gt5']
         obj.height = '5. mm'
 
