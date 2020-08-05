@@ -21,7 +21,8 @@ __python > 3 (for python2 use branch py2)__
 * Double Helical
 
 ### Spherical Involute Bevel-Gear
-* Spiral
+* Spiral  
+
 ![bevel-gear](examples/bevel-gear.png)
 
 ### Crown-Gear
