@@ -12,7 +12,10 @@ __python > 3 (for python2 use branch py2)__
 * Shifting
 * Helical
 * Double Helical
-* Undercut
+* Undercut  
+
+![involute-gear](examples/involute-double-helical-gear.png)
+
 
 ### Involute Rack
 

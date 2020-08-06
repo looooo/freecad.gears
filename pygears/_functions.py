@@ -128,7 +128,7 @@ def trimfunc(l1, l2):
                     l2 == [l2[0]]
                 else:
                     l2 = l2[jk::-1]
-                return(array([vstack([l1, [s]]), vstack([[s], l2])]))
+                return([vstack([l1, [s]]), vstack([[s], l2])])
             j0 = j
             jk += 1
         i0 = i
