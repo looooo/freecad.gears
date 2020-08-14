@@ -29,8 +29,10 @@ __python > 3 (for python2 use branch py2)__
 ![bevel-gear](examples/bevel-gear.png)
 
 ### Crown-Gear
+![crown-gear](examples/crown-gear.png)
 
 ### Worm-Gear
+![worm-gear](examples/worm-gear.png)
 
 ### Timing-Gear
 ![timing-gear](examples/timing-gear.png)
