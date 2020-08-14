@@ -18,10 +18,13 @@ __python > 3 (for python2 use branch py2)__
 
 
 ### Involute Rack
+![involute-rack](examples/involute-rack.png)
 
 ### Cylindric Cycloid
 * Helical
 * Double Helical
+
+![cycloide-gear](examples/cycloide-gear.png)
 
 ### Spherical Involute Bevel-Gear
 * Spiral  
