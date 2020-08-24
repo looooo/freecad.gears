@@ -46,7 +46,7 @@ class GearWorkbench(Workbench):
         "CreateCrownGear",
         "CreateWormGear",
         "CreateTimingGear",
-        "CreateLaternGear"]
+        "CreateLanternGear"]
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
@@ -54,7 +54,7 @@ class GearWorkbench(Workbench):
     def Initialize(self):
         from .commands import CreateCycloideGear, CreateInvoluteGear
         from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
-        from .commands import CreateWormGear, CreateTimingGear, CreateLaternGear
+        from .commands import CreateWormGear, CreateTimingGear, CreateLanternGear
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
         # Gui.addIconPath(App.getHomePath()+"Mod/gear/icons/")
@@ -65,7 +65,7 @@ class GearWorkbench(Workbench):
         Gui.addCommand('CreateCrownGear', CreateCrownGear())
         Gui.addCommand('CreateWormGear', CreateWormGear())
         Gui.addCommand('CreateTimingGear', CreateTimingGear())
-        Gui.addCommand('CreateLaternGear', CreateLaternGear())
+        Gui.addCommand('CreateLanternGear', CreateLanternGear())
 
     def Activated(self):
         pass

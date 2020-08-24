@@ -847,7 +847,7 @@ class TimingGear(object):
             fp.Shape = Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
 
-class LaternGear(object):
+class LanternGear(object):
     def __init__(self, obj):
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
@@ -859,7 +859,8 @@ class LaternGear(object):
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty("App::PropertyInteger",
                         "num_profiles", "accuracy", "number of profiles used for loft")
-        obj.teeth = 15
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
 
         obj.teeth = 15
         obj.module = '1. mm'
@@ -876,7 +877,7 @@ class LaternGear(object):
         teeth = fp.teeth
         r_r = fp.bolt_radius.Value
         r_0 = m * teeth / 2
-        r_max = r_r / 2 + r_0
+        r_max = r_0 + r_r + fp.head * m
 
         print("r_r: {}".format(r_r))
         print("r_max: {}".format(r_max))
@@ -895,10 +896,6 @@ class LaternGear(object):
             App.Console.Warning("scipy not available. Can't compute numerical root. Leads to a wrong bolt-radius")
             phi_min = r_r / r_0
 
-    
-        print(phi_min)
-        print(r_r / r_0)
-        print(find_phi_min(phi_min))
         # phi_min = 0 # r_r / r_0
         phi = np.linspace(phi_min, phi_max, fp.num_profiles)
         x = r_0 * (np.cos(phi) + phi * np.sin(phi)) - r_r * np.sin(phi)
