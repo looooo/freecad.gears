@@ -40,8 +40,8 @@ __python > 3 (for python2 use branch py2)__
 ### Timing-Gear
 ![timing-gear](examples/timing-gear.png)
 
-### Latern-Gear
-![latern-gear](examples/latern-gear.png)
+### Lantern-Gear
+![lantern-gear](examples/lantern-gear.png)
 
 ---------------------------
 
