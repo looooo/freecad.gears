@@ -846,6 +846,12 @@ class TimingGear(object):
         else:
             fp.Shape = Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
+    def __getstate__(self):
+        pass
+
+    def __setstate__(self, state):
+        pass
+
 
 class LanternGear(object):
     def __init__(self, obj):
@@ -878,11 +884,6 @@ class LanternGear(object):
         r_r = fp.bolt_radius.Value
         r_0 = m * teeth / 2
         r_max = r_0 + r_r + fp.head * m
-
-        print("r_r: {}".format(r_r))
-        print("r_max: {}".format(r_max))
-        print("r_0: {}".format(r_0))
-
 
         phi_max = (r_r + np.sqrt(r_max**2 - r_0**2)) / r_0
 
@@ -935,6 +936,12 @@ class LanternGear(object):
             fp.Shape = wi
         else:
             fp.Shape = Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
+
+    def __getstate__(self):
+        pass
+
+    def __setstate__(self, state):
+        pass
 
 
 
