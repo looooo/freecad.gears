@@ -943,7 +943,35 @@ class LanternGear(object):
     def __setstate__(self, state):
         pass
 
+class HypoCycloidGear(object):
 
+    """parameters:
+        pressure_angle:  pressureangle,   10-30°
+        pitch_angle:  cone angle,      0 < pitch_angle < pi/4
+    """
+
+    def __init__(self, obj):
+        obj.addProperty("App::PropertyFloat","pin_circle_diameter",     "gear_parameter","Pin bold circle diameter(overrides Tooth Pitch")
+        obj.addProperty("App::PropertyFloat","roller_diameter",         "gear_parameter","Roller Diameter")
+        obj.addProperty("App::PropertyFloat","eccentricity",            "gear_parameter","Eccentricity")
+        obj.addProperty("App::PropertyAngle","pressure_angle_lim",      "gear_parameter","Pressure angle limit")
+        obj.addProperty("App::PropertyFloat","pressure_angle_offset",   "gear_parameter","Offset in pressure angle")
+        obj.addProperty("App::PropertyInteger","teeth_number",          "gear_parameter","Number of teeth in Cam")
+
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+
+        obj.pin_circle_diameter = 92
+        obj.roller_diameter = 6
+        obj.eccentricity = 3
+        obj.pressure_angle_lim = '50.0 deg'
+        obj.pressure_angle_offset = 0.01
+        obj.teeth_number = 20
+        obj.height = '5. mm'
+        self.obj = obj
+        obj.Proxy = self
+
+    def execute(self, fp):
 
 def part_arc_from_points_and_center(p_1, p_2, m):
     p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)

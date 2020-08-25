@@ -23,7 +23,7 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 from .features import ViewProviderGear, InvoluteGear, InvoluteGearRack
-from .features import CycloideGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear
+from .features import CycloideGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
 
 
 class BaseCommand(object):
@@ -109,6 +109,13 @@ class CreateBevelGear(BaseCommand):
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
     MenuText = 'Bevel gear'
     ToolTip = 'Create a Bevel gear'
+
+class CreateHypoCycloidGear(BaseCommand):
+    NAME = "hypocycloidgear"
+    GEAR_FUNCTION = HypoCycloidGear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'hypocycloidgear.svg')
+    MenuText = 'HypoCycloid gear'
+    ToolTip = 'Create a HypoCycloid gear with its pins'
 
 
 class CreateWormGear(BaseCommand):
