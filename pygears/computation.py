@@ -23,7 +23,7 @@ import numpy as np
 from scipy import optimize as opt
 
 
-def computeShiftedGears(m, alpha, t1, t2, x1, x2):
+def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     """Summary
 
     Args:
