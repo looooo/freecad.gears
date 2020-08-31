@@ -23,6 +23,7 @@ from __future__ import division
 import os
 
 import numpy as np
+import math
 from pygears.involute_tooth import InvoluteTooth, InvoluteRack
 from pygears.cycloide_tooth import CycloideTooth
 from pygears.bevel_tooth import BevelTooth
@@ -925,7 +926,7 @@ class LanternGear(object):
         l = part_arc_from_points_and_center(p_1_end, p_3, np.array([0., 0.])).toShape()
         w = Part.Wire([w_2, arc, w_1, l])
         wires = [w]
-        
+
         rot = App.Matrix()
         for _ in range(teeth - 1):
             rot.rotateZ(np.pi * 2 / teeth)
@@ -957,21 +958,142 @@ class HypoCycloidGear(object):
         obj.addProperty("App::PropertyAngle","pressure_angle_lim",      "gear_parameter","Pressure angle limit")
         obj.addProperty("App::PropertyFloat","pressure_angle_offset",   "gear_parameter","Offset in pressure angle")
         obj.addProperty("App::PropertyInteger","teeth_number",          "gear_parameter","Number of teeth in Cam")
+        obj.addProperty("App::PropertyInteger","segment_count",         "gear_parameter","Overall line segments")
+        obj.addProperty("App::PropertyLength","hole_radius",            "gear_parameter","Center hole's radius")
 
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty("App::PropertyLength", "height", "gear_parameter", "height")
 
-        obj.pin_circle_diameter = 92
+        obj.addProperty("App::PropertyBool", "show_pins", "Extra", "Create pins in place")
+        obj.addProperty("App::PropertyBool", "show_opposite_cam", "Extra", "Show another reversed cam disk on top")
+
+        obj.pin_circle_diameter = 184
         obj.roller_diameter = 6
         obj.eccentricity = 3
         obj.pressure_angle_lim = '50.0 deg'
         obj.pressure_angle_offset = 0.01
         obj.teeth_number = 20
-        obj.height = '5. mm'
+        obj.segment_count = 400
+        obj.height = '10. mm'
+        obj.hole_radius = '30. mm'
+        obj.show_pins = True
+        obj.show_opposite_cam = True
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
+    def toPolar(self,x, y):
+        return (x**2 + y**2)**0.5, math.atan2(y, x)
+    def toRect(self,r, a):
+        return r*math.cos(a), r*math.sin(a)
+    def calcyp(self,p,a,e,n):
+        return math.atan(math.sin(n*a)/(math.cos(n*a)+(n*p)/(e*(n+1))))
+    def calcX(self,p,d,e,n,a):
+        return (n*p)*math.cos(a)+e*math.cos((n+1)*a)-d/2*math.cos(self.calcyp(p,a,e,n)+a)
+    def calcY(self,p,d,e,n,a):
+        return (n*p)*math.sin(a)+e*math.sin((n+1)*a)-d/2*math.sin(self.calcyp(p,a,e,n)+a)
+    def calcPressureAngle(self,p,d,n,a):
+        ex = 2**0.5
+        r3 = p*n
+        rg = r3/ex
+        pp = rg * (ex**2 + 1 - 2*ex*math.cos(a))**0.5 - d/2
+        return math.asin( (r3*math.cos(a)-rg)/(pp+d/2))*180/math.pi
+    def calcPressureLimit(self,p,d,e,n,a):
+        ex = 2**0.5
+        r3 = p*n
+        rg = r3/ex
+        q = (r3**2 + rg**2 - 2*r3*rg*math.cos(a))**0.5
+        x = rg - e + (q-d/2)*(r3*math.cos(a)-rg)/q
+        y = (q-d/2)*r3*math.sin(a)/q
+        return (x**2 + y**2)**0.5
+    def checkLimit(self,x,y,maxrad,minrad,offset):
+        r, a = self.toPolar(x, y)
+        if (r > maxrad) or (r < minrad):
+                r = r - offset
+                x, y = self.toRect(r, a)
+        return x, y
+
+    def execute(self,fp):
+        b = fp.pin_circle_diameter
+        d = fp.roller_diameter
+        e = fp.eccentricity
+        n = fp.teeth_number
+        p = b/n
+        s = fp.segment_count
+        ang = fp.pressure_angle_lim
+        c = fp.pressure_angle_offset
+
+        q = 2*math.pi/float(s)
+
+        # Find the pressure angle limit circles
+        minAngle = -1.0
+        maxAngle = -1.0
+        for i in range(0,180):
+            x = self.calcPressureAngle(p,d,n,float(i)*math.pi/180)
+            if ( x < ang) and (minAngle < 0):
+                minAngle = float(i)
+            if (x < -ang) and (maxAngle < 0):
+                maxAngle = float(i-1)
+
+        minRadius = self.calcPressureLimit(p,d,e,n,minAngle*math.pi/180)
+        maxRadius = self.calcPressureLimit(p,d,e,n,maxAngle*math.pi/180)
+        Wire(Part.makeCircle(minRadius,App.Vector(-e,0,0)))
+        Wire(Part.makeCircle(maxRadius,App.Vector(-e,0,0)))
+
+        App.Console.PrintMessage("Generating cam disk\r\n")
+        #generate the cam profile - note: shifted in -x by eccentricicy amount
+        i=0
+        x = self.calcX(p,d,e,n,q*i)
+        y = self.calcY(p,d,e,n,q*i)
+        x,y = self.checkLimit(x,y,maxRadius,minRadius,c)
+        points = [App.Vector(x-e,y,0)]
+        for i in range(0,s):
+            x = self.calcX(p,d,e,n,q*(i+1))
+            y = self.calcY(p,d,e,n,q*(i+1))
+            x, y = self.checkLimit(x,y,maxRadius, minRadius, c)
+            points.append(App.Vector(x-e,y,0))
+
+        cam = Face(Wire(makePolygon(points)))
+        #add a circle in the center of the cam
+        centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value,App.Vector(-e,0,0))))
+        cam = cam.cut(centerCircle)
+
+        shape = cam.extrude(App.Vector(0,0,fp.height.Value))
+
+        to_be_fused = []
+        #secondary cam disk
+        if fp.show_opposite_cam==True:
+            App.Console.PrintMessage("Generating secondary cam disk\r\n")
+            second_cam = cam.copy()
+            mat= App.Matrix()
+            mat.rotateZ(np.pi)
+            mat.move(App.Vector(-e,0,0))
+            mat.rotateZ(np.pi/n)
+            mat.move(App.Vector(e,0,0))
+            second_cam = second_cam.transformGeometry(mat)
+            to_be_fused.append(second_cam.extrude(App.Vector(0,0,-fp.height.Value)))
+
+        #pins
+        if fp.show_pins==True:
+            App.Console.PrintMessage("Generating pins\r\n")
+            pins = []
+            for i in range(0,n+1):
+                x = p*n*math.cos(2*math.pi/(n+1)*i)
+                y = p*n*math.sin(2*math.pi/(n+1)*i)
+                pins.append(Wire(Part.makeCircle(d/2,App.Vector(x,y,0))))
+
+            pins = Face(pins)
+            if fp.show_opposite_cam==True:
+                pins.translate(App.Vector(0,0,-fp.height.Value))
+                to_be_fused.append(pins.extrude(App.Vector(0,0,2*fp.height.Value)))
+            else:
+                to_be_fused.append(pins.extrude(App.Vector(0,0,fp.height.Value)))
+
+        fp.Shape = shape.fuse(to_be_fused)
+
+    def __getstate__(self):
+        pass
+
+    def __setstate__(self, state):
+        pass
 
 def part_arc_from_points_and_center(p_1, p_2, m):
     p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)
