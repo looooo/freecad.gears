@@ -961,10 +961,14 @@ class HypoCycloidGear(object):
         obj.addProperty("App::PropertyInteger","segment_count",         "gear_parameter","Overall line segments")
         obj.addProperty("App::PropertyLength","hole_radius",            "gear_parameter","Center hole's radius")
 
-        obj.addProperty("App::PropertyLength", "height", "gear_parameter", "height")
 
-        obj.addProperty("App::PropertyBool", "show_pins", "Extra", "Create pins in place")
-        obj.addProperty("App::PropertyBool", "show_opposite_cam", "Extra", "Show another reversed cam disk on top")
+        obj.addProperty("App::PropertyBool", "show_pins", "Pins", "Create pins in place")
+        obj.addProperty("App::PropertyLength","pin_height", "Pins", "height")
+        obj.addProperty("App::PropertyBool", "center_pins", "Pins", "Center pin Z axis to generated disks")
+
+        obj.addProperty("App::PropertyBool", "show_disk0", "Disks", "Show main cam disk")
+        obj.addProperty("App::PropertyBool", "show_disk1", "Disks", "Show another reversed cam disk on top")
+        obj.addProperty("App::PropertyLength","disk_height", "Disks", "height")
 
         obj.pin_circle_diameter = 184
         obj.roller_diameter = 6
@@ -973,10 +977,16 @@ class HypoCycloidGear(object):
         obj.pressure_angle_offset = 0.01
         obj.teeth_number = 20
         obj.segment_count = 400
-        obj.height = '10. mm'
         obj.hole_radius = '30. mm'
-        obj.show_pins = True
-        obj.show_opposite_cam = True
+
+        obj.show_pins  = True
+        obj.pin_height = '20. mm'
+        obj.center_pins= True
+
+        obj.show_disk0 = True
+        obj.show_disk1 = True
+        obj.disk_height= '10. mm'
+
         self.obj = obj
         obj.Proxy = self
 
@@ -1056,11 +1066,16 @@ class HypoCycloidGear(object):
         centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value,App.Vector(-e,0,0))))
         cam = cam.cut(centerCircle)
 
-        shape = cam.extrude(App.Vector(0,0,fp.height.Value))
-
+        shape = Part.Shape
         to_be_fused = []
+        if fp.show_disk0==True:
+            if fp.disk_height.Value==0:
+                to_be_fused.append(cam)
+            else:
+                to_be_fused.append(cam.extrude(App.Vector(0,0,fp.disk_height.Value)))
+
         #secondary cam disk
-        if fp.show_opposite_cam==True:
+        if fp.show_disk1==True:
             App.Console.PrintMessage("Generating secondary cam disk\r\n")
             second_cam = cam.copy()
             mat= App.Matrix()
@@ -1069,7 +1084,10 @@ class HypoCycloidGear(object):
             mat.rotateZ(np.pi/n)
             mat.move(App.Vector(e,0,0))
             second_cam = second_cam.transformGeometry(mat)
-            to_be_fused.append(second_cam.extrude(App.Vector(0,0,-fp.height.Value)))
+            if fp.disk_height.Value==0:
+                to_be_fused.append(second_cam)
+            else:
+                to_be_fused.append(second_cam.extrude(App.Vector(0,0,-fp.disk_height.Value)))
 
         #pins
         if fp.show_pins==True:
@@ -1081,13 +1099,25 @@ class HypoCycloidGear(object):
                 pins.append(Wire(Part.makeCircle(d/2,App.Vector(x,y,0))))
 
             pins = Face(pins)
-            if fp.show_opposite_cam==True:
-                pins.translate(App.Vector(0,0,-fp.height.Value))
-                to_be_fused.append(pins.extrude(App.Vector(0,0,2*fp.height.Value)))
-            else:
-                to_be_fused.append(pins.extrude(App.Vector(0,0,fp.height.Value)))
 
-        fp.Shape = shape.fuse(to_be_fused)
+            z_offset = -fp.pin_height.Value/2;
+
+            if fp.center_pins==True:
+                if fp.show_disk0==True and fp.show_disk1==False:
+                    z_offset += fp.disk_height.Value/2;
+                elif fp.show_disk0==False and fp.show_disk1==True:
+                    z_offset += -fp.disk_height.Value/2;
+            #extrude
+            if z_offset!=0:
+                pins.translate(App.Vector(0,0,z_offset))
+            if fp.pin_height!=0:
+                pins = pins.extrude(App.Vector(0,0,fp.pin_height.Value))
+
+            to_be_fused.append(pins);
+
+        if to_be_fused:
+            shape = Part.makeCompound(to_be_fused)
+        fp.Shape = shape
 
     def __getstate__(self):
         pass
