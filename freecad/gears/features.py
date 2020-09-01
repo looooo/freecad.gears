@@ -1066,7 +1066,6 @@ class HypoCycloidGear(object):
         centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value,App.Vector(-e,0,0))))
         cam = cam.cut(centerCircle)
 
-        shape = Part.Shape
         to_be_fused = []
         if fp.show_disk0==True:
             if fp.disk_height.Value==0:
@@ -1116,8 +1115,7 @@ class HypoCycloidGear(object):
             to_be_fused.append(pins);
 
         if to_be_fused:
-            shape = Part.makeCompound(to_be_fused)
-        fp.Shape = shape
+            fp.Shape = Part.makeCompound(to_be_fused)
 
     def __getstate__(self):
         pass
