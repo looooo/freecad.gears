@@ -548,8 +548,8 @@ class BevelGear(object):
         scale_0 = scale - fp.height.Value / 2
         scale_1 = scale + fp.height.Value / 2
         if fp.beta.Value == 0:
-            wires.append(makeBSplineWire([scale_0 * p for p in pts]))
-            wires.append(makeBSplineWire([scale_1 * p for p in pts]))
+            wires.append(make_bspline_wire([scale_0 * p for p in pts]))
+            wires.append(make_bspline_wire([scale_1 * p for p in pts]))
         else:
             for scale_i in np.linspace(scale_0, scale_1, 20):
                 # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
@@ -560,7 +560,7 @@ class BevelGear(object):
                     np.sin(fp.pitch_angle.Value * np.pi / 180.)
                 points = [np.array([self.spherical_rot(p, angle)
                                     for p in scale_i * pt]) for pt in pts]
-                wires.append(makeBSplineWire(points))
+                wires.append(make_bspline_wire(points))
         shape = makeLoft(wires, True)
         if fp.reset_origin:
             mat = App.Matrix()
@@ -958,7 +958,7 @@ class HypoCycloidGear(object):
         obj.addProperty("App::PropertyAngle","pressure_angle_lim",      "gear_parameter","Pressure angle limit")
         obj.addProperty("App::PropertyFloat","pressure_angle_offset",   "gear_parameter","Offset in pressure angle")
         obj.addProperty("App::PropertyInteger","teeth_number",          "gear_parameter","Number of teeth in Cam")
-        obj.addProperty("App::PropertyInteger","segment_count",         "gear_parameter","Overall line segments")
+        obj.addProperty("App::PropertyInteger","segment_count",         "gear_parameter","Number of points used for spline interpolation")
         obj.addProperty("App::PropertyLength","hole_radius",            "gear_parameter","Center hole's radius")
 
 
@@ -976,7 +976,7 @@ class HypoCycloidGear(object):
         obj.pressure_angle_lim = '50.0 deg'
         obj.pressure_angle_offset = 0.01
         obj.teeth_number = 20
-        obj.segment_count = 400
+        obj.segment_count = 20
         obj.hole_radius = '30. mm'
 
         obj.show_pins  = True
@@ -990,23 +990,29 @@ class HypoCycloidGear(object):
         self.obj = obj
         obj.Proxy = self
 
-    def toPolar(self,x, y):
+    def to_polar(self,x, y):
         return (x**2 + y**2)**0.5, math.atan2(y, x)
-    def toRect(self,r, a):
+
+    def to_rect(self,r, a):
         return r*math.cos(a), r*math.sin(a)
+
     def calcyp(self,p,a,e,n):
         return math.atan(math.sin(n*a)/(math.cos(n*a)+(n*p)/(e*(n+1))))
-    def calcX(self,p,d,e,n,a):
+
+    def calc_x(self,p,d,e,n,a):
         return (n*p)*math.cos(a)+e*math.cos((n+1)*a)-d/2*math.cos(self.calcyp(p,a,e,n)+a)
-    def calcY(self,p,d,e,n,a):
+
+    def calc_y(self,p,d,e,n,a):
         return (n*p)*math.sin(a)+e*math.sin((n+1)*a)-d/2*math.sin(self.calcyp(p,a,e,n)+a)
-    def calcPressureAngle(self,p,d,n,a):
+
+    def calc_pressure_angle(self,p,d,n,a):
         ex = 2**0.5
         r3 = p*n
         rg = r3/ex
         pp = rg * (ex**2 + 1 - 2*ex*math.cos(a))**0.5 - d/2
         return math.asin( (r3*math.cos(a)-rg)/(pp+d/2))*180/math.pi
-    def calcPressureLimit(self,p,d,e,n,a):
+
+    def calc_pressure_limit(self,p,d,e,n,a):
         ex = 2**0.5
         r3 = p*n
         rg = r3/ex
@@ -1014,11 +1020,12 @@ class HypoCycloidGear(object):
         x = rg - e + (q-d/2)*(r3*math.cos(a)-rg)/q
         y = (q-d/2)*r3*math.sin(a)/q
         return (x**2 + y**2)**0.5
-    def checkLimit(self,x,y,maxrad,minrad,offset):
-        r, a = self.toPolar(x, y)
+
+    def check_limit(self,x,y,maxrad,minrad,offset):
+        r, a = self.to_polar(x, y)
         if (r > maxrad) or (r < minrad):
                 r = r - offset
-                x, y = self.toRect(r, a)
+                x, y = self.to_rect(r, a)
         return x, y
 
     def execute(self,fp):
@@ -1036,34 +1043,45 @@ class HypoCycloidGear(object):
         # Find the pressure angle limit circles
         minAngle = -1.0
         maxAngle = -1.0
-        for i in range(0,180):
-            x = self.calcPressureAngle(p,d,n,float(i)*math.pi/180)
+        for i in range(0, 180):
+            x = self.calc_pressure_angle(p, d, n, i * math.pi / 180.)
             if ( x < ang) and (minAngle < 0):
                 minAngle = float(i)
             if (x < -ang) and (maxAngle < 0):
                 maxAngle = float(i-1)
 
-        minRadius = self.calcPressureLimit(p,d,e,n,minAngle*math.pi/180)
-        maxRadius = self.calcPressureLimit(p,d,e,n,maxAngle*math.pi/180)
-        Wire(Part.makeCircle(minRadius,App.Vector(-e,0,0)))
-        Wire(Part.makeCircle(maxRadius,App.Vector(-e,0,0)))
+        minRadius = self.calc_pressure_limit(p, d, e, n, minAngle * math.pi / 180.)
+        maxRadius = self.calc_pressure_limit(p, d, e, n, maxAngle * math.pi / 180.)
+        # unused
+        # Wire(Part.makeCircle(minRadius,App.Vector(-e, 0, 0)))
+        # Wire(Part.makeCircle(maxRadius,App.Vector(-e, 0, 0)))
 
         App.Console.PrintMessage("Generating cam disk\r\n")
         #generate the cam profile - note: shifted in -x by eccentricicy amount
         i=0
-        x = self.calcX(p,d,e,n,q*i)
-        y = self.calcY(p,d,e,n,q*i)
-        x,y = self.checkLimit(x,y,maxRadius,minRadius,c)
-        points = [App.Vector(x-e,y,0)]
+        x = self.calc_x(p, d, e, n, q*i / float(n))
+        y = self.calc_y(p, d, e, n, q*i / n)
+        x, y = self.check_limit(x,y,maxRadius,minRadius,c)
+        points = [App.Vector(x-e, y, 0)]
         for i in range(0,s):
-            x = self.calcX(p,d,e,n,q*(i+1))
-            y = self.calcY(p,d,e,n,q*(i+1))
-            x, y = self.checkLimit(x,y,maxRadius, minRadius, c)
-            points.append(App.Vector(x-e,y,0))
+            x = self.calc_x(p, d, e, n, q*(i+1) / n)
+            y = self.calc_y(p, d, e, n, q*(i+1) / n)
+            x, y = self.check_limit(x, y, maxRadius, minRadius, c)
+            points.append([x-e, y, 0])
 
-        cam = Face(Wire(makePolygon(points)))
+        wi = make_bspline_wire([points])
+        wires = []
+        mat= App.Matrix()
+        mat.move(App.Vector(e, 0., 0.))
+        mat.rotateZ(2 * np.pi / n)
+        mat.move(App.Vector(-e, 0., 0.))
+        for _ in range(n):
+            wi = wi.transformGeometry(mat)
+            wires.append(wi)
+
+        cam = Face(Wire(wires))
         #add a circle in the center of the cam
-        centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value,App.Vector(-e,0,0))))
+        centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value, App.Vector(-e, 0, 0))))
         cam = cam.cut(centerCircle)
 
         to_be_fused = []
@@ -1071,7 +1089,7 @@ class HypoCycloidGear(object):
             if fp.disk_height.Value==0:
                 to_be_fused.append(cam)
             else:
-                to_be_fused.append(cam.extrude(App.Vector(0,0,fp.disk_height.Value)))
+                to_be_fused.append(cam.extrude(App.Vector(0, 0, fp.disk_height.Value)))
 
         #secondary cam disk
         if fp.show_disk1==True:
@@ -1079,38 +1097,38 @@ class HypoCycloidGear(object):
             second_cam = cam.copy()
             mat= App.Matrix()
             mat.rotateZ(np.pi)
-            mat.move(App.Vector(-e,0,0))
+            mat.move(App.Vector(-e, 0, 0))
             mat.rotateZ(np.pi/n)
-            mat.move(App.Vector(e,0,0))
+            mat.move(App.Vector(e, 0, 0))
             second_cam = second_cam.transformGeometry(mat)
             if fp.disk_height.Value==0:
                 to_be_fused.append(second_cam)
             else:
-                to_be_fused.append(second_cam.extrude(App.Vector(0,0,-fp.disk_height.Value)))
+                to_be_fused.append(second_cam.extrude(App.Vector(0, 0, -fp.disk_height.Value)))
 
         #pins
         if fp.show_pins==True:
             App.Console.PrintMessage("Generating pins\r\n")
             pins = []
-            for i in range(0,n+1):
-                x = p*n*math.cos(2*math.pi/(n+1)*i)
-                y = p*n*math.sin(2*math.pi/(n+1)*i)
-                pins.append(Wire(Part.makeCircle(d/2,App.Vector(x,y,0))))
+            for i in range(0, n + 1):
+                x = p * n * math.cos(2 * math.pi / (n + 1) * i)
+                y = p * n * math.sin(2 * math.pi / (n + 1) * i)
+                pins.append(Wire(Part.makeCircle(d / 2, App.Vector(x, y, 0))))
 
             pins = Face(pins)
 
-            z_offset = -fp.pin_height.Value/2;
+            z_offset = -fp.pin_height.Value / 2;
 
             if fp.center_pins==True:
                 if fp.show_disk0==True and fp.show_disk1==False:
-                    z_offset += fp.disk_height.Value/2;
+                    z_offset += fp.disk_height.Value / 2;
                 elif fp.show_disk0==False and fp.show_disk1==True:
-                    z_offset += -fp.disk_height.Value/2;
+                    z_offset += -fp.disk_height.Value / 2;
             #extrude
             if z_offset!=0:
-                pins.translate(App.Vector(0,0,z_offset))
+                pins.translate(App.Vector(0, 0, z_offset))
             if fp.pin_height!=0:
-                pins = pins.extrude(App.Vector(0,0,fp.pin_height.Value))
+                pins = pins.extrude(App.Vector(0, 0, fp.pin_height.Value))
 
             to_be_fused.append(pins);
 
@@ -1161,7 +1179,7 @@ def make_face(edge1, edge2):
     return(Face(w))
 
 
-def makeBSplineWire(pts):
+def make_bspline_wire(pts):
     wi = []
     for i in pts:
         out = BSplineCurve()
