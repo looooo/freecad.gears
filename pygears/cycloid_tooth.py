@@ -24,7 +24,7 @@ from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
 from ._functions import rotation, reflection
 
 
-class CycloideTooth():
+class CycloidTooth():
     def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.12, backlash=0.00):
         self.m = m
         self.z = z
@@ -43,22 +43,22 @@ class CycloideTooth():
         self.di = self.d - 2*self.m - self.clearance * self.m
         self.phipart = 2 * pi / self.z
 
-    def epicycloide_x(self):
+    def epicycloid_x(self):
         def func(t):
             return(((self.d2 + self.d) * cos(t))/2. - (self.d2 * cos((1 + self.d / self.d2) * t))/2.)
         return(func)
 
-    def epicycloide_y(self):
+    def epicycloid_y(self):
         def func(t):
             return(((self.d2 + self.d) * sin(t))/2. - (self.d2 * sin((1 + self.d / self.d2) * t))/2.)
         return(func)
 
-    def hypocycloide_x(self):
+    def hypocycloid_x(self):
         def func(t):
             return((self.d - self.d1)*cos(t)/2 + self.d1/2 * cos((self.d / self.d1 - 1) * t))
         return(func)
 
-    def hypocycloide_y(self):
+    def hypocycloid_y(self):
         def func(t):
             return((self.d - self.d1)*sin(t)/2 - self.d1/2 * sin((self.d/self.d1 - 1)*t))
         return(func)
@@ -79,10 +79,10 @@ class CycloideTooth():
 
     def points(self, num=10):
 
-        inner_x = self.hypocycloide_x()
-        inner_y = self.hypocycloide_y()
-        outer_x = self.epicycloide_x()
-        outer_y = self.epicycloide_y()
+        inner_x = self.hypocycloid_x()
+        inner_y = self.hypocycloid_y()
+        outer_x = self.epicycloid_x()
+        outer_y = self.epicycloid_y()
         t_inner_end = self.inner_end()
         t_outer_end = self.outer_end()
         t_vals_outer = linspace(0, t_outer_end, num)

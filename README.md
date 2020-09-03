@@ -24,7 +24,7 @@ __python > 3 (for python2 use branch py2)__
 * Helical
 * Double Helical
 
-![cycloide-gear](examples/cycloide-gear.png)
+![cycloid-gear](examples/cycloid-gear.png)
 
 ### Spherical Involute Bevel-Gear
 * Spiral  

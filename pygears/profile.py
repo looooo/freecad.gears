@@ -1,7 +1,7 @@
 import numpy as np
 from .involute_tooth import InvoluteTooth, InvoluteRack
 from .bevel_tooth import BevelTooth
-from .cycloide_tooth import CycloideTooth
+from .cycloid_tooth import CycloidTooth
 from ._functions import rotation, rotation3D
 
 
@@ -23,7 +23,7 @@ class _GearProfile(object):
 class InvoluteProfile(InvoluteTooth, _GearProfile):
     pass
 
-class CycloideProfile(CycloideTooth, _GearProfile):
+class CycloidProfile(CycloidTooth, _GearProfile):
     pass
 
 class BevelProfile(BevelTooth, _GearProfile):

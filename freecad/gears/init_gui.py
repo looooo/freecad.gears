@@ -41,7 +41,7 @@ class GearWorkbench(Workbench):
     commands = [
         "CreateInvoluteGear",
         "CreateInvoluteRack",
-        "CreateCycloideGear",
+        "CreateCycloidGear",
         "CreateBevelGear",
         "CreateCrownGear",
         "CreateWormGear",
@@ -53,7 +53,7 @@ class GearWorkbench(Workbench):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
-        from .commands import CreateCycloideGear, CreateInvoluteGear
+        from .commands import CreateCycloidGear, CreateInvoluteGear
         from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
         from .commands import CreateWormGear, CreateTimingGear, CreateLanternGear
         from .commands import CreateHypoCycloidGear
@@ -62,7 +62,7 @@ class GearWorkbench(Workbench):
         self.appendMenu("Gear", self.commands)
         # Gui.addIconPath(App.getHomePath()+"Mod/gear/icons/")
         Gui.addCommand('CreateInvoluteGear', CreateInvoluteGear())
-        Gui.addCommand('CreateCycloideGear', CreateCycloideGear())
+        Gui.addCommand('CreateCycloidGear', CreateCycloidGear())
         Gui.addCommand('CreateBevelGear', CreateBevelGear())
         Gui.addCommand('CreateInvoluteRack', CreateInvoluteRack())
         Gui.addCommand('CreateCrownGear', CreateCrownGear())

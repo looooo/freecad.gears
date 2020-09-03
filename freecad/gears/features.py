@@ -25,7 +25,7 @@ import os
 import numpy as np
 import math
 from pygears.involute_tooth import InvoluteTooth, InvoluteRack
-from pygears.cycloide_tooth import CycloideTooth
+from pygears.cycloid_tooth import CycloidTooth
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D, rotation, reflection, arc_from_points_and_center
 
@@ -38,9 +38,12 @@ from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
 
 
 __all__ = ["InvoluteGear",
-           "CycloideGear",
+           "CycloidGear",
            "BevelGear",
            "InvoluteGearRack",
+           "CrownGear",
+           "WormGear",
+           "HypoCycloidGear"
            "ViewProviderGear"]
 
 
@@ -402,19 +405,19 @@ class CrownGear(object):
         pass
 
 
-class CycloideGear(object):
+class CycloidGear(object):
     """FreeCAD gear"""
 
     def __init__(self, obj):
-        self.cycloide_tooth = CycloideTooth()
+        self.cycloid_tooth = CycloidTooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
             "App::PropertyLength", "module", "gear_parameter", "module")
         obj.addProperty(
-            "App::PropertyLength", "inner_diameter", "cycloid_parameter", "inner_diameter")
+            "App::PropertyLength", "inner_diameter", "cycloid_parameter", "inner_diameter (hypocycloid)")
         obj.addProperty(
-            "App::PropertyLength", "outer_diameter", "cycloid_parameter", "outer_diameter")
+            "App::PropertyLength", "outer_diameter", "cycloid_parameter", "outer_diameter (epicycloid)")
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
@@ -428,7 +431,7 @@ class CycloideGear(object):
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyPythonObject", "gear",
                         "gear_parameter", "the python object")
-        obj.gear = self.cycloide_tooth
+        obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
         obj.inner_diameter = '5 mm'
