@@ -43,7 +43,7 @@ __all__ = ["InvoluteGear",
            "InvoluteGearRack",
            "CrownGear",
            "WormGear",
-           "HypoCycloidGear"
+           "HypoCycloidGear",
            "ViewProviderGear"]
 
 
