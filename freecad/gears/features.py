@@ -84,7 +84,8 @@ class InvoluteGear(object):
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
+            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
+                                                                else it's the traverse module.")
         obj.addProperty(
             "App::PropertyBool", "undercut", "gear_parameter", "undercut")
         obj.addProperty(
