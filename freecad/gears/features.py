@@ -80,7 +80,7 @@ class InvoluteGear(object):
     def __init__(self, obj):
         self.involute_tooth = InvoluteTooth()
         obj.addProperty(
-            "App::PropertyBool", "simple", "gear_parameter", "simple")
+            "App::PropertyBool", "simple", "precision", "simple")
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -97,7 +97,7 @@ class InvoluteGear(object):
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
-                        "gear_parameter", "number of points for spline")
+                        "precision", "number of points for spline")
         obj.addProperty(
             "App::PropertyAngle", "beta", "gear_parameter", "beta ")
         obj.addProperty(
@@ -132,7 +132,7 @@ class InvoluteGear(object):
         obj.double_helix = False
         obj.backlash = '0.00 mm'
         obj.reversed_backlash = False
-        obj.properties_from_tool = True
+        obj.properties_from_tool = False
         self.obj = obj
         obj.Proxy = self
 
@@ -426,7 +426,7 @@ class CycloidGear(object):
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
-                        "gear_parameter", "number of points for spline")
+                        "precision", "number of points for spline")
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
@@ -504,7 +504,7 @@ class BevelGear(object):
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints",
-                        "gear_parameter", "number of points for spline")
+                        "precision", "number of points for spline")
         obj.addProperty("App::PropertyBool", "reset_origin", "gear_parameter",
                         "if value is true the gears outer face will match the z=0 plane")
         obj.addProperty(
