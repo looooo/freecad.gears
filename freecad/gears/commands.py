@@ -49,20 +49,25 @@ class BaseCommand(object):
 
     @classmethod
     def create(cls):
-        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
-        cls.GEAR_FUNCTION(obj)
         if FreeCAD.GuiUp:
-            ViewProviderGear(obj.ViewObject)
-
             # borrowed from threaded profiles
             # puts the gear into an active container
             body = Gui.ActiveDocument.ActiveView.getActiveObject("pdbody")
             part = Gui.ActiveDocument.ActiveView.getActiveObject("part")
 
             if body:
+                obj = FreeCAD.ActiveDocument.addObject("PartDesign::FeaturePython", cls.NAME)
+
+            ViewProviderGear(obj.ViewObject)
+            cls.GEAR_FUNCTION(obj)
+
+            if body:
                 body.Group += [obj]
             elif part:
                 part.Group += [obj]
+        else:
+            obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
+            cls.GEAR_FUNCTION(obj)
         return obj
 
     def GetResources(self):
