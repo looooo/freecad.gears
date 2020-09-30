@@ -15,9 +15,10 @@ class _GearProfile(object):
         else:
             rot = rotation(- np.pi * 2 / self.z)
         profile = tooth
-        for i in range(self.z):
+        for i in range(self.z - 1):
             tooth = rot(tooth).tolist()
             profile = profile + tooth
+        profile.append(profile[0])
         return np.array(profile)
 
 class InvoluteProfile(InvoluteTooth, _GearProfile):
