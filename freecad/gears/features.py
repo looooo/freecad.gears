@@ -630,7 +630,8 @@ class WormGear(object):
             "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of foot")
-
+        obj.addProperty(
+            "App::PropertyBool", "reverse_pitch", "gear_parameter", "reverse rotation of helix")
         obj.teeth = 3
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
@@ -638,6 +639,7 @@ class WormGear(object):
         obj.diameter = '5. mm'
         obj.clearance = 0.25
         obj.head = 0
+        obj.reverse_pitch = False
 
         self.obj = obj
         obj.Proxy = self
@@ -653,7 +655,7 @@ class WormGear(object):
         alpha = fp.pressure_angle.Value
         beta = np.arctan(m * t / d)
         fp.beta = np.rad2deg(beta)
-        beta = np.pi / 2 - beta
+        beta = -(fp.reverse_pitch * 2 - 1) * (np.pi / 2 - beta)
 
         r_1 = (d - (2 + 2 * clearance) * m) / 2
         r_2 = (d + (2 + 2 * head) * m) / 2
@@ -712,7 +714,9 @@ class WormGear(object):
         if h == 0:
             fp.Shape = full_wire
         else:
-            shape = helicalextrusion(full_wire, h, h * np.tan(beta) * 2 / d)
+            shape = helicalextrusion(full_wire,
+                                     h,
+                                     h * np.tan(beta) * 2 / d)
             fp.Shape = shape
 
     def __getstate__(self):
