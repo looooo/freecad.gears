@@ -306,7 +306,7 @@ class CrownGear(object):
         obj.addProperty("App::PropertyInteger",
                         "num_profiles", "accuracy", "number of profiles used for loft")
         obj.addProperty("App::PropertyBool",
-                        "preview_mode", "preview", "if true no boolean operation is done")
+                        "preview_edit", "preview", "if true no boolean operation is done")
         obj.teeth = 15
         obj.other_teeth = 15
         obj.module = '1. mm'
@@ -314,7 +314,7 @@ class CrownGear(object):
         obj.height = '2. mm'
         obj.thickness = '5 mm'
         obj.num_profiles = 4
-        obj.construct = True
+        obj.preview_edit = True
         self.obj = obj
         obj.Proxy = self
 
@@ -387,7 +387,7 @@ class CrownGear(object):
         loft = makeLoft(polies, True)
         rot = App.Matrix()
         rot.rotateZ(2 * np.pi / t)
-        if fp.preview_mode:
+        if fp.preview_edit:
             cut_shapes = [solid]
             for _ in range(t):
                 loft = loft.transformGeometry(rot)
