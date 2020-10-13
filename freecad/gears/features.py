@@ -306,7 +306,7 @@ class CrownGear(object):
         obj.addProperty("App::PropertyInteger",
                         "num_profiles", "accuracy", "number of profiles used for loft")
         obj.addProperty("App::PropertyBool",
-                        "construct", "accuracy", "number of profiles used for loft")
+                        "preview_mode", "preview", "if true no boolean operation is done")
         obj.teeth = 15
         obj.other_teeth = 15
         obj.module = '1. mm'
@@ -318,8 +318,8 @@ class CrownGear(object):
         self.obj = obj
         obj.Proxy = self
 
-        App.Console.PrintMessage("Gear module: Crown gear created, construct mode = true for improved performance. "\
-                                 "Set construct property to false when ready to cut teeth.")
+        App.Console.PrintMessage("Gear module: Crown gear created, preview_mode = true for improved performance. "\
+                                 "Set preview_mode property to false when ready to cut teeth.")
 
     def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):
         r_ew = m * t_i / 2
@@ -387,7 +387,7 @@ class CrownGear(object):
         loft = makeLoft(polies, True)
         rot = App.Matrix()
         rot.rotateZ(2 * np.pi / t)
-        if fp.construct:
+        if fp.preview_mode:
             cut_shapes = [solid]
             for _ in range(t):
                 loft = loft.transformGeometry(rot)
