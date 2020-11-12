@@ -24,6 +24,7 @@ import os
 
 import numpy as np
 import math
+from pygears import __version__
 from pygears.involute_tooth import InvoluteTooth, InvoluteRack
 from pygears.cycloid_tooth import CycloidTooth
 from pygears.bevel_tooth import BevelTooth
@@ -72,12 +73,18 @@ class ViewProviderGear(object):
     def __setstate__(self, state):
         return None
 
+class BaseGear(object):
+    def __init__(self, obj):
+        obj.addProperty("App::PropertyString", "version", "version", "freecad.gears-version", 1)
+        obj.version = __version__
 
-class InvoluteGear(object):
+
+class InvoluteGear(BaseGear):
 
     """FreeCAD gear"""
 
     def __init__(self, obj):
+        super(InvoluteGear, self).__init__(obj)
         self.involute_tooth = InvoluteTooth()
         obj.addProperty(
             "App::PropertyBool", "simple", "precision", "simple")
@@ -190,11 +197,12 @@ class InvoluteGear(object):
         return None
 
 
-class InvoluteGearRack(object):
+class InvoluteGearRack(BaseGear):
 
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
+        super(InvoluteGearRack, self).__init__(obj)
         self.involute_rack = InvoluteRack()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
@@ -289,8 +297,9 @@ class InvoluteGearRack(object):
         return None
 
 
-class CrownGear(object):
+class CrownGear(BaseGear):
     def __init__(self, obj):
+        super(CrownGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty("App::PropertyInteger",
@@ -406,10 +415,11 @@ class CrownGear(object):
         pass
 
 
-class CycloidGear(object):
+class CycloidGear(BaseGear):
     """FreeCAD gear"""
 
     def __init__(self, obj):
+        super(CycloidGear, self).__init__(obj)
         self.cycloid_tooth = CycloidTooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
@@ -483,7 +493,7 @@ class CycloidGear(object):
         return None
 
 
-class BevelGear(object):
+class BevelGear(BaseGear):
 
     """parameters:
         pressure_angle:  pressureangle,   10-30°
@@ -491,6 +501,7 @@ class BevelGear(object):
     """
 
     def __init__(self, obj):
+        super(BevelGear, self).__init__(obj)
         self.bevel_tooth = BevelTooth()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
@@ -549,8 +560,12 @@ class BevelGear(object):
             pts += rotated_pts
         pts.append(np.array([pts[-1][-1], pts[0][0]]))
         wires = []
-        scale_0 = scale - fp.height.Value / 2
-        scale_1 = scale + fp.height.Value / 2
+        if not "version" in fp.PropertiesList:
+            scale_0 = scale - fp.height.Value / 2
+            scale_1 = scale + fp.height.Value / 2
+        else: # starting with version 0.0.2
+            scale_0 = scale - fp.height.Value
+            scale_1 = scale
         if fp.beta.Value == 0:
             wires.append(make_bspline_wire([scale_0 * p for p in pts]))
             wires.append(make_bspline_wire([scale_1 * p for p in pts]))
@@ -609,11 +624,12 @@ class BevelGear(object):
         return None
 
 
-class WormGear(object):
+class WormGear(BaseGear):
 
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
+        super(WormGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -726,7 +742,7 @@ class WormGear(object):
         return None
 
 
-class TimingGear(object):
+class TimingGear(BaseGear):
 
     """FreeCAD gear rack"""
     data = {"gt2":  {'pitch': 2.0, 'u': 0.254,  'h': 0.75,
@@ -745,6 +761,7 @@ class TimingGear(object):
             }
 
     def __init__(self, obj):
+        super(TimingGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -862,8 +879,9 @@ class TimingGear(object):
         pass
 
 
-class LanternGear(object):
+class LanternGear(BaseGear):
     def __init__(self, obj):
+        super(LanternGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
                         "teeth", "gear_parameter", "number of teeth")
         obj.addProperty(
@@ -952,7 +970,7 @@ class LanternGear(object):
     def __setstate__(self, state):
         pass
 
-class HypoCycloidGear(object):
+class HypoCycloidGear(BaseGear):
 
     """parameters:
         pressure_angle:  pressureangle,   10-30°
@@ -960,6 +978,7 @@ class HypoCycloidGear(object):
     """
 
     def __init__(self, obj):
+        super(HypoCycloidGear, self).__init__(obj)
         obj.addProperty("App::PropertyFloat","pin_circle_diameter",     "gear_parameter","Pin bold circle diameter(overrides Tooth Pitch")
         obj.addProperty("App::PropertyFloat","roller_diameter",         "gear_parameter","Roller Diameter")
         obj.addProperty("App::PropertyFloat","eccentricity",            "gear_parameter","Eccentricity")
