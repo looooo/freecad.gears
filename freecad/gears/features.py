@@ -979,7 +979,7 @@ class HypoCycloidGear(BaseGear):
 
     def __init__(self, obj):
         super(HypoCycloidGear, self).__init__(obj)
-        obj.addProperty("App::PropertyFloat","pin_circle_diameter",     "gear_parameter","Pin bold circle diameter(overrides Tooth Pitch")
+        obj.addProperty("App::PropertyFloat","pin_circle_radius",       "gear_parameter","Pin ball circle radius(overrides Tooth Pitch")
         obj.addProperty("App::PropertyFloat","roller_diameter",         "gear_parameter","Roller Diameter")
         obj.addProperty("App::PropertyFloat","eccentricity",            "gear_parameter","Eccentricity")
         obj.addProperty("App::PropertyAngle","pressure_angle_lim",      "gear_parameter","Pressure angle limit")
@@ -1056,7 +1056,7 @@ class HypoCycloidGear(BaseGear):
         return x, y
 
     def execute(self,fp):
-        b = fp.pin_circle_diameter
+        b = fp.pin_circle_radius
         d = fp.roller_diameter
         e = fp.eccentricity
         n = fp.teeth_number
