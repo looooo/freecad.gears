@@ -997,13 +997,13 @@ class HypoCycloidGear(BaseGear):
         obj.addProperty("App::PropertyBool", "show_disk1", "Disks", "Show another reversed cam disk on top")
         obj.addProperty("App::PropertyLength","disk_height", "Disks", "height")
 
-        obj.pin_circle_diameter = 184
-        obj.roller_diameter = 6
-        obj.eccentricity = 3
+        obj.pin_circle_radius = 66
+        obj.roller_diameter = 3
+        obj.eccentricity = 1.5
         obj.pressure_angle_lim = '50.0 deg'
         obj.pressure_angle_offset = 0.01
-        obj.teeth_number = 20
-        obj.segment_count = 20
+        obj.teeth_number = 42
+        obj.segment_count = 42
         obj.hole_radius = '30. mm'
 
         obj.show_pins  = True
@@ -1108,8 +1108,9 @@ class HypoCycloidGear(BaseGear):
 
         cam = Face(Wire(wires))
         #add a circle in the center of the cam
-        centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value, App.Vector(-e, 0, 0))))
-        cam = cam.cut(centerCircle)
+        if fp.hole_radius.Value:
+            centerCircle = Face(Wire(Part.makeCircle(fp.hole_radius.Value, App.Vector(-e, 0, 0))))
+            cam = cam.cut(centerCircle)
 
         to_be_fused = []
         if fp.show_disk0==True:
