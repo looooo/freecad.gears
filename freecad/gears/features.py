@@ -1126,7 +1126,8 @@ class HypoCycloidGear(BaseGear):
             mat= App.Matrix()
             mat.rotateZ(np.pi)
             mat.move(App.Vector(-e, 0, 0))
-            mat.rotateZ(np.pi/n)
+            if n%2 == 0:
+                mat.rotateZ(np.pi/n)
             mat.move(App.Vector(e, 0, 0))
             second_cam = second_cam.transformGeometry(mat)
             if fp.disk_height.Value==0:
