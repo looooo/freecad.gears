@@ -920,7 +920,7 @@ class LanternGear(BaseGear):
         try:
             import scipy.optimize
             phi_min = scipy.optimize.root(find_phi_min, (phi_max + r_r / r_0 * 4) / 5).x[0] # , r_r / r_0, phi_max)
-        except importError:
+        except ImportError:
             App.Console.Warning("scipy not available. Can't compute numerical root. Leads to a wrong bolt-radius")
             phi_min = r_r / r_0
 
