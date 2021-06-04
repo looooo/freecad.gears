@@ -34,8 +34,8 @@ from pygears._functions import rotation3D, rotation, reflection, arc_from_points
 import FreeCAD as App
 import Part
 from Part import BSplineCurve, Shape, Wire, Face, makePolygon, \
-    makeLoft, Line, BSplineSurface, \
-    makePolygon, makeHelix, makeShell, makeSolid
+    makeLoft, BSplineSurface, \
+    makePolygon, makeHelix, makeShell, makeSolid, LineSegment
 
 
 __all__ = ["InvoluteGear",
@@ -182,21 +182,14 @@ class InvoluteGear(BaseGear):
         if "properties_from_tool" in fp.PropertiesList:
             fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
-        pts = fp.gear.points(num=fp.numpoints)
-        rotated_pts = pts
-        rot = rotation(-fp.gear.phipart)
-        for i in range(fp.gear.z - 1):
-            rotated_pts = list(map(rot, rotated_pts))
-            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
-            pts += rotated_pts
-        pts.append(np.array([pts[-1][-1], pts[0][0]]))
+
         if not fp.simple:
-            wi = []
-            for i in pts:
-                out = BSplineCurve()
-                out.interpolate(list(map(fcvec, i)))
-                wi.append(out.toShape())
-            wi = Wire(wi)
+            pts = fp.gear.points(num=fp.numpoints)
+            rot = rotation(-fp.gear.phipart)
+            pts.append([pts[-1][-1], rot(pts[0])[0]])
+            tooth = points_to_wire(pts)
+            wi = rotate_tooth(tooth, fp.teeth)
+
             if fp.height.Value == 0:
                 fp.Shape = wi
             elif fp.beta.Value == 0:
@@ -495,19 +488,11 @@ class CycloidGear(BaseGear):
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        rotated_pts = pts
+        pts = fp.gear.points(num=fp.numpoints)
         rot = rotation(-fp.gear.phipart)
-        for i in range(fp.gear.z - 1):
-            rotated_pts = list(map(rot, rotated_pts))
-            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
-            pts += rotated_pts
-        pts.append(np.array([pts[-1][-1], pts[0][0]]))
-        wi = []
-        for i in pts:
-            out = BSplineCurve()
-            out.interpolate(list(map(fcvec, i)))
-            wi.append(out.toShape())
-        wi = Wire(wi)
+        pts.append([pts[-1][-1], rot(pts[0])[0]])
+        tooth = points_to_wire(pts)
+        wi = rotate_tooth(tooth, fp.teeth)
         if fp.height.Value == 0:
             fp.Shape = wi
         elif fp.beta.Value == 0:
@@ -1237,9 +1222,9 @@ def make_face(edge1, edge2):
     v1, v2 = edge1.Vertexes
     v3, v4 = edge2.Vertexes
     e1 = Wire(edge1)
-    e2 = Line(v1.Point, v3.Point).toShape().Edges[0]
+    e2 = LineSegment(v1.Point, v3.Point).toShape().Edges[0]
     e3 = edge2
-    e4 = Line(v4.Point, v2.Point).toShape().Edges[0]
+    e4 = LineSegment(v4.Point, v2.Point).toShape().Edges[0]
     w = Wire([e3, e4, e1, e2])
     return(Face(w))
 
@@ -1257,3 +1242,23 @@ def on_mirror_plane(face, z, direction, small_size=0.000001):
     # the tolerance is very high. Maybe there is a bug in Part.makeHelix.
     return (face.normalAt(0, 0).cross(direction).Length < small_size and
             abs(face.CenterOfMass.z - z) < small_size)
+
+def points_to_wire(pts):
+    wire = []
+    for i in pts:
+        if len(i) == 2:
+            # straight edge
+            out = LineSegment(*list(map(fcvec, i)))
+        else:
+            out = BSplineCurve()
+            out.interpolate(list(map(fcvec, i)))
+        wire.append(out.toShape())  
+    return Wire(wire)
+
+def rotate_tooth(base_tooth, num_teeth):
+    rot = App.Matrix()
+    rot.rotateZ(2 * np.pi / num_teeth)
+    flat_shape = [base_tooth]
+    for t in range(num_teeth - 1):
+        flat_shape.append(flat_shape[-1].transformGeometry(rot))
+    return Wire(flat_shape)
