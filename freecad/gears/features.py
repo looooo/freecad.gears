@@ -118,6 +118,8 @@ class InvoluteGear(BaseGear):
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "foot_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
@@ -140,6 +142,8 @@ class InvoluteGear(BaseGear):
         obj.backlash = '0.00 mm'
         obj.reversed_backlash = False
         obj.properties_from_tool = False
+        obj.head_fillet = 0
+        obj.foot_fillet = 0
         self.obj = obj
         obj.Proxy = self
 
@@ -163,8 +167,45 @@ class InvoluteGear(BaseGear):
         if not fp.simple:
             pts = fp.gear.points(num=fp.numpoints)
             rot = rotation(-fp.gear.phipart)
-            pts.append([pts[-1][-1], rot(pts[0])[0]])
+            rotated_pts = list(map(rot, pts))
+            pts.append([pts[-1][-1],rotated_pts[0][0]])
+            pts += rotated_pts
             tooth = points_to_wire(pts)
+            edges = tooth.Edges
+
+            # head-fillet:
+            r_head = float(fp.head_fillet * fp.module)
+            r_foot = float(fp.foot_fillet * fp.module)
+            if fp.undercut and r_foot != 0.:
+                r_foot = 0.
+                App.Console.PrintWarning("foot fillet is not allowed if undercut is computed")
+            if len(tooth.Edges) == 11:
+                pos_head = [1, 3, 9]
+                pos_foot = [6, 8]
+                edge_range = [2, 12]
+            else:
+                pos_head = [0, 2, 6]
+                pos_foot = [4, 6]
+                edge_range = [1, 9]
+
+            for pos in pos_head:
+                edges = insert_fillet(edges, pos, r_head)
+
+            for pos in pos_foot:
+                try:
+                    edges = insert_fillet(edges, pos, r_foot)
+                except RuntimeError:
+                    edges.pop(8)
+                    edges.pop(6)
+                    edge_range = [2, 10]
+                    pos_foot = [5, 7]
+                    for pos in pos_foot:
+                        edges = insert_fillet(edges, pos, r_foot)
+                    break
+            edges = edges[edge_range[0]:edge_range[1]]
+            edges = [e for e in edges if e is not None]
+
+            tooth = Wire(edges)
             wi = rotate_tooth(tooth, fp.teeth)
 
             if fp.height.Value == 0:
@@ -1226,3 +1267,62 @@ def rotate_tooth(base_tooth, num_teeth):
     for t in range(num_teeth - 1):
         flat_shape.append(flat_shape[-1].transformGeometry(rot))
     return Wire(flat_shape)
+
+
+
+
+def fillet_between_edges(edge_1, edge_2, radius):
+    # asuming edges are in a plane
+    # extracting vertices
+    try:
+        from OCC.Core import ChFi2d
+        from OCC import Core
+    except ImportError:
+        App.Console.PrintWarning("python-occ not available")
+        App.Console.PrintWarning("2d fillets not yet possible")
+        return Part.Wire(edge_1, edge_2)
+
+    api = ChFi2d.ChFi2d_FilletAPI()
+    p1 = np.array([*edge_1.valueAt(edge_1.FirstParameter)])
+    p2 = np.array([*edge_1.valueAt(edge_1.LastParameter)])
+    p3 = np.array([*edge_2.valueAt(edge_2.FirstParameter)])
+    p4 = np.array([*edge_2.valueAt(edge_2.LastParameter)])
+    t1 = p2 - p1
+    t2 = p4 - p3
+    n = np.cross(t1, t2)
+    pln = Core.gp.gp_Pln(Core.gp.gp_Pnt(*p1), Core.gp.gp_Dir(*n))
+    occ_e1 = Core.TopoDS.topods_Edge(Part.__toPythonOCC__(edge_1))
+    occ_e2 = Core.TopoDS.topods_Edge(Part.__toPythonOCC__(edge_2))
+    api.Init(occ_e1, occ_e2, pln)
+    if api.Perform(radius) > 0:
+        occ_p0 = Core.gp.gp_Pnt(*((p2 + p3) / 2))
+        occ_arc = api.Result(occ_p0, occ_e1, occ_e2)
+        return Part.Wire([Part.__fromPythonOCC__(occ_e1),
+                      Part.__fromPythonOCC__(occ_arc),
+                      Part.__fromPythonOCC__(occ_e2)])
+    else:
+        return None
+
+
+def insert_fillet(edges, pos, radius):
+    assert pos < (len(edges) - 1)
+    e1 = edges[pos]
+    e2 = edges[pos + 1]
+    if radius > 0:
+        fillet = fillet_between_edges(e1, e2, radius)
+        if fillet:
+            fillet_edges = fillet.Edges
+        else:
+            raise RuntimeError("fillet not possible")
+    else:
+        fillet_edges = [e1, None, e2]
+    output_edges = []
+    for i, edge in enumerate(edges):
+        if i == pos:
+            output_edges += fillet_edges
+        elif i == (pos + 1):
+            pass
+        else:
+            output_edges.append(edge)
+    return output_edges
+
