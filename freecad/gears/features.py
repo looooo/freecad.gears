@@ -122,6 +122,10 @@ class InvoluteGear(BaseGear):
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
                         "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "da",
+                        "computed", "outside diameter", 1)
+        obj.addProperty("App::PropertyLength", "df",
+                        "computed", "root diameter", 1)
         obj.addProperty("App::PropertyLength", "transverse_pitch",
                         "computed", "transverse_pitch", 1)
         obj.gear = self.involute_tooth
@@ -188,6 +192,8 @@ class InvoluteGear(BaseGear):
 
         # computed properties
         fp.dw = "{}mm".format(fp.gear.dw)
+        fp.da = "{}mm".format(fp.gear.da)
+        fp.df = "{}mm".format(fp.gear.df)
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
 
     def __getstate__(self):
