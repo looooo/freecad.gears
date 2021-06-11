@@ -126,6 +126,7 @@ class InvoluteGear(BaseGear):
                         "computed", "pitch diameter", 1)
         obj.addProperty("App::PropertyLength", "transverse_pitch",
                         "computed", "transverse_pitch", 1)
+        self.add_limiting_diameter_properties(obj)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -146,6 +147,12 @@ class InvoluteGear(BaseGear):
         obj.foot_fillet = 0
         self.obj = obj
         obj.Proxy = self
+
+    def add_limiting_diameter_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "da",
+                        "computed", "outside diameter", 1)
+        obj.addProperty("App::PropertyLength", "df",
+                        "computed", "root diameter", 1)
 
     def execute(self, fp):
         fp.gear.double_helix = fp.double_helix
@@ -223,6 +230,11 @@ class InvoluteGear(BaseGear):
         # computed properties
         fp.dw = "{}mm".format(fp.gear.dw)
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
+        # checksbackwardcompatibility:
+        if not "da" in fp.PropertiesList:
+            self.add_limiting_diameter_properties(fp)
+        fp.da = "{}mm".format(fp.gear.da)
+        fp.df = "{}mm".format(fp.gear.df)
 
     def __getstate__(self):
         return None
