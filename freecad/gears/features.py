@@ -472,9 +472,9 @@ class CycloidGear(BaseGear):
         obj.addProperty(
             "App::PropertyLength", "module", "gear_parameter", "module")
         obj.addProperty(
-            "App::PropertyLength", "inner_diameter", "cycloid_parameter", "inner_diameter (hypocycloid)")
+            "App::PropertyFloat", "inner_diameter", "cycloid_parameter", "inner_diameter divided by module (hypocycloid)")
         obj.addProperty(
-            "App::PropertyLength", "outer_diameter", "cycloid_parameter", "outer_diameter (epicycloid)")
+            "App::PropertyFloat", "outer_diameter", "cycloid_parameter", "outer_diameter divided by module (epicycloid)")
         obj.addProperty(
             "App::PropertyLength", "height", "gear_parameter", "height")
         obj.addProperty(
@@ -486,27 +486,31 @@ class CycloidGear(BaseGear):
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "gear",
                         "gear_parameter", "the python object")
         obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
-        obj.inner_diameter = '5 mm'
-        obj.outer_diameter = '5 mm'
+        obj.inner_diameter = 7.5
+        obj.outer_diameter = 7.5
         obj.beta = '0. deg'
         obj.height = '5. mm'
         obj.clearance = 0.25
         obj.numpoints = 15
         obj.backlash = '0.00 mm'
         obj.double_helix = False
+        obj.head = 0
         obj.Proxy = self
 
     def execute(self, fp):
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
-        fp.gear.z1 = fp.inner_diameter.Value
-        fp.gear.z2 = fp.outer_diameter.Value
+        fp.gear.z1 = fp.inner_diameter
+        fp.gear.z2 = fp.outer_diameter
         fp.gear.clearance = fp.clearance
+        fp.gear.head = fp.head
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
