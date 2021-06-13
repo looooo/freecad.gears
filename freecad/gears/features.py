@@ -483,6 +483,8 @@ class CycloidGear(BaseGear):
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
+        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "foot_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "gear",
@@ -499,6 +501,8 @@ class CycloidGear(BaseGear):
         obj.backlash = '0.00 mm'
         obj.double_helix = False
         obj.head = 0
+        obj.head_fillet = 0
+        obj.foot_fillet = 0
         obj.Proxy = self
 
     def execute(self, fp):
@@ -511,10 +515,31 @@ class CycloidGear(BaseGear):
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
         pts = fp.gear.points(num=fp.numpoints)
-        pts = fp.gear.points(num=fp.numpoints)
         rot = rotation(-fp.gear.phipart)
-        pts.append([pts[-1][-1], rot(pts[0])[0]])
+        rotated_pts = list(map(rot, pts))
+        pts.append([pts[-1][-1],rotated_pts[0][0]])
+        pts += rotated_pts
         tooth = points_to_wire(pts)
+        edges = tooth.Edges
+
+        r_head = float(fp.head_fillet * fp.module)
+        r_foot = float(fp.foot_fillet * fp.module)
+
+        pos_head = [0, 2, 6]
+        pos_foot = [4, 6]
+        edge_range = [1, 9]
+
+        for pos in pos_head:
+            edges = insert_fillet(edges, pos, r_head)
+
+        for pos in pos_foot:
+            edges = insert_fillet(edges, pos, r_foot)
+
+        edges = edges[edge_range[0]:edge_range[1]]
+        edges = [e for e in edges if e is not None]
+
+        tooth = Wire(edges)
+
         wi = rotate_tooth(tooth, fp.teeth)
         if fp.height.Value == 0:
             fp.Shape = wi
@@ -1293,7 +1318,7 @@ def fillet_between_edges(edge_1, edge_2, radius):
     except ImportError:
         App.Console.PrintWarning("python-occ not available")
         App.Console.PrintWarning("2d fillets not yet possible")
-        return Part.Wire(edge_1, edge_2)
+        return [edge_1, edge_2]
 
     api = ChFi2d.ChFi2d_FilletAPI()
     p1 = np.array([*edge_1.valueAt(edge_1.FirstParameter)])
@@ -1311,8 +1336,8 @@ def fillet_between_edges(edge_1, edge_2, radius):
         occ_p0 = Core.gp.gp_Pnt(*((p2 + p3) / 2))
         occ_arc = api.Result(occ_p0, occ_e1, occ_e2)
         return Part.Wire([Part.__fromPythonOCC__(occ_e1),
-                      Part.__fromPythonOCC__(occ_arc),
-                      Part.__fromPythonOCC__(occ_e2)])
+                Part.__fromPythonOCC__(occ_arc),
+                Part.__fromPythonOCC__(occ_e2)]).Edges
     else:
         return None
 
@@ -1322,10 +1347,8 @@ def insert_fillet(edges, pos, radius):
     e1 = edges[pos]
     e2 = edges[pos + 1]
     if radius > 0:
-        fillet = fillet_between_edges(e1, e2, radius)
-        if fillet:
-            fillet_edges = fillet.Edges
-        else:
+        fillet_edges = fillet_between_edges(e1, e2, radius)
+        if not fillet_edges:
             raise RuntimeError("fillet not possible")
     else:
         fillet_edges = [e1, None, e2]
