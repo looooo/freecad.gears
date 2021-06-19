@@ -131,7 +131,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "foot_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
@@ -502,7 +502,7 @@ class CycloidGear(BaseGear):
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "foot_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "gear",
