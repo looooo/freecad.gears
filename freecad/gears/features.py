@@ -116,7 +116,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
         obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
@@ -141,7 +141,7 @@ class InvoluteGear(BaseGear):
         obj.reversed_backlash = False
         obj.properties_from_tool = False
         obj.head_fillet = 0
-        obj.foot_fillet = 0
+        obj.root_fillet = 0
         self.obj = obj
         obj.Proxy = self
 
@@ -179,32 +179,32 @@ class InvoluteGear(BaseGear):
 
             # head-fillet:
             r_head = float(fp.head_fillet * fp.module)
-            r_foot = float(fp.foot_fillet * fp.module)
-            if fp.undercut and r_foot != 0.:
-                r_foot = 0.
-                App.Console.PrintWarning("foot fillet is not allowed if undercut is computed")
+            r_root = float(fp.root_fillet * fp.module)
+            if fp.undercut and r_root != 0.:
+                r_root = 0.
+                App.Console.PrintWarning("root fillet is not allowed if undercut is computed")
             if len(tooth.Edges) == 11:
                 pos_head = [1, 3, 9]
-                pos_foot = [6, 8]
+                pos_root = [6, 8]
                 edge_range = [2, 12]
             else:
                 pos_head = [0, 2, 6]
-                pos_foot = [4, 6]
+                pos_root = [4, 6]
                 edge_range = [1, 9]
 
             for pos in pos_head:
                 edges = insert_fillet(edges, pos, r_head)
 
-            for pos in pos_foot:
+            for pos in pos_root:
                 try:
-                    edges = insert_fillet(edges, pos, r_foot)
+                    edges = insert_fillet(edges, pos, r_root)
                 except RuntimeError:
                     edges.pop(8)
                     edges.pop(6)
                     edge_range = [2, 10]
-                    pos_foot = [5, 7]
-                    for pos in pos_foot:
-                        edges = insert_fillet(edges, pos, r_foot)
+                    pos_root = [5, 7]
+                    for pos in pos_root:
+                        edges = insert_fillet(edges, pos, r_root)
                     break
             edges = edges[edge_range[0]:edge_range[1]]
             edges = [e for e in edges if e is not None]
@@ -264,7 +264,7 @@ class InvoluteGearRack(BaseGear):
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of foot")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of root")
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
@@ -310,6 +310,7 @@ class InvoluteGearRack(BaseGear):
         fp.rack._update()
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))
+        
         if fp.height.Value == 0:
             fp.Shape = pol
         elif fp.beta.Value == 0:
@@ -484,7 +485,7 @@ class CycloidGear(BaseGear):
         obj.addProperty(
             "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
         obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-foot, radius = foot_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyPythonObject", "gear",
@@ -502,7 +503,7 @@ class CycloidGear(BaseGear):
         obj.double_helix = False
         obj.head = 0
         obj.head_fillet = 0
-        obj.foot_fillet = 0
+        obj.root_fillet = 0
         obj.Proxy = self
 
     def execute(self, fp):
@@ -523,17 +524,17 @@ class CycloidGear(BaseGear):
         edges = tooth.Edges
 
         r_head = float(fp.head_fillet * fp.module)
-        r_foot = float(fp.foot_fillet * fp.module)
+        r_root = float(fp.root_fillet * fp.module)
 
         pos_head = [0, 2, 6]
-        pos_foot = [4, 6]
+        pos_root = [4, 6]
         edge_range = [1, 9]
 
         for pos in pos_head:
             edges = insert_fillet(edges, pos, r_head)
 
-        for pos in pos_foot:
-            edges = insert_fillet(edges, pos, r_foot)
+        for pos in pos_root:
+            edges = insert_fillet(edges, pos, r_root)
 
         edges = edges[edge_range[0]:edge_range[1]]
         edges = [e for e in edges if e is not None]
@@ -607,6 +608,9 @@ class BevelGear(BaseGear):
         fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.
         fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
+        max_height = fp.gear.module * fp.teeth / 2 / np.tan(fp.gear.pitch_angle)
+        if fp.height >= max_height:
+            App.Console.PrintWarning("height must be smaller than {}".format(max_height))
         fp.gear.backlash = fp.backlash.Value
         scale = fp.module.Value * fp.gear.z / 2 / \
             np.tan(fp.pitch_angle.Value * np.pi / 180)
@@ -709,7 +713,7 @@ class WormGear(BaseGear):
         obj.addProperty(
             "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
         obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of foot")
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of root")
         obj.addProperty(
             "App::PropertyBool", "reverse_pitch", "gear_parameter", "reverse rotation of helix")
         obj.teeth = 3
