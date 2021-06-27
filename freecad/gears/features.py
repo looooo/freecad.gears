@@ -125,6 +125,7 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "transverse_pitch",
                         "computed", "transverse_pitch", 1)
         self.add_limiting_diameter_properties(obj)
+        self.make_attachable(obj)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -150,6 +151,12 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
 
+    def make_attachable(self, obj):
+        # Needed to make this object "attachable",
+        # aka able to attach parameterically to other objects
+        # cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
+        obj.addExtension('Part::AttachExtensionPython', obj)
+
     def execute(self, fp):
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
@@ -166,6 +173,10 @@ class InvoluteGear(BaseGear):
         if "properties_from_tool" in fp.PropertiesList:
             fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
+        # checksbackwardcompatibility:
+        if not hasattr(fp, "positionBySupport"):
+            self.make_attachable(fp)
+        fp.positionBySupport()
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
