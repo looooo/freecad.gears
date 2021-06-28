@@ -77,7 +77,19 @@ class BaseGear(object):
     def __init__(self, obj):
         obj.addProperty("App::PropertyString", "version", "version", "freecad.gears-version", 1)
         obj.version = __version__
+        self.make_attachable(obj)
 
+    def make_attachable(self, obj):
+        # Needed to make this object "attachable",
+        # aka able to attach parameterically to other objects
+        # cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
+        obj.addExtension('Part::AttachExtensionPython', obj)
+
+    def execute(self, fp):
+        # checksbackwardcompatibility:
+        if not hasattr(fp, "positionBySupport"):
+            self.make_attachable(fp)
+        fp.positionBySupport()
 
 class InvoluteGear(BaseGear):
 
@@ -125,7 +137,6 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "transverse_pitch",
                         "computed", "transverse_pitch", 1)
         self.add_limiting_diameter_properties(obj)
-        self.make_attachable(obj)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -151,13 +162,8 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
 
-    def make_attachable(self, obj):
-        # Needed to make this object "attachable",
-        # aka able to attach parameterically to other objects
-        # cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
-        obj.addExtension('Part::AttachExtensionPython', obj)
-
     def execute(self, fp):
+        super(InvoluteGear, self).execute(fp)
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
         fp.gear.z = fp.teeth
@@ -173,10 +179,6 @@ class InvoluteGear(BaseGear):
         if "properties_from_tool" in fp.PropertiesList:
             fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
-        # checksbackwardcompatibility:
-        if not hasattr(fp, "positionBySupport"):
-            self.make_attachable(fp)
-        fp.positionBySupport()
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
@@ -272,6 +274,7 @@ class InvoluteGearRack(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(InvoluteGearRack, self).execute(fp)
         fp.rack.m = fp.module.Value
         fp.rack.z = fp.teeth
         fp.rack.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
@@ -391,6 +394,7 @@ class CrownGear(BaseGear):
         return pts
 
     def execute(self, fp):
+        super(CrownGear, self).execute(fp)
         inner_diameter = fp.module.Value * fp.teeth
         outer_diameter = inner_diameter + fp.height.Value * 2
         inner_circle = Part.Wire(Part.makeCircle(inner_diameter / 2.))
@@ -479,6 +483,7 @@ class CycloidGear(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(CycloidGear, self).execute(fp)
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value
@@ -562,6 +567,7 @@ class BevelGear(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(BevelGear, self).execute(fp)
         fp.gear.z = fp.teeth
         fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.
@@ -684,6 +690,7 @@ class WormGear(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(WormGear, self).execute(fp)
         m = fp.module.Value
         d = fp.diameter.Value
         t = fp.teeth
@@ -814,6 +821,7 @@ class TimingGear(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(TimingGear, self).execute(fp)
         # m ... center of arc/circle
         # r ... radius of arc/circle
         # x ... end-point of arc
@@ -929,6 +937,7 @@ class LanternGear(BaseGear):
         obj.Proxy = self
 
     def execute(self, fp):
+        super(LanternGear, self).execute(fp)
         m = fp.module.Value
         teeth = fp.teeth
         r_r = fp.bolt_radius.Value
@@ -1079,6 +1088,7 @@ class HypoCycloidGear(BaseGear):
         return x, y
 
     def execute(self,fp):
+        super(HypoCycloidGear, self).execute(fp)
         b = fp.pin_circle_radius
         d = fp.roller_diameter
         e = fp.eccentricity
