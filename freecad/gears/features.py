@@ -1338,7 +1338,7 @@ def rotate_tooth(base_tooth, num_teeth):
 
 
 def fillet_between_edges(edge_1, edge_2, radius):
-    # asuming edges are in a plane
+    # assuming edges are in a plane
     # extracting vertices
     try:
         from OCC.Core import ChFi2d
