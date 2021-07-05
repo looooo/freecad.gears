@@ -63,7 +63,7 @@ class BaseCommand(object):
             cls.GEAR_FUNCTION(obj)
 
             if body:
-                body.Group += [obj]
+                body.addObject(obj)
             elif part:
                 part.Group += [obj]
         else:
