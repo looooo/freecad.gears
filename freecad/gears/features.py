@@ -87,6 +87,8 @@ class BaseGear(object):
             obj.addExtension('Part::AttachExtensionPython')
         else:
             obj.addExtension('Part::AttachExtensionPython', obj)
+        # unveil the "Placement" property, which seems hidden by default in PartDesign
+        obj.setEditorMode('Placement', 0) #non-readonly non-hidden
 
     def execute(self, fp):
         # checksbackwardcompatibility:
@@ -94,7 +96,22 @@ class BaseGear(object):
             self.make_attachable(fp)
         fp.positionBySupport()
 
-class InvoluteGear(BaseGear):
+class BaseGearNew(BaseGear):
+    def execute(self, fp):
+        super(BaseGearNew, self).execute(fp)
+        self.update_gear_properties(fp)
+        gear_shape = self.generate_gear_shape(fp)
+        if hasattr(fp, "BaseFeature") and fp.BaseFeature != None:
+            # we're inside a PartDesign Body, thus need to fuse with the base feature
+            gear_shape.Placement = fp.Placement # ensure the gear is placed correctly before fusing
+            result_shape = fp.BaseFeature.Shape.fuse(gear_shape)
+            result_shape.transformShape(fp.Placement.inverse().toMatrix(), True) # account for setting fp.Shape below moves the shape to fp.Placement, ignoring its previous placement
+            fp.Shape = result_shape
+        else:
+            fp.Shape = gear_shape
+        App.Console.PrintLog(f"execute done\n")
+
+class InvoluteGear(BaseGearNew):
 
     """FreeCAD gear"""
 
@@ -165,8 +182,7 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
 
-    def execute(self, fp):
-        super(InvoluteGear, self).execute(fp)
+    def update_gear_properties(self, fp):
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
         fp.gear.z = fp.teeth
@@ -182,6 +198,17 @@ class InvoluteGear(BaseGear):
         if "properties_from_tool" in fp.PropertiesList:
             fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
+
+        # computed properties
+        fp.dw = "{}mm".format(fp.gear.dw)
+        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
+        # checksbackwardcompatibility:
+        if not "da" in fp.PropertiesList:
+            self.add_limiting_diameter_properties(fp)
+        fp.da = "{}mm".format(fp.gear.da)
+        fp.df = "{}mm".format(fp.gear.df)
+
+    def generate_gear_shape(self, fp):
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
@@ -198,25 +225,16 @@ class InvoluteGear(BaseGear):
                 wi.append(out.toShape())
             wi = Wire(wi)
             if fp.height.Value == 0:
-                fp.Shape = wi
+                return wi
             elif fp.beta.Value == 0:
                 sh = Face(wi)
-                fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
+                return sh.extrude(App.Vector(0, 0, fp.height.Value))
             else:
-                fp.Shape = helicalextrusion(
+                return helicalextrusion(
                     wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
         else:
             rw = fp.gear.dw / 2
-            fp.Shape = Part.makeCylinder(rw, fp.height.Value)
-
-        # computed properties
-        fp.dw = "{}mm".format(fp.gear.dw)
-        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
-        # checksbackwardcompatibility:
-        if not "da" in fp.PropertiesList:
-            self.add_limiting_diameter_properties(fp)
-        fp.da = "{}mm".format(fp.gear.da)
-        fp.df = "{}mm".format(fp.gear.df)
+            return Part.makeCylinder(rw, fp.height.Value)
 
     def __getstate__(self):
         return None
