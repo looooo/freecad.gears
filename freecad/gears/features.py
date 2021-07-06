@@ -95,11 +95,6 @@ class BaseGear(object):
         if not hasattr(fp, "positionBySupport"):
             self.make_attachable(fp)
         fp.positionBySupport()
-
-class BaseGearNew(BaseGear):
-    def execute(self, fp):
-        super(BaseGearNew, self).execute(fp)
-        self.update_gear_properties(fp)
         gear_shape = self.generate_gear_shape(fp)
         if hasattr(fp, "BaseFeature") and fp.BaseFeature != None:
             # we're inside a PartDesign Body, thus need to fuse with the base feature
@@ -109,9 +104,14 @@ class BaseGearNew(BaseGear):
             fp.Shape = result_shape
         else:
             fp.Shape = gear_shape
-        App.Console.PrintLog(f"execute done\n")
 
-class InvoluteGear(BaseGearNew):
+    def generate_gear_shape(self, fp):
+        """
+        This method has to return the TopoShape of the gear.
+        """
+        raise "generate_gear_shape not implemented"
+
+class InvoluteGear(BaseGear):
 
     """FreeCAD gear"""
 
@@ -182,7 +182,7 @@ class InvoluteGear(BaseGearNew):
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
 
-    def update_gear_properties(self, fp):
+    def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
         fp.gear.z = fp.teeth
@@ -208,7 +208,6 @@ class InvoluteGear(BaseGearNew):
         fp.da = "{}mm".format(fp.gear.da)
         fp.df = "{}mm".format(fp.gear.df)
 
-    def generate_gear_shape(self, fp):
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
@@ -294,8 +293,7 @@ class InvoluteGearRack(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(InvoluteGearRack, self).execute(fp)
+    def generate_gear_shape(self, fp):
         fp.rack.m = fp.module.Value
         fp.rack.z = fp.teeth
         fp.rack.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
@@ -312,13 +310,18 @@ class InvoluteGearRack(BaseGear):
         if "simplified" in fp.PropertiesList:
             fp.rack.simplified = fp.simplified
         fp.rack._update()
+
+        # computed properties
+        if "transverse_pitch" in fp.PropertiesList:
+            fp.transverse_pitch = "{} mm".format(fp.rack.compute_properties()[2])
+
         pts = fp.rack.points()
         pol = Wire(makePolygon(list(map(fcvec, pts))))
         if fp.height.Value == 0:
-            fp.Shape = pol
+            return pol
         elif fp.beta.Value == 0:
             face = Face(Wire(pol))
-            fp.Shape = face.extrude(fcvec([0., 0., fp.height.Value]))
+            return face.extrude(fcvec([0., 0., fp.height.Value]))
         elif fp.double_helix:
             beta = fp.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
@@ -326,16 +329,13 @@ class InvoluteGearRack(BaseGear):
                 fcvec([0., np.tan(beta) * fp.height.Value / 2, fp.height.Value / 2]))
             pol3 = Part.Wire(pol)
             pol3.translate(fcvec([0., 0., fp.height.Value]))
-            fp.Shape = makeLoft([pol, pol2, pol3], True, True)
+            return makeLoft([pol, pol2, pol3], True, True)
         else:
             beta = fp.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
             pol2.translate(
                 fcvec([0., np.tan(beta) * fp.height.Value, fp.height.Value]))
-            fp.Shape = makeLoft([pol, pol2], True)
-        # computed properties
-        if "transverse_pitch" in fp.PropertiesList:
-            fp.transverse_pitch = "{} mm".format(fp.rack.compute_properties()[2])
+            return makeLoft([pol, pol2], True)
 
     def __getstate__(self):
         return None
@@ -414,8 +414,7 @@ class CrownGear(BaseGear):
         pts.append(pts[0])
         return pts
 
-    def execute(self, fp):
-        super(CrownGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         inner_diameter = fp.module.Value * fp.teeth
         outer_diameter = inner_diameter + fp.height.Value * 2
         inner_circle = Part.Wire(Part.makeCircle(inner_diameter / 2.))
@@ -449,12 +448,12 @@ class CrownGear(BaseGear):
             for _ in range(t):
                 loft = loft.transformGeometry(rot)
                 cut_shapes.append(loft)
-            fp.Shape = Part.Compound(cut_shapes)
+            return Part.Compound(cut_shapes)
         else:
             for i in range(t):
                 loft = loft.transformGeometry(rot)
                 solid = solid.cut(loft)
-            fp.Shape = solid
+            return solid
 
     def __getstate__(self):
         pass
@@ -503,8 +502,7 @@ class CycloidGear(BaseGear):
         obj.double_helix = False
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(CycloidGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value
@@ -512,6 +510,7 @@ class CycloidGear(BaseGear):
         fp.gear.clearance = fp.clearance
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
+
         pts = fp.gear.points(num=fp.numpoints)
         rotated_pts = pts
         rot = rotation(-fp.gear.phipart)
@@ -527,12 +526,12 @@ class CycloidGear(BaseGear):
             wi.append(out.toShape())
         wi = Wire(wi)
         if fp.height.Value == 0:
-            fp.Shape = wi
+            return wi
         elif fp.beta.Value == 0:
             sh = Face(wi)
-            fp.Shape = sh.extrude(App.Vector(0, 0, fp.height.Value))
+            return sh.extrude(App.Vector(0, 0, fp.height.Value))
         else:
-            fp.Shape = helicalextrusion(
+            return helicalextrusion(
                 wi, fp.height.Value, fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d, fp.double_helix)
 
     def __getstate__(self):
@@ -587,8 +586,7 @@ class BevelGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(BevelGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         fp.gear.z = fp.teeth
         fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.
@@ -636,8 +634,8 @@ class BevelGear(BaseGear):
             mat.A33 = -1
             mat.move(fcvec([0, 0, scale_1]))
             shape = shape.transformGeometry(mat)
-        fp.Shape = shape
-        # fp.Shape = self.create_teeth(pts, pos1, fp.teeth)
+        return shape
+        # return self.create_teeth(pts, pos1, fp.teeth)
 
     def create_tooth(self):
         w = []
@@ -710,8 +708,7 @@ class WormGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(WormGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         m = fp.module.Value
         d = fp.diameter.Value
         t = fp.teeth
@@ -779,12 +776,12 @@ class WormGear(BaseGear):
 
         full_wire = Part.Wire(Part.Wire(w_all))
         if h == 0:
-            fp.Shape = full_wire
+            return full_wire
         else:
             shape = helicalextrusion(full_wire,
                                      h,
                                      h * np.tan(beta) * 2 / d)
-            fp.Shape = shape
+            return shape
 
     def __getstate__(self):
         return None
@@ -841,8 +838,7 @@ class TimingGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(TimingGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         # m ... center of arc/circle
         # r ... radius of arc/circle
         # x ... end-point of arc
@@ -920,9 +916,9 @@ class TimingGear(BaseGear):
 
         wi = Part.Wire(wires)
         if fp.height.Value == 0:
-            fp.Shape = wi
+            return wi
         else:
-            fp.Shape = Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
+            return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
     def __getstate__(self):
         pass
@@ -957,8 +953,7 @@ class LanternGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def execute(self, fp):
-        super(LanternGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         m = fp.module.Value
         teeth = fp.teeth
         r_r = fp.bolt_radius.Value
@@ -1013,9 +1008,9 @@ class LanternGear(BaseGear):
 
         wi = Part.Wire(wires)
         if fp.height.Value == 0:
-            fp.Shape = wi
+            return wi
         else:
-            fp.Shape = Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
+            return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
     def __getstate__(self):
         pass
@@ -1108,8 +1103,7 @@ class HypoCycloidGear(BaseGear):
                 x, y = self.to_rect(r, a)
         return x, y
 
-    def execute(self,fp):
-        super(HypoCycloidGear, self).execute(fp)
+    def generate_gear_shape(self, fp):
         b = fp.pin_circle_radius
         d = fp.roller_diameter
         e = fp.eccentricity
@@ -1216,7 +1210,7 @@ class HypoCycloidGear(BaseGear):
             to_be_fused.append(pins);
 
         if to_be_fused:
-            fp.Shape = Part.makeCompound(to_be_fused)
+            return Part.makeCompound(to_be_fused)
 
     def __getstate__(self):
         pass
