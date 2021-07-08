@@ -422,6 +422,8 @@ class CrownGear(BaseGear):
         inner_circle.reverse()
         face = Part.Face([outer_circle, inner_circle])
         solid = face.extrude(App.Vector([0., 0., -fp.thickness.Value]))
+        if fp.preview_mode:
+            return solid
 
         # cutting obj
         alpha_w = np.deg2rad(fp.pressure_angle.Value)
@@ -443,17 +445,11 @@ class CrownGear(BaseGear):
         loft = makeLoft(polies, True)
         rot = App.Matrix()
         rot.rotateZ(2 * np.pi / t)
-        if fp.preview_mode:
-            cut_shapes = [solid]
-            for _ in range(t):
-                loft = loft.transformGeometry(rot)
-                cut_shapes.append(loft)
-            return Part.Compound(cut_shapes)
-        else:
-            for i in range(t):
-                loft = loft.transformGeometry(rot)
-                solid = solid.cut(loft)
-            return solid
+        cut_shapes = []
+        for _ in range(t):
+            loft = loft.transformGeometry(rot)
+            cut_shapes.append(loft)
+        return solid.cut(cut_shapes)
 
     def __getstate__(self):
         pass
