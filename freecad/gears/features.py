@@ -209,6 +209,8 @@ class InvoluteGear(BaseGear):
         fp.da = "{}mm".format(fp.gear.da)
         fp.df = "{}mm".format(fp.gear.df)
 
+        if not fp.simple:
+
             pts = fp.gear.points(num=fp.numpoints)
             rot = rotation(-fp.gear.phipart)
             rotated_pts = list(map(rot, pts))
