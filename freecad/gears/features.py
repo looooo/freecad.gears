@@ -272,6 +272,147 @@ class InvoluteGear(BaseGear):
     def __setstate__(self, state):
         return None
 
+class InternalInvoluteGear(BaseGear):
+    """FreeCAD internal involute gear
+
+    Using the same tooth as the external, just turning it inside-out:
+    addedum becomes dedendum, clearance becomes head, negate the backslash, ...
+    """
+
+    def __init__(self, obj):
+        super(InternalInvoluteGear, self).__init__(obj)
+        self.involute_tooth = InvoluteTooth()
+        obj.addProperty(
+            "App::PropertyBool", "simple", "precision", "simple")
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
+                                                                else it's the transverse module.")
+        obj.addProperty(
+            "App::PropertyFloat", "shift", "gear_parameter", "shift")
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty(
+            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
+        obj.addProperty(
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty(
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
+        obj.addProperty("App::PropertyInteger", "numpoints",
+                        "precision", "number of points for spline")
+        obj.addProperty(
+            "App::PropertyAngle", "beta", "gear_parameter", "beta ")
+        obj.addProperty(
+            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
+        obj.addProperty(
+            "App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty(
+            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty("App::PropertyPythonObject",
+                        "gear", "gear_parameter", "test")
+        obj.addProperty("App::PropertyLength", "dw",
+                        "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+                        "computed", "transverse_pitch", 1)
+        obj.addProperty("App::PropertyLength", "outside_diameter",
+                        "computed", "Outside diameter", 1)
+        self.add_limiting_diameter_properties(obj)
+        obj.gear = self.involute_tooth
+        obj.simple = False
+        obj.teeth = 15
+        obj.module = '1. mm'
+        obj.shift = 0.
+        obj.pressure_angle = '20. deg'
+        obj.beta = '0. deg'
+        obj.height = '5. mm'
+        obj.thickness = '5 mm'
+        obj.clearance = 0.25
+        obj.head = -0.4 # using head=0 and shift=0.5 may be better, but makes placeing the pinion less intuitive
+        obj.numpoints = 6
+        obj.double_helix = False
+        obj.backlash = '0.00 mm'
+        obj.reversed_backlash = False
+        obj.properties_from_tool = False
+        self.obj = obj
+        obj.Proxy = self
+
+    def add_limiting_diameter_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "da",
+                        "computed", "inside diameter", 1)
+        obj.addProperty("App::PropertyLength", "df",
+                        "computed", "root diameter", 1)
+
+    def generate_gear_shape(self, fp):
+        fp.gear.double_helix = fp.double_helix
+        fp.gear.m_n = fp.module.Value
+        fp.gear.z = fp.teeth
+        fp.gear.undercut = False # no undercut for internal gears
+        fp.gear.shift = fp.shift
+        fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
+        fp.gear.beta = fp.beta.Value * np.pi / 180
+        fp.gear.clearance = fp.head # swap head and clearance to become "internal"
+        fp.gear.backlash = fp.backlash.Value * \
+            (fp.reversed_backlash - 0.5) * 2. # negate "reversed_backslash", for "internal"
+        fp.gear.head = fp.clearance # swap head and clearance to become "internal"
+        # checksbackwardcompatibility:
+        if "properties_from_tool" in fp.PropertiesList:
+            fp.gear.properties_from_tool = fp.properties_from_tool
+        fp.gear._update()
+
+        # computed properties
+        fp.dw = "{}mm".format(fp.gear.dw)
+        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
+        fp.outside_diameter = fp.dw + 2 * fp.thickness
+        # checksbackwardcompatibility:
+        if not "da" in fp.PropertiesList:
+            self.add_limiting_diameter_properties(fp)
+        fp.da = "{}mm".format(fp.gear.df) # swap addednum and dedendum for "internal"
+        fp.df = "{}mm".format(fp.gear.da) # swap addednum and dedendum for "internal"
+
+        pts = fp.gear.points(num=fp.numpoints)
+        rotated_pts = pts
+        rot = rotation(-fp.gear.phipart)
+        for i in range(fp.gear.z - 1):
+            rotated_pts = list(map(rot, rotated_pts))
+            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
+            pts += rotated_pts
+        pts.append(np.array([pts[-1][-1], pts[0][0]]))
+        outer_circle = Part.Wire(Part.makeCircle(fp.outside_diameter / 2.))
+        if not fp.simple:
+            wi = []
+            for i in pts:
+                out = BSplineCurve()
+                out.interpolate(list(map(fcvec, i)))
+                wi.append(out.toShape())
+            wi = Wire(wi)
+            wi.reverse() # turn inside out
+            if fp.height.Value == 0:
+                return Part.makeCompound([outer_circle, wi])
+            elif fp.beta.Value == 0:
+                sh = Face([outer_circle, wi])
+                return sh.extrude(App.Vector(0, 0, fp.height.Value))
+            else:
+                tool = helicalextrusion(
+                    wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
+                return Part.makeCylinder(fp.outside_diameter / 2., fp.height.Value).cut(tool)
+        else:
+            inner_circle = Part.Wire(Part.makeCircle(fp.dw / 2.))
+            inner_circle.reverse()
+            sh = Face([outer_circle, inner_circle])
+            return sh.extrude(App.Vector(0, 0, fp.height.Value))
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
+
 
 class InvoluteGearRack(BaseGear):
 
