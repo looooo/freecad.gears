@@ -22,7 +22,7 @@
 import os
 import FreeCAD
 import FreeCADGui as Gui
-from .features import ViewProviderGear, InvoluteGear, InvoluteGearRack
+from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack
 from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
 
 
@@ -82,7 +82,15 @@ class CreateInvoluteGear(BaseCommand):
     GEAR_FUNCTION = InvoluteGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
     MenuText = 'Involute gear'
-    ToolTip = 'Create an Involute gear'
+    ToolTip = 'Create an external involute gear'
+
+
+class CreateInternalInvoluteGear(BaseCommand):
+    NAME = "internalinvolutegear"
+    GEAR_FUNCTION = InternalInvoluteGear
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
+    MenuText = 'Internal involute gear'
+    ToolTip = 'Create an internal involute gear'
 
 
 class CreateInvoluteRack(BaseCommand):
