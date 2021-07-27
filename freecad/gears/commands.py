@@ -85,7 +85,7 @@ class CreateInvoluteGear(BaseCommand):
 class CreateInternalInvoluteGear(BaseCommand):
     NAME = "internalinvolutegear"
     GEAR_FUNCTION = InternalInvoluteGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'internalinvolutegear.svg')
     MenuText = 'Internal involute gear'
     ToolTip = 'Create an internal involute gear'
 
