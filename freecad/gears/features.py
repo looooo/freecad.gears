@@ -398,9 +398,9 @@ class InternalInvoluteGear(BaseGear):
                 sh = Face([outer_circle, wi])
                 return sh.extrude(App.Vector(0, 0, fp.height.Value))
             else:
-                tool = helicalextrusion(
-                    wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
-                return Part.makeCylinder(fp.outside_diameter / 2., fp.height.Value).cut(tool)
+                sh = Face([outer_circle, wi])
+                twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
+                return helicalextrusion2(sh, fp.height.Value, twist_angle, fp.double_helix)
         else:
             inner_circle = Part.Wire(Part.makeCircle(fp.dw / 2.))
             inner_circle.reverse()
@@ -1437,6 +1437,62 @@ def helicalextrusion(wire, height, angle, double_helix=False):
         first_solid = first_spine.makePipeShell([wire], True, True)
         return first_solid
 
+def helicalextrusion2(face, height, angle, double_helix=False):
+    """
+    A helical extrusion using the BRepOffsetAPI
+    face -- the face to extrude (may contain holes, i.e. more then one wires)
+    height -- the hight of the extrusion, normal to the face
+    angle -- the twist angle of the extrusion in radians
+
+    returns a solid
+    """
+    pitch = height * 2 * np.pi / abs(angle)
+    radius = 10.0 # as we are only interested in the "twist", we take an arbitrary constant here
+    cone_angle = 0
+    direction = bool(angle < 0)
+    if double_helix:
+        spine = Part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
+    else:
+        spine = Part.makeHelix(pitch, height, radius, cone_angle, direction)
+    def make_pipe(path, profile):
+        """
+        returns (shell, last_wire)
+        """
+        mkPS = Part.BRepOffsetAPI.MakePipeShell(path)
+        mkPS.setFrenetMode(True) # otherwise, the profile's normal would follow the path
+        mkPS.add(profile, False, False)
+        mkPS.build()
+        return (mkPS.shape(), mkPS.lastShape())
+    shell_faces = []
+    top_wires = []
+    for wire in face.Wires:
+        pipe_shell, top_wire = make_pipe(spine, wire)
+        shell_faces.extend(pipe_shell.Faces)
+        top_wires.append(top_wire)
+    top_face = Part.Face(top_wires)
+    shell_faces.append(top_face)
+    if double_helix:
+        origin = App.Vector(0, 0, 0)
+        xy_normal = App.Vector(0, 0, 1)
+        mirror_xy = lambda f: f.mirror(origin, xy_normal)
+        bottom_faces = list(map(mirror_xy, shell_faces))
+        shell_faces.extend(bottom_faces)
+        matrix = App.Matrix()
+        matrix.move(App.Vector(0, 0, height / 2.0))
+        move_up = lambda f: f.transformGeometry(matrix)
+        shell_faces = list(map(move_up, shell_faces))
+    else:
+        shell_faces.append(face) # the bottom is what we extruded
+    shell = Part.makeShell(shell_faces)
+    # TODO: why the heck is this shell empty if double_helix???
+    if len(shell.Faces) == 0:
+        # ... and why the heck does it work when making an intermediate compound???
+        hacky_intermediate_compound = Part.makeCompound(shell_faces)
+        shell = Part.makeShell(hacky_intermediate_compound.Faces)
+        App.Console.PrintMessage(f"shell.Faces from compound: {len(shell.Faces)}\n")
+    #shell.sewShape() # fill gaps that may result from accumulated tolerances. Needed?
+    #shell = shell.removeSplitter() # refine. Needed?
+    return Part.makeSolid(shell)
 
 def make_face(edge1, edge2):
     v1, v2 = edge1.Vertexes
