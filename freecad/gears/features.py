@@ -1430,6 +1430,8 @@ def helicalextrusion(face, height, angle, double_helix=False):
     direction = bool(angle < 0)
     if double_helix:
         spine = Part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
+        spine.translate(App.Vector(0, 0, height / 2.0))
+        face = face.translated(App.Vector(0, 0, height / 2.0)) # don't transfrom our argument
     else:
         spine = Part.makeHelix(pitch, height, radius, cone_angle, direction)
     def make_pipe(path, profile):
@@ -1450,24 +1452,18 @@ def helicalextrusion(face, height, angle, double_helix=False):
     top_face = Part.Face(top_wires)
     shell_faces.append(top_face)
     if double_helix:
-        origin = App.Vector(0, 0, 0)
+        origin = App.Vector(0, 0, height / 2.0)
         xy_normal = App.Vector(0, 0, 1)
         mirror_xy = lambda f: f.mirror(origin, xy_normal)
         bottom_faces = list(map(mirror_xy, shell_faces))
         shell_faces.extend(bottom_faces)
-        matrix = App.Matrix()
-        matrix.move(App.Vector(0, 0, height / 2.0))
-        move_up = lambda f: f.transformGeometry(matrix)
-        shell_faces = list(map(move_up, shell_faces))
+        # TODO: why the heck is makeShell from this empty after mirroring?
+        # ... and why the heck does it work when making an intermediate compound???
+        hacky_intermediate_compound = Part.makeCompound(shell_faces)
+        shell_faces = hacky_intermediate_compound.Faces
     else:
         shell_faces.append(face) # the bottom is what we extruded
     shell = Part.makeShell(shell_faces)
-    # TODO: why the heck is this shell empty if double_helix???
-    if len(shell.Faces) == 0:
-        # ... and why the heck does it work when making an intermediate compound???
-        hacky_intermediate_compound = Part.makeCompound(shell_faces)
-        shell = Part.makeShell(hacky_intermediate_compound.Faces)
-        App.Console.PrintMessage(f"shell.Faces from compound: {len(shell.Faces)}\n")
     #shell.sewShape() # fill gaps that may result from accumulated tolerances. Needed?
     #shell = shell.removeSplitter() # refine. Needed?
     return Part.makeSolid(shell)
