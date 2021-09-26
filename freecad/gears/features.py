@@ -255,13 +255,13 @@ class InvoluteGear(BaseGear):
             wi = rotate_tooth(tooth, fp.teeth)
 
             if fp.height.Value == 0:
-                return wi
-            elif fp.beta.Value == 0:
-                sh = Face(wi)
-                return sh.extrude(App.Vector(0, 0, fp.height.Value))
+                return profile
+            base = Face(profile)
+            if fp.beta.Value == 0:
+                return base.extrude(App.Vector(0, 0, fp.height.Value))
             else:
-                return helicalextrusion(
-                    wi, fp.height.Value, fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d, fp.double_helix)
+                twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
+                return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
         else:
             rw = fp.gear.dw / 2
             return Part.makeCylinder(rw, fp.height.Value)
@@ -390,22 +390,21 @@ class InternalInvoluteGear(BaseGear):
                 out = BSplineCurve()
                 out.interpolate(list(map(fcvec, i)))
                 wi.append(out.toShape())
-            wi = Wire(wi)
-            wi.reverse() # turn inside out
+            profile = Wire(wi)
+            profile.reverse() # turn inside out
             if fp.height.Value == 0:
-                return Part.makeCompound([outer_circle, wi])
-            elif fp.beta.Value == 0:
-                sh = Face([outer_circle, wi])
-                return sh.extrude(App.Vector(0, 0, fp.height.Value))
+                return Part.makeCompound([outer_circle, profile])
+            base = Face([outer_circle, profile])
+            if fp.beta.Value == 0:
+                return base.extrude(App.Vector(0, 0, fp.height.Value))
             else:
-                sh = Face([outer_circle, wi])
                 twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
-                return helicalextrusion2(sh, fp.height.Value, twist_angle, fp.double_helix)
+                return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
         else:
             inner_circle = Part.Wire(Part.makeCircle(fp.dw / 2.))
             inner_circle.reverse()
-            sh = Face([outer_circle, inner_circle])
-            return sh.extrude(App.Vector(0, 0, fp.height.Value))
+            base = Face([outer_circle, inner_circle])
+            return base.extrude(App.Vector(0, 0, fp.height.Value))
 
     def __getstate__(self):
         return None
@@ -716,13 +715,13 @@ class CycloidGear(BaseGear):
 
         wi = rotate_tooth(tooth, fp.teeth)
         if fp.height.Value == 0:
-            return wi
-        elif fp.beta.Value == 0:
-            sh = Face(wi)
-            return sh.extrude(App.Vector(0, 0, fp.height.Value))
+            return profile
+        base = Face(profile)
+        if fp.beta.Value == 0:
+            return base.extrude(App.Vector(0, 0, fp.height.Value))
         else:
-            return helicalextrusion(
-                wi, fp.height.Value, fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d, fp.double_helix)
+            twist_angle = fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
+            return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
 
     def __getstate__(self):
         return None
@@ -971,7 +970,7 @@ class WormGear(BaseGear):
         if h == 0:
             return full_wire
         else:
-            shape = helicalextrusion(full_wire,
+            shape = helicalextrusion(Face(full_wire),
                                      h,
                                      h * np.tan(beta) * 2 / d)
             return shape
@@ -1416,28 +1415,7 @@ def part_arc_from_points_and_center(p_1, p_2, m):
     return Part.Arc(App.Vector(*p_1, 0.), App.Vector(*p_12, 0.), App.Vector(*p_2, 0.))
 
 
-def helicalextrusion(wire, height, angle, double_helix=False):
-    direction = bool(angle < 0)
-    if double_helix:
-        first_spine = makeHelix(height * 2. * np.pi /
-                                abs(angle), 0.5 * height, 10., 0, direction)
-        first_solid = first_spine.makePipeShell([wire], True, True)
-        second_solid = first_solid.mirror(
-            fcvec([0., 0., 0.]), fcvec([0, 0, 1]))
-        faces = first_solid.Faces + second_solid.Faces
-        faces = [f for f in faces if not on_mirror_plane(
-            f, 0., fcvec([0., 0., 1.]))]
-        solid = makeSolid(makeShell(faces))
-        mat = App.Matrix()
-        mat.move(fcvec([0, 0, 0.5 * height]))
-        return solid.transformGeometry(mat)
-    else:
-        first_spine = makeHelix(height * 2 * np.pi /
-                                abs(angle), height, 10., 0, direction)
-        first_solid = first_spine.makePipeShell([wire], True, True)
-        return first_solid
-
-def helicalextrusion2(face, height, angle, double_helix=False):
+def helicalextrusion(face, height, angle, double_helix=False):
     """
     A helical extrusion using the BRepOffsetAPI
     face -- the face to extrude (may contain holes, i.e. more then one wires)
@@ -1514,11 +1492,6 @@ def make_bspline_wire(pts):
     return Wire(wi)
 
 
-def on_mirror_plane(face, z, direction, small_size=0.000001):
-    # the tolerance is very high. Maybe there is a bug in Part.makeHelix.
-    return (face.normalAt(0, 0).cross(direction).Length < small_size and
-            abs(face.CenterOfMass.z - z) < small_size)
-
 def points_to_wire(pts):
     wire = []
     for i in pts:
@@ -1594,4 +1567,3 @@ def insert_fillet(edges, pos, radius):
         else:
             output_edges.append(edge)
     return output_edges
-
