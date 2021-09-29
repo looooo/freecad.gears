@@ -252,7 +252,7 @@ class InvoluteGear(BaseGear):
             edges = [e for e in edges if e is not None]
 
             tooth = Wire(edges)
-            wi = rotate_tooth(tooth, fp.teeth)
+            profile = rotate_tooth(tooth, fp.teeth)
 
             if fp.height.Value == 0:
                 return profile
