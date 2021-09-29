@@ -314,6 +314,8 @@ class InternalInvoluteGear(BaseGear):
         obj.addProperty(
             "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
             gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
         obj.addProperty("App::PropertyPythonObject",
                         "gear", "gear_parameter", "test")
         obj.addProperty("App::PropertyLength", "dw",
@@ -339,6 +341,8 @@ class InternalInvoluteGear(BaseGear):
         obj.backlash = '0.00 mm'
         obj.reversed_backlash = False
         obj.properties_from_tool = False
+        obj.head_fillet = 0
+        obj.root_fillet = 0
         self.obj = obj
         obj.Proxy = self
 
@@ -375,23 +379,48 @@ class InternalInvoluteGear(BaseGear):
         fp.da = "{}mm".format(fp.gear.df) # swap addednum and dedendum for "internal"
         fp.df = "{}mm".format(fp.gear.da) # swap addednum and dedendum for "internal"
 
-        pts = fp.gear.points(num=fp.numpoints)
-        rotated_pts = pts
-        rot = rotation(-fp.gear.phipart)
-        for i in range(fp.gear.z - 1):
-            rotated_pts = list(map(rot, rotated_pts))
-            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
-            pts += rotated_pts
-        pts.append(np.array([pts[-1][-1], pts[0][0]]))
+
         outer_circle = Part.Wire(Part.makeCircle(fp.outside_diameter / 2.))
+        outer_circle.reverse()
         if not fp.simple:
-            wi = []
-            for i in pts:
-                out = BSplineCurve()
-                out.interpolate(list(map(fcvec, i)))
-                wi.append(out.toShape())
-            profile = Wire(wi)
-            profile.reverse() # turn inside out
+            # head-fillet:
+            pts = fp.gear.points(num=fp.numpoints)
+            rot = rotation(-fp.gear.phipart)
+            rotated_pts = list(map(rot, pts))
+            pts.append([pts[-1][-1],rotated_pts[0][0]])
+            pts += rotated_pts
+            tooth = points_to_wire(pts)
+            r_head = float(fp.root_fillet * fp.module)  # reversing head
+            r_root = float(fp.head_fillet * fp.module)  # and foot
+            edges = tooth.Edges
+            if len(tooth.Edges) == 11:
+                pos_head = [1, 3, 9]
+                pos_root = [6, 8]
+                edge_range = [2, 12]
+            else:
+                pos_head = [0, 2, 6]
+                pos_root = [4, 6]
+                edge_range = [1, 9]
+
+            for pos in pos_head:
+                edges = insert_fillet(edges, pos, r_head)
+
+            for pos in pos_root:
+                try:
+                    edges = insert_fillet(edges, pos, r_root)
+                except RuntimeError:
+                    edges.pop(8)
+                    edges.pop(6)
+                    edge_range = [2, 10]
+                    pos_root = [5, 7]
+                    for pos in pos_root:
+                        edges = insert_fillet(edges, pos, r_root)
+                    break
+            edges = edges[edge_range[0]:edge_range[1]]
+            edges = [e for e in edges if e is not None]
+
+            tooth = Wire(edges)
+            profile = rotate_tooth(tooth, fp.teeth)
             if fp.height.Value == 0:
                 return Part.makeCompound([outer_circle, profile])
             base = Face([outer_circle, profile])
