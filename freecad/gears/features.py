@@ -107,7 +107,7 @@ class BaseGear(object):
         """
         This method has to return the TopoShape of the gear.
         """
-        raise "generate_gear_shape not implemented"
+        raise NotImplementedError("generate_gear_shape not implemented")
 
 class InvoluteGear(BaseGear):
 
