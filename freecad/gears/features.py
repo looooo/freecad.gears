@@ -742,7 +742,7 @@ class CycloidGear(BaseGear):
 
         tooth = Wire(edges)
 
-        wi = rotate_tooth(tooth, fp.teeth)
+        profile = rotate_tooth(tooth, fp.teeth)
         if fp.height.Value == 0:
             return profile
         base = Face(profile)
