@@ -53,16 +53,17 @@ def fcvec(x):
 
 
 class ViewProviderGear(object):
-    def __init__(self, obj):
+    def __init__(self, obj, icon_fn=None):
         ''' Set this object to the proxy object of the actual view provider '''
         obj.Proxy = self
+        dirname = os.path.dirname(__file__)
+        self.icon_fn = icon_fn or os.path.join(dirname, "icons", "involutegear.svg")
 
     def attach(self, vobj):
         self.vobj = vobj
 
     def getIcon(self):
-        __dirname__ = os.path.dirname(__file__)
-        return(os.path.join(__dirname__, "icons", "involutegear.svg"))
+        return self.icon_fn
 
     def __getstate__(self):
         return None

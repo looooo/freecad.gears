@@ -41,3 +41,24 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     alpha_w = opt.fsolve(root_inv, 0.)
     dist = m * (t1 + t2) / 2 * np.cos(alpha) / np.cos(alpha_w)
     return dist, alpha_w
+
+
+def shifted_pitch_diameter(m, alpha, t1, x1):
+    """Summary
+
+    Args:
+        m (float): common module of both gears [length]
+        alpha (float): pressure-angle [rad]
+        t1 (int): number of teeth of gear1
+        x1 (float): relative profile-shift of gear1
+
+    Returns:
+        (float, float): distance between gears [length], pressure angle of the assembly [rad]
+    """
+    def inv(x): return np.tan(x) - x
+    inv_alpha_w = inv(alpha) + 2 * np.tan(alpha) * x1 / t1
+
+    def root_inv(x): return inv(x) - inv_alpha_w
+    alpha_w = opt.fsolve(root_inv, 0.)
+    pitch_diameter = m * t1  * np.cos(alpha) / np.cos(alpha_w)
+    return pitch_diameter, alpha_w

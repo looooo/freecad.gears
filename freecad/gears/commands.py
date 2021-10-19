@@ -56,7 +56,7 @@ class BaseCommand(object):
                 obj = FreeCAD.ActiveDocument.addObject("PartDesign::FeaturePython", cls.NAME)
             else:
                 obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
-            ViewProviderGear(obj.ViewObject)
+            ViewProviderGear(obj.ViewObject, cls.Pixmap)
             cls.GEAR_FUNCTION(obj)
 
             if body:
