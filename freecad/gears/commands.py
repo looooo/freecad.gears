@@ -41,10 +41,13 @@ class BaseCommand(object):
             return True
 
     def Activated(self):
+        doc = FreeCAD.ActiveDocument
         Gui.doCommandGui("import freecad.gears.commands")
+        doc.openTransaction(self.ToolTip)
         Gui.doCommandGui("freecad.gears.commands.{}.create()".format(
             self.__class__.__name__))
-        FreeCAD.ActiveDocument.recompute()
+        doc.commitTransaction()
+        doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
     @classmethod
