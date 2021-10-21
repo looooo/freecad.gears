@@ -59,3 +59,6 @@ target/
 .ipynb_checkpoints/
 results/
 *.vtk
+
+# VIM
+*.swp
