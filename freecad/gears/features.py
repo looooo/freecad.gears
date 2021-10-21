@@ -116,47 +116,17 @@ class InvoluteGear(BaseGear):
     def __init__(self, obj):
         super(InvoluteGear, self).__init__(obj)
         self.involute_tooth = InvoluteTooth()
-        obj.addProperty(
-            "App::PropertyBool", "simple", "precision", "simple")
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
-        obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
-                                                                else it's the transverse module.")
-        obj.addProperty(
-            "App::PropertyBool", "undercut", "gear_parameter", "undercut")
-        obj.addProperty(
-            "App::PropertyFloat", "shift", "gear_parameter", "shift")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
-        obj.addProperty("App::PropertyInteger", "numpoints",
-                        "precision", "number of points for spline")
-        obj.addProperty(
-            "App::PropertyAngle", "beta", "gear_parameter", "beta ")
-        obj.addProperty(
-            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
-        obj.addProperty(
-            "App::PropertyLength", "backlash", "tolerance", "backlash")
-        obj.addProperty(
-            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
-        obj.addProperty(
-            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
-            gear parameters are internally recomputed for the rotated gear")
-        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
+
         obj.addProperty("App::PropertyPythonObject",
-                        "gear", "gear_parameter", "test")
-        obj.addProperty("App::PropertyLength", "dw",
-                        "computed", "pitch diameter", 1)
-        obj.addProperty("App::PropertyLength", "transverse_pitch",
-                        "computed", "transverse_pitch", 1)
-        self.add_limiting_diameter_properties(obj)
+                        "gear", "gear_parameter", "python gear object")
+
+        self.add_gear_properties(obj)
+        self.add_fillet_properties(obj)
+        self.add_helical_properties(obj)
+        self.add_computed_properties(obj)
+        self.add_tolerance_properties(obj)
+        self.add_precision_properties(obj)
+
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -178,11 +148,55 @@ class InvoluteGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-    def add_limiting_diameter_properties(self, obj):
+    def add_gear_properties(self, obj):
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
+                                                                else it's the transverse module.")
+        obj.addProperty(
+            "App::PropertyFloat", "shift", "gear_parameter", "shift")
+        obj.addProperty(
+            "App::PropertyLength", "height", "gear_parameter", "height")
+        obj.addProperty(
+            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
+        obj.addProperty(
+            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+
+    def add_fillet_properties(self, obj):
+        obj.addProperty("App::PropertyBool", "undercut", "fillets", "undercut")
+        obj.addProperty("App::PropertyFloat", "head_fillet", "fillets",
+                        "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "fillets",
+                        "a fillet for the tooth-root, radius = root_fillet x module")
+
+    def add_helical_properties(self, obj):
+        obj.addProperty("App::PropertyBool", "properties_from_tool",
+                        "helical", "if beta is given and properties_from_tool is enabled, \
+                         gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta ")
+        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
+
+    def add_computed_properties(self, obj):
         obj.addProperty("App::PropertyLength", "da",
                         "computed", "outside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
+        obj.addProperty("App::PropertyLength", "dw",
+                        "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+                        "computed", "transverse_pitch", 1)
+
+    def add_tolerance_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty("App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
+
+    def add_precision_properties(self, obj):
+        obj.addProperty("App::PropertyBool", "simple", "precision", "simple")
+        obj.addProperty("App::PropertyInteger", "numpoints",
+                        "precision", "number of points for spline")
 
     def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
@@ -204,9 +218,6 @@ class InvoluteGear(BaseGear):
         # computed properties
         fp.dw = "{}mm".format(fp.gear.dw)
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
-        # checksbackwardcompatibility:
-        if not "da" in fp.PropertiesList:
-            self.add_limiting_diameter_properties(fp)
         fp.da = "{}mm".format(fp.gear.da)
         fp.df = "{}mm".format(fp.gear.df)
 
