@@ -118,14 +118,14 @@ class InvoluteGear(BaseGear):
         self.involute_tooth = InvoluteTooth()
 
         obj.addProperty("App::PropertyPythonObject",
-                        "gear", "gear_parameter", "python gear object")
+                        "gear", "base", "python gear object")
 
         self.add_gear_properties(obj)
         self.add_fillet_properties(obj)
         self.add_helical_properties(obj)
         self.add_computed_properties(obj)
         self.add_tolerance_properties(obj)
-        self.add_precision_properties(obj)
+        self.add_accuracy_properties(obj)
 
         obj.gear = self.involute_tooth
         obj.simple = False
@@ -149,21 +149,15 @@ class InvoluteGear(BaseGear):
         obj.Proxy = self
 
     def add_gear_properties(self, obj):
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
+            "App::PropertyLength", "module", "base", "normal module if properties_from_tool=True, \
                                                                 else it's the transverse module.")
         obj.addProperty(
-            "App::PropertyFloat", "shift", "gear_parameter", "shift")
+            "App::PropertyLength", "height", "base", "height")
         obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
+        obj.addProperty("App::PropertyFloat", "shift", "involute", "shift")
 
     def add_fillet_properties(self, obj):
         obj.addProperty("App::PropertyBool", "undercut", "fillets", "undercut")
@@ -192,11 +186,15 @@ class InvoluteGear(BaseGear):
     def add_tolerance_properties(self, obj):
         obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash")
         obj.addProperty("App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
+        obj.addProperty(
+            "App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty(
+            "App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
 
-    def add_precision_properties(self, obj):
-        obj.addProperty("App::PropertyBool", "simple", "precision", "simple")
+    def add_accuracy_properties(self, obj):
+        obj.addProperty("App::PropertyBool", "simple", "accuracy", "simple")
         obj.addProperty("App::PropertyInteger", "numpoints",
-                        "precision", "number of points for spline")
+                        "accuracy", "number of points for spline")
 
     def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
@@ -296,47 +294,23 @@ class InternalInvoluteGear(BaseGear):
         self.involute_tooth = InvoluteTooth()
         obj.addProperty(
             "App::PropertyBool", "simple", "precision", "simple")
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "normal module if properties_from_tool=True, \
+            "App::PropertyLength", "module", "base", "normal module if properties_from_tool=True, \
                                                                 else it's the transverse module.")
-        obj.addProperty(
-            "App::PropertyFloat", "shift", "gear_parameter", "shift")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
+        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty("App::PropertyLength", "thickness", "base", "thickness")
         obj.addProperty("App::PropertyInteger", "numpoints",
-                        "precision", "number of points for spline")
-        obj.addProperty(
-            "App::PropertyAngle", "beta", "gear_parameter", "beta ")
-        obj.addProperty(
-            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
-        obj.addProperty(
-            "App::PropertyLength", "backlash", "tolerance", "backlash")
-        obj.addProperty(
-            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
-        obj.addProperty(
-            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
-            gear parameters are internally recomputed for the rotated gear")
-        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
-        obj.addProperty("App::PropertyPythonObject",
-                        "gear", "gear_parameter", "test")
-        obj.addProperty("App::PropertyLength", "dw",
-                        "computed", "pitch diameter", 1)
-        obj.addProperty("App::PropertyLength", "transverse_pitch",
-                        "computed", "transverse_pitch", 1)
-        obj.addProperty("App::PropertyLength", "outside_diameter",
-                        "computed", "Outside diameter", 1)
+                        "accuracy", "number of points for spline")
+        obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
+
+        self.add_involute_properties(obj)
+        self.add_tolerance_properties(obj)
+        self.add_fillet_properties(obj)
+        self.add_computed_properties(obj)
         self.add_limiting_diameter_properties(obj)
+        self.add_helical_properties(obj)
+
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.teeth = 15
@@ -363,6 +337,32 @@ class InternalInvoluteGear(BaseGear):
                         "computed", "inside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
+
+    def add_computed_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "dw", "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "transverse_pitch", "computed", "transverse_pitch", 1)
+        obj.addProperty("App::PropertyLength", "outside_diameter", "computed", "Outside diameter", 1)
+
+    def add_fillet_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "head_fillet", "fillets", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
+
+    def add_tolerance_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty("App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
+        obj.addProperty("App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
+        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+
+    def add_involute_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "shift", "involute", "shift")
+        obj.addProperty("App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
+
+    def add_helical_properties(self, obj):
+        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta ")
+        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "helical", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
 
     def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
@@ -462,34 +462,20 @@ class InvoluteGearRack(BaseGear):
         super(InvoluteGearRack, self).__init__(obj)
         self.involute_rack = InvoluteRack()
         obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
+                        "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
+            "App::PropertyLength", "height", "base", "height")
         obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
+            "App::PropertyLength", "thickness", "base", "thickness")
         obj.addProperty(
-            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
-        obj.addProperty(
-            "App::PropertyAngle", "beta", "gear_parameter", "beta ")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty(
-            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of root")
-        obj.addProperty(
-            "App::PropertyBool", "properties_from_tool", "gear_parameter", "if beta is given and properties_from_tool is enabled, \
-            gear parameters are internally recomputed for the rotated gear")
-        obj.addProperty("App::PropertyLength", "transverse_pitch",
-            "computed", "pitch in the transverse plane", 1)
-        obj.addProperty("App::PropertyBool", "add_endings", "gear_parameter", "if enabled the total length of the rack is teeth x pitch, \
-            otherwise the rack starts with a tooth-flank")
-        obj.addProperty(
-            "App::PropertyBool", "simplified", "gear_parameter", "if enabled the rack is drawn with a constant number of \
+            "App::PropertyBool", "simplified", "precision", "if enabled the rack is drawn with a constant number of \
             teeth to avoid topologic renaming.")
-        obj.addProperty("App::PropertyPythonObject", "rack", "test", "test")
+        obj.addProperty("App::PropertyPythonObject", "rack", "base", "test")
+
+        self.add_helical_properties(obj)
+        self.add_computed_properties(obj)
+        self.add_tolerance_properties(obj)
+        self.add_involute_properties(obj)
         obj.rack = self.involute_rack
         obj.teeth = 15
         obj.module = '1. mm'
@@ -504,6 +490,33 @@ class InvoluteGearRack(BaseGear):
         obj.simplified = False
         self.obj = obj
         obj.Proxy = self
+
+    def add_helical_properties(self, obj):
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "helical", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty(
+            "App::PropertyAngle", "beta", "helical", "beta ")
+        obj.addProperty(
+            "App::PropertyBool", "double_helix", "helical", "double helix")
+
+    def add_computed_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+            "computed", "pitch in the transverse plane", 1)
+        obj.addProperty("App::PropertyBool", "add_endings", "base", "if enabled the total length of the rack is teeth x pitch, \
+            otherwise the rack starts with a tooth-flank")
+
+    def add_tolerance_properties(self, obj):
+        obj.addProperty(
+            "App::PropertyFloat", "head", "tolerance", "head * module = additional length of head")
+        obj.addProperty(
+            "App::PropertyFloat", "clearance", "tolerance", "clearance * module = additional length of root")
+
+    def add_involute_properties(self, obj):
+        obj.addProperty(
+            "App::PropertyLength", "module", "involute", "module")
+        obj.addProperty(
+            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
 
     def generate_gear_shape(self, fp):
         fp.rack.m = fp.module.Value
@@ -561,21 +574,14 @@ class CrownGear(BaseGear):
     def __init__(self, obj):
         super(CrownGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
+                        "teeth", "base", "number of teeth")
         obj.addProperty("App::PropertyInteger",
-                        "other_teeth", "gear_parameter", "number of teeth of other gear")
-        obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyLength", "thickness", "gear_parameter", "thickness")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty("App::PropertyInteger",
-                        "num_profiles", "accuracy", "number of profiles used for loft")
-        obj.addProperty("App::PropertyBool",
-                        "preview_mode", "preview", "if true no boolean operation is done")
+                        "other_teeth", "base", "number of teeth of other gear")
+        obj.addProperty("App::PropertyLength", "module", "base", "module")
+        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty("App::PropertyLength", "thickness", "base", "thickness")
+        obj.addProperty("App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
+        self.add_accuracy_properties(obj)
         obj.teeth = 15
         obj.other_teeth = 15
         obj.module = '1. mm'
@@ -589,6 +595,10 @@ class CrownGear(BaseGear):
 
         App.Console.PrintMessage("Gear module: Crown gear created, preview_mode = true for improved performance. "\
                                  "Set preview_mode property to false when ready to cut teeth.")
+
+    def add_accuracy_properties(self, obj):
+        obj.addProperty("App::PropertyInteger", "num_profiles", "accuracy", "number of profiles used for loft")
+        obj.addProperty("App::PropertyBool", "preview_mode", "accuracy", "if true no boolean operation is done")
 
     def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):
         r_ew = m * t_i / 2
@@ -678,30 +688,20 @@ class CycloidGear(BaseGear):
         super(CycloidGear, self).__init__(obj)
         self.cycloid_tooth = CycloidTooth()
         obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
+                        "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
+            "App::PropertyLength", "module", "base", "module")
         obj.addProperty(
-            "App::PropertyFloat", "inner_diameter", "cycloid_parameter", "inner_diameter divided by module (hypocycloid)")
-        obj.addProperty(
-            "App::PropertyFloat", "outer_diameter", "cycloid_parameter", "outer_diameter divided by module (epicycloid)")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
-        obj.addProperty("App::PropertyInteger", "numpoints",
-                        "precision", "number of points for spline")
-        obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
-        obj.addProperty(
-            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyFloat", "head_fillet", "gear_parameter", "a fillet for the tooth-head, radius = head_fillet x module")
-        obj.addProperty("App::PropertyFloat", "root_fillet", "gear_parameter", "a fillet for the tooth-root, radius = root_fillet x module")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head_value * modul_value = additional length of head")
+            "App::PropertyLength", "height", "base", "height")
+
+        obj.addProperty("App::PropertyInteger", "numpoints", "precision", "number of points for spline")
         obj.addProperty("App::PropertyPythonObject", "gear",
-                        "gear_parameter", "the python object")
+                        "base", "the python object")
+
+        self.add_helical_properties(obj)
+        self.add_fillet_properties(obj)
+        self.add_tolerance_properties(obj)
+        self.add_cycloide_properties(obj)
         obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
@@ -717,6 +717,23 @@ class CycloidGear(BaseGear):
         obj.head_fillet = 0
         obj.root_fillet = 0
         obj.Proxy = self
+
+    def add_helical_properties(self, obj):
+        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
+        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta")
+
+    def add_fillet_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "head_fillet", "fillets", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
+
+    def add_tolerance_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash in mm")
+        obj.addProperty("App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
+
+    def add_cycloide_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloide", "inner_diameter divided by module (hypocycloid)")
+        obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloide", "outer_diameter divided by module (epicycloid)")
 
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
@@ -781,27 +798,17 @@ class BevelGear(BaseGear):
     def __init__(self, obj):
         super(BevelGear, self).__init__(obj)
         self.bevel_tooth = BevelTooth()
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyAngle", "pitch_angle", "involute_parameter", "pitch_angle")
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure_angle")
-        obj.addProperty("App::PropertyLength", "module", "gear_parameter", "module")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
-        obj.addProperty("App::PropertyInteger", "numpoints",
-                        "precision", "number of points for spline")
-        obj.addProperty("App::PropertyBool", "reset_origin", "gear_parameter",
-                        "if value is true the gears outer face will match the z=0 plane")
-        obj.addProperty(
-            "App::PropertyLength", "backlash", "gear_parameter", "backlash in mm")
-        obj.addProperty("App::PropertyPythonObject",
-                        "gear", "gear_paramenter", "test")
-        obj.addProperty("App::PropertyAngle", "beta",
-                        "gear_paramenter", "test")
+        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
+        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty("App::PropertyAngle", "pitch_angle", "involute", "pitch_angle")
+        obj.addProperty("App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure_angle")
+        obj.addProperty("App::PropertyLength", "module", "base", "module")
+        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty("App::PropertyInteger", "numpoints", "precision", "number of points for spline")
+        obj.addProperty("App::PropertyBool", "reset_origin", "base", "if value is true the gears outer face will match the z=0 plane")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash in mm")
+        obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
+        obj.addProperty("App::PropertyAngle", "beta","helical", "angle used for spiral bevel-gears")
         obj.gear = self.bevel_tooth
         obj.module = '1. mm'
         obj.teeth = 15
@@ -911,24 +918,15 @@ class WormGear(BaseGear):
 
     def __init__(self, obj):
         super(WormGear, self).__init__(obj)
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
-        obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyLength", 'diameter', "gear_parameter", "diameter")
-        obj.addProperty(
-            "App::PropertyAngle", "beta", "gear_parameter", "beta ", 1)
-        obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute_parameter", "pressure angle")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
-        obj.addProperty(
-            "App::PropertyFloat", "clearance", "gear_parameter", "clearance * module = additional length of root")
-        obj.addProperty(
-            "App::PropertyBool", "reverse_pitch", "gear_parameter", "reverse rotation of helix")
+        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
+        obj.addProperty( "App::PropertyLength", "module", "base", "module")
+        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty("App::PropertyLength", 'diameter', "base", "diameter")
+        obj.addProperty("App::PropertyAngle", "beta", "computed", "beta ", 1)
+        obj.addProperty("App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
+        obj.addProperty("App::PropertyBool", "reverse_pitch", "base", "reverse rotation of helix")
+        obj.addProperty("App::PropertyFloat", "head", "tolerance", "head * module = additional length of head")
+        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance * module = additional length of root")
         obj.teeth = 3
         obj.module = '1. mm'
         obj.pressure_angle = '20. deg'
@@ -1044,26 +1042,17 @@ class TimingGear(BaseGear):
     def __init__(self, obj):
         super(TimingGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
-        obj.addProperty(
-            "App::PropertyEnumeration", "type", "gear_parameter", "type of timing-gear")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty(
-            "App::PropertyLength", "pitch", "computed", "pitch off gear", 1)
-        obj.addProperty(
-            "App::PropertyLength", "h", "computed", "radial height of teeth", 1)
-        obj.addProperty(
-            "App::PropertyLength", "u", "computed", "radial difference between pitch \
+                        "teeth", "base", "number of teeth")
+        obj.addProperty( "App::PropertyEnumeration", "type", "base", "type of timing-gear")
+        obj.addProperty( "App::PropertyLength", "height", "base", "height")
+        obj.addProperty( "App::PropertyLength", "pitch", "computed", "pitch off gear", 1)
+        obj.addProperty( "App::PropertyLength", "h", "computed", "radial height of teeth", 1)
+        obj.addProperty( "App::PropertyLength", "u", "computed", "radial difference between pitch \
             diameter and head of gear", 1)
-        obj.addProperty(
-            "App::PropertyLength", "r0", "computed", "radius of first arc", 1)
-        obj.addProperty(
-            "App::PropertyLength", "r1", "computed", "radius of second arc", 1)
-        obj.addProperty(
-            "App::PropertyLength", "rs", "computed", "radius of third arc", 1)
-        obj.addProperty(
-            "App::PropertyLength", "offset", "computed", "x-offset of second arc-midpoint", 1)
+        obj.addProperty( "App::PropertyLength", "r0", "computed", "radius of first arc", 1)
+        obj.addProperty( "App::PropertyLength", "r1", "computed", "radius of second arc", 1)
+        obj.addProperty( "App::PropertyLength", "rs", "computed", "radius of third arc", 1)
+        obj.addProperty( "App::PropertyLength", "offset", "computed", "x-offset of second arc-midpoint", 1)
         obj.teeth = 15
         obj.type = ['gt2', 'gt3', 'gt5']
         obj.height = '5. mm'
@@ -1163,18 +1152,12 @@ class TimingGear(BaseGear):
 class LanternGear(BaseGear):
     def __init__(self, obj):
         super(LanternGear, self).__init__(obj)
-        obj.addProperty("App::PropertyInteger",
-                        "teeth", "gear_parameter", "number of teeth")
-        obj.addProperty(
-            "App::PropertyLength", "module", "gear_parameter", "module")
-        obj.addProperty(
-            "App::PropertyLength", "bolt_radius", "gear_parameter", "the bolt radius of the rack/chain")
-        obj.addProperty(
-            "App::PropertyLength", "height", "gear_parameter", "height")
-        obj.addProperty("App::PropertyInteger",
-                        "num_profiles", "accuracy", "number of profiles used for loft")
-        obj.addProperty(
-            "App::PropertyFloat", "head", "gear_parameter", "head * module = additional length of head")
+        obj.addProperty("App::PropertyInteger", "teeth", "gear_parameter", "number of teeth")
+        obj.addProperty("App::PropertyLength", "module", "base", "module")
+        obj.addProperty("App::PropertyLength", "bolt_radius", "base", "the bolt radius of the rack/chain")
+        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty("App::PropertyInteger", "num_profiles", "accuracy", "number of profiles used for loft")
+        obj.addProperty("App::PropertyFloat", "head", "tolerance", "head * module = additional length of head")
 
         obj.teeth = 15
         obj.module = '1. mm'
