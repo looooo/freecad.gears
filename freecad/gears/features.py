@@ -56,20 +56,29 @@ class ViewProviderGear(object):
     def __init__(self, obj, icon_fn=None):
         ''' Set this object to the proxy object of the actual view provider '''
         obj.Proxy = self
+        self._check_attr()
         dirname = os.path.dirname(__file__)
         self.icon_fn = icon_fn or os.path.join(dirname, "icons", "involutegear.svg")
+            
+    def _check_attr(self):
+        ''' Check for missing attributes. '''
+        if not hasattr(self, "icon_fn"):
+            setattr(self, "icon_fn", os.path.join(os.path.dirname(__file__), "icons", "involutegear.svg"))
 
     def attach(self, vobj):
         self.vobj = vobj
 
     def getIcon(self):
+        self._check_attr()
         return self.icon_fn
 
     def __getstate__(self):
+        self._check_attr()
         return {"icon_fn": self.icon_fn}
 
     def __setstate__(self, state):
-        self.icon_fn = state["icon_fn"]
+        if state and "icon_fn" in state:
+            self.icon_fn = state["icon_fn"]
 
 class BaseGear(object):
     def __init__(self, obj):
