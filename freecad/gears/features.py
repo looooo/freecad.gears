@@ -23,7 +23,7 @@ import numpy as np
 import math
 from pygears import __version__
 from pygears.involute_tooth import InvoluteTooth, InvoluteRack
-from pygears.cycloid_tooth import CycloidTooth
+from pygears.cycloid_tooth import CycloidTooth, CycloidRack
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D, rotation, reflection, arc_from_points_and_center
 
@@ -66,10 +66,10 @@ class ViewProviderGear(object):
         return self.icon_fn
 
     def __getstate__(self):
-        return None
+        return {"icon_fn": self.icon_fn}
 
     def __setstate__(self, state):
-        return None
+        self.icon_fn = state["icon_fn"]
 
 class BaseGear(object):
     def __init__(self, obj):
@@ -466,6 +466,8 @@ class InvoluteGearRack(BaseGear):
         obj.addProperty(
             "App::PropertyLength", "height", "base", "height")
         obj.addProperty(
+            "App::PropertyLength", "module", "base", "module")
+        obj.addProperty(
             "App::PropertyLength", "thickness", "base", "thickness")
         obj.addProperty(
             "App::PropertyBool", "simplified", "precision", "if enabled the rack is drawn with a constant number of \
@@ -514,8 +516,6 @@ class InvoluteGearRack(BaseGear):
 
     def add_involute_properties(self, obj):
         obj.addProperty(
-            "App::PropertyLength", "module", "involute", "module")
-        obj.addProperty(
             "App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
 
     def generate_gear_shape(self, fp):
@@ -562,6 +562,80 @@ class InvoluteGearRack(BaseGear):
             pol2.translate(
                 fcvec([0., np.tan(beta) * fp.height.Value, fp.height.Value]))
             return makeLoft([pol, pol2], True)
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
+
+class CycloidGearRack(BaseGear):
+
+    """FreeCAD gear rack"""
+
+    def __init__(self, obj):
+        super(CycloidGearRack, self).__init__(obj)
+        self.involute_rack = CycloidRack()
+        obj.addProperty("App::PropertyInteger",
+                        "teeth", "base", "number of teeth")
+        obj.addProperty(
+            "App::PropertyLength", "height", "base", "height")
+        obj.addProperty(
+            "App::PropertyLength", "thickness", "base", "thickness")
+        obj.addProperty(
+            "App::PropertyLength", "module", "involute", "module")
+        obj.addProperty(
+            "App::PropertyBool", "simplified", "precision", "if enabled the rack is drawn with a constant number of \
+            teeth to avoid topologic renaming.")
+        obj.addProperty("App::PropertyPythonObject", "rack", "base", "test")
+
+        self.add_helical_properties(obj)
+        self.add_computed_properties(obj)
+        self.add_tolerance_properties(obj)
+        self.add_cycloid_properties(obj)
+        obj.rack = self.involute_rack
+        obj.teeth = 15
+        obj.module = '1. mm'
+        obj.inner_diameter = 15
+        obj.outer_diameter= 15
+        obj.height = '5. mm'
+        obj.thickness = '5 mm'
+        obj.beta = '0. deg'
+        obj.clearance = 0.25
+        obj.head = 0.
+        obj.properties_from_tool = True
+        obj.add_endings = True
+        obj.simplified = False
+        self.obj = obj
+        obj.Proxy = self
+
+    def add_helical_properties(self, obj):
+        obj.addProperty(
+            "App::PropertyBool", "properties_from_tool", "helical", "if beta is given and properties_from_tool is enabled, \
+            gear parameters are internally recomputed for the rotated gear")
+        obj.addProperty(
+            "App::PropertyAngle", "beta", "helical", "beta ")
+        obj.addProperty(
+            "App::PropertyBool", "double_helix", "helical", "double helix")
+
+    def add_computed_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "transverse_pitch",
+            "computed", "pitch in the transverse plane", 1)
+        obj.addProperty("App::PropertyBool", "add_endings", "base", "if enabled the total length of the rack is teeth x pitch, \
+            otherwise the rack starts with a tooth-flank")
+
+    def add_tolerance_properties(self, obj):
+        obj.addProperty(
+            "App::PropertyFloat", "head", "tolerance", "head * module = additional length of head")
+        obj.addProperty(
+            "App::PropertyFloat", "clearance", "tolerance", "clearance * module = additional length of root")
+
+    def add_cycloid_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloid", "inner_diameter divided by module (hypocycloid)")
+        obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
+
+    def generate_gear_shape(self, fp):
+        pass
 
     def __getstate__(self):
         return None
@@ -701,7 +775,7 @@ class CycloidGear(BaseGear):
         self.add_helical_properties(obj)
         self.add_fillet_properties(obj)
         self.add_tolerance_properties(obj)
-        self.add_cycloide_properties(obj)
+        self.add_cycloid_properties(obj)
         obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
@@ -731,9 +805,9 @@ class CycloidGear(BaseGear):
         obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash in mm")
         obj.addProperty("App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
 
-    def add_cycloide_properties(self, obj):
-        obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloide", "inner_diameter divided by module (hypocycloid)")
-        obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloide", "outer_diameter divided by module (epicycloid)")
+    def add_cycloid_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloid", "inner_diameter divided by module (hypocycloid)")
+        obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value

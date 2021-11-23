@@ -40,6 +40,7 @@ class GearWorkbench(Workbench):
         "CreateInternalInvoluteGear",
         "CreateInvoluteRack",
         "CreateCycloidGear",
+        "CreateCycloidRack",
         "CreateBevelGear",
         "CreateCrownGear",
         "CreateWormGear",
@@ -54,7 +55,7 @@ class GearWorkbench(Workbench):
         from .commands import CreateCycloidGear, CreateInvoluteGear, CreateInternalInvoluteGear
         from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
         from .commands import CreateWormGear, CreateTimingGear, CreateLanternGear
-        from .commands import CreateHypoCycloidGear
+        from .commands import CreateHypoCycloidGear, CreateCycloidRack
 
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
@@ -62,6 +63,7 @@ class GearWorkbench(Workbench):
         Gui.addCommand('CreateInvoluteGear', CreateInvoluteGear())
         Gui.addCommand('CreateInternalInvoluteGear', CreateInternalInvoluteGear())
         Gui.addCommand('CreateCycloidGear', CreateCycloidGear())
+        Gui.addCommand('CreateCycloidRack', CreateCycloidRack())
         Gui.addCommand('CreateBevelGear', CreateBevelGear())
         Gui.addCommand('CreateInvoluteRack', CreateInvoluteRack())
         Gui.addCommand('CreateCrownGear', CreateCrownGear())

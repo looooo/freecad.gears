@@ -19,7 +19,7 @@
 import os
 import FreeCAD
 import FreeCADGui as Gui
-from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack
+from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack, CycloidGearRack
 from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
 
 
@@ -96,6 +96,13 @@ class CreateInvoluteRack(BaseCommand):
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
     MenuText = 'Involute rack'
     ToolTip = 'Create an Involute rack'
+
+class CreateCycloidRack(BaseCommand):
+    NAME = "Cycloidrack"
+    GEAR_FUNCTION = CycloidGearRack
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidrack.svg')
+    MenuText = 'Cycloid rack'
+    ToolTip = 'Create an Cycloid rack'
 
 
 class CreateCrownGear(BaseCommand):

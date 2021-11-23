@@ -103,3 +103,26 @@ class CycloidTooth():
         self.__init__(m=self.m, z=self.z, z1=self.z1, z2=self.z2,
                       clearance=self.clearance, backlash=self.backlash, head=self.head)
 
+
+class CycloidRack(object):
+    def __init__(self, m=5, z=15, inner_diameter=15, outer_diameter=15, thickness=5, head=0, clearance=0.25, 
+                 properties_from_tool=False, add_endings=False, simplified=False):
+        self.thickness = thickness
+        self.m = m
+        self.z = z
+        self.head = head
+        self.clearance = clearance
+        self.properties_from_tool = properties_from_tool
+        self.add_endings = add_endings
+        self.simplified = simplified
+        self.inner_diameter = inner_diameter
+        self.outer_diameter = outer_diameter
+
+    def compute_properties(self):
+        pass
+
+    def _update(self):
+        pass
+
+    def points(self, num=10):
+        pass
