@@ -18,12 +18,13 @@
 
 from __future__ import division
 import os
+import copy
 
 import numpy as np
 import math
 from pygears import __version__
 from pygears.involute_tooth import InvoluteTooth, InvoluteRack
-from pygears.cycloid_tooth import CycloidTooth, CycloidRack
+from pygears.cycloid_tooth import CycloidTooth
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D, rotation, reflection, arc_from_points_and_center
 
@@ -584,7 +585,6 @@ class CycloidGearRack(BaseGear):
 
     def __init__(self, obj):
         super(CycloidGearRack, self).__init__(obj)
-        self.involute_rack = CycloidRack()
         obj.addProperty("App::PropertyInteger",
                         "teeth", "base", "number of teeth")
         obj.addProperty(
@@ -602,7 +602,6 @@ class CycloidGearRack(BaseGear):
         self.add_computed_properties(obj)
         self.add_tolerance_properties(obj)
         self.add_cycloid_properties(obj)
-        obj.rack = self.involute_rack
         obj.teeth = 15
         obj.module = '1. mm'
         obj.inner_diameter = 15
@@ -612,16 +611,12 @@ class CycloidGearRack(BaseGear):
         obj.beta = '0. deg'
         obj.clearance = 0.25
         obj.head = 0.
-        obj.properties_from_tool = True
         obj.add_endings = True
         obj.simplified = False
         self.obj = obj
         obj.Proxy = self
 
     def add_helical_properties(self, obj):
-        obj.addProperty(
-            "App::PropertyBool", "properties_from_tool", "helical", "if beta is given and properties_from_tool is enabled, \
-            gear parameters are internally recomputed for the rotated gear")
         obj.addProperty(
             "App::PropertyAngle", "beta", "helical", "beta ")
         obj.addProperty(
@@ -643,8 +638,85 @@ class CycloidGearRack(BaseGear):
         obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloid", "inner_diameter divided by module (hypocycloid)")
         obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
-    def generate_gear_shape(self, fp):
-        pass
+    def generate_gear_shape(self, obj):
+        numpoints = 15
+        m = obj.module.Value
+        t = obj.thickness.Value
+        r_i = obj.inner_diameter / 2 * m
+        r_o = obj.outer_diameter / 2 * m
+        c = obj.clearance
+        h = obj.head
+        phi_i_end = np.arccos(1 - m / r_i * (1 + c))
+        phi_o_end = np.arccos(1 - m / r_o * (1 + h))
+        phi_i = np.linspace(phi_i_end, 0, numpoints)
+        phi_o = np.linspace(0, phi_o_end, numpoints)
+        y_i = r_i * (np.cos(phi_i) - 1)
+        y_o = r_o * (1 - np.cos(phi_o))
+        x_i = r_i * (np.sin(phi_i) - phi_i) - np.pi / 4
+        x_o = r_o * (phi_o - np.sin(phi_o)) - np.pi / 4
+        x = x_i.tolist()[:-1] + x_o.tolist()
+        y = y_i.tolist()[:-1] + y_o.tolist()
+        points = np.array([y, x]).T
+        mirror = reflection(0)
+        points_1 = mirror(points)[::-1]
+        line_1 = [points[-1], points_1[0]]
+        line_2 = [points_1[-1], points[0] + np.array([0., m * np.pi])]
+        tooth = points_to_wire([points, line_1, points_1, line_2])
+        teeth = [tooth]
+        for i in range(obj.teeth - 1):
+            tooth = copy.deepcopy(tooth)
+            tooth.translate(App.Vector(0, np.pi * m, 0))
+            teeth.append(tooth)
+        teeth[-1] = Wire(teeth[-1].Edges[:-1])
+
+        # extending the profile
+        if obj.add_endings:
+            p_0 = np.array([y[0], -np.pi / 2 * m])
+            p_1 = p_0 + np.array([-t, 0.])
+            p_3 = np.array([y[0], - np.pi / 2 * m + obj.teeth * m * np.pi])
+            p_2 = p_3 + np.array([-t, 0.])
+            p_end = points_1[-1] + np.array([0, np.pi * m * (obj.teeth - 1)])
+            line_3 = np.array([p_0, points[0]])
+            line_4 = np.array([p_end, p_3])
+            l_ext_1 = points_to_wire([line_3])
+            l_ext_2 = points_to_wire([line_4])
+            l_ext_3 = points_to_wire([np.array([p_0, p_1])])
+            l_ext_4 = points_to_wire([np.array([p_1, p_2])])
+            l_ext_5 = points_to_wire([np.array([p_2, p_3])])
+            pol = Wire([l_ext_4, l_ext_3, l_ext_1] + teeth + [l_ext_2, l_ext_5])
+        else:
+            p_0 = points[0]
+            p_1 = p_0 + np.array([-t, 0.])
+            p_3 = points_1[-1] + np.array([0, np.pi * m * (obj.teeth - 1)])
+            p_2 = p_3 + np.array([-t, 0.])
+            l_ext_3 = points_to_wire([np.array([p_0, p_1])])
+            l_ext_4 = points_to_wire([np.array([p_1, p_2])])
+            l_ext_5 = points_to_wire([np.array([p_2, p_3])])
+            pol = Wire([l_ext_4, l_ext_3] + teeth + [l_ext_5])
+        
+        if obj.height.Value == 0:
+            return pol
+        elif obj.beta.Value == 0:
+            face = Face(Wire(pol))
+            return face.extrude(fcvec([0., 0., obj.height.Value]))
+        elif obj.double_helix:
+            beta = obj.beta.Value * np.pi / 180.
+            pol2 = Part.Wire(pol)
+            pol2.translate(
+                fcvec([0., np.tan(beta) * obj.height.Value / 2, obj.height.Value / 2]))
+            pol3 = Part.Wire(pol)
+            pol3.translate(fcvec([0., 0., obj.height.Value]))
+            return makeLoft([pol, pol2, pol3], True, True)
+        else:
+            beta = obj.beta.Value * np.pi / 180.
+            pol2 = Part.Wire(pol)
+            pol2.translate(
+                fcvec([0., np.tan(beta) * obj.height.Value, obj.height.Value]))
+            return makeLoft([pol, pol2], True)
+
+
+
+
 
     def __getstate__(self):
         return None
