@@ -26,6 +26,10 @@ __python > 3 (for python2 use branch py2)__
 
 ![cycloid-gear](examples/cycloid-gear.png)
 
+### Cycloid Rack
+
+![cycloid-rack](examples/cycloid-rack.png)
+
 ### Spherical Involute Bevel-Gear
 * Spiral  
 
