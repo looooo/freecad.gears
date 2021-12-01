@@ -596,6 +596,7 @@ class CycloidGearRack(BaseGear):
         obj.addProperty(
             "App::PropertyBool", "simplified", "precision", "if enabled the rack is drawn with a constant number of \
             teeth to avoid topologic renaming.")
+        obj.addProperty("App::PropertyInteger", "numpoints", "accuracy", "number of points for spline")
         obj.addProperty("App::PropertyPythonObject", "rack", "base", "test")
 
         self.add_helical_properties(obj)
@@ -604,8 +605,8 @@ class CycloidGearRack(BaseGear):
         self.add_cycloid_properties(obj)
         obj.teeth = 15
         obj.module = '1. mm'
-        obj.inner_diameter = 15
-        obj.outer_diameter= 15
+        obj.inner_diameter = 7.5
+        obj.outer_diameter= 7.5
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         obj.beta = '0. deg'
@@ -613,6 +614,7 @@ class CycloidGearRack(BaseGear):
         obj.head = 0.
         obj.add_endings = True
         obj.simplified = False
+        obj.numpoints = 15
         self.obj = obj
         obj.Proxy = self
 
@@ -639,7 +641,7 @@ class CycloidGearRack(BaseGear):
         obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
     def generate_gear_shape(self, obj):
-        numpoints = 15
+        numpoints = obj.numpoints
         m = obj.module.Value
         t = obj.thickness.Value
         r_i = obj.inner_diameter / 2 * m
@@ -849,7 +851,7 @@ class CycloidGear(BaseGear):
         obj.addProperty(
             "App::PropertyLength", "height", "base", "height")
 
-        obj.addProperty("App::PropertyInteger", "numpoints", "precision", "number of points for spline")
+        obj.addProperty("App::PropertyInteger", "numpoints", "accuracy", "number of points for spline")
         obj.addProperty("App::PropertyPythonObject", "gear",
                         "base", "the python object")
 
