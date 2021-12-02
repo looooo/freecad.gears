@@ -20,7 +20,7 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack, CycloidGearRack
-from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
+from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear, BaseGear
 from .connector import GearConnector, ViewProviderGearConnector
 
 
@@ -167,10 +167,17 @@ class CreateGearConnector(BaseCommand):
     ToolTip = 'Combine two gears'
 
     def Activated(self):
-        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
         gear1 = Gui.Selection.getSelection()[0]
+        assert isinstance(gear1.Proxy, BaseGear)
+
         gear2 = Gui.Selection.getSelection()[1]
+        assert isinstance(gear2.Proxy, BaseGear)
+
         # check if selected objects are beams
+
+        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
         GearConnector(obj, gear1, gear2)
         ViewProviderGearConnector(obj.ViewObject)
+
+        FreeCAD.ActiveDocument.recompute()
         return obj
