@@ -55,7 +55,7 @@ def fcvec(x):
 
 class ViewProviderGear(object):
     def __init__(self, obj, icon_fn=None):
-        ''' Set this object to the proxy object of the actual view provider '''
+        # Set this object to the proxy object of the actual view provider
         obj.Proxy = self
         self._check_attr()
         dirname = os.path.dirname(__file__)

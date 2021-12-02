@@ -21,6 +21,7 @@ import FreeCAD
 import FreeCADGui as Gui
 from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack, CycloidGearRack
 from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear
+from .connector import GearConnector, ViewProviderGearConnector
 
 
 class BaseCommand(object):
@@ -157,3 +158,19 @@ class CreateLanternGear(BaseCommand):
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'lanterngear.svg')
     MenuText = 'Lantern gear'
     ToolTip = 'Create a Lantern gear'
+
+class CreateGearConnector(BaseCommand):
+    NAME = "gearconnector"
+    GEAR_FUNCTION = GearConnector
+    Pixmap = os.path.join(BaseCommand.ICONDIR, 'gearconnector.svg')
+    MenuText = 'Combine two gears'
+    ToolTip = 'Combine two gears'
+
+    def Activated(self):
+        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
+        gear1 = Gui.Selection.getSelection()[0]
+        gear2 = Gui.Selection.getSelection()[1]
+        # check if selected objects are beams
+        GearConnector(obj, gear1, gear2)
+        ViewProviderGearConnector(obj.ViewObject)
+        return obj

@@ -46,7 +46,8 @@ class GearWorkbench(Workbench):
         "CreateWormGear",
         "CreateTimingGear",
         "CreateLanternGear",
-        "CreateHypoCycloidGear"]
+        "CreateHypoCycloidGear",
+        "CreateGearConnector"]
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
@@ -56,6 +57,7 @@ class GearWorkbench(Workbench):
         from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
         from .commands import CreateWormGear, CreateTimingGear, CreateLanternGear
         from .commands import CreateHypoCycloidGear, CreateCycloidRack
+        from .commands import CreateGearConnector
 
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
@@ -71,6 +73,7 @@ class GearWorkbench(Workbench):
         Gui.addCommand('CreateTimingGear', CreateTimingGear())
         Gui.addCommand('CreateLanternGear', CreateLanternGear())
         Gui.addCommand('CreateHypoCycloidGear', CreateHypoCycloidGear())
+        Gui.addCommand('CreateGearConnector', CreateGearConnector())
 
     def Activated(self):
         pass
