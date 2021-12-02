@@ -61,7 +61,6 @@ class GearConnector(object):
         obj.Proxy = self
 
     def onChanged(self, fp, prop):
-        print(fp.master_gear.Proxy)
         if isinstance(fp.master_gear.Proxy, InvoluteGear) and isinstance(fp.slave_gear.Proxy, InvoluteGear):
             fp.master_gear.Placement.Rotation.Angle = np.deg2rad(fp.angle2.Value)
             angle_master = fp.master_gear.Placement.Rotation.Angle
@@ -80,6 +79,9 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+
+    def execute(self, fp):
+        self.onChanged(fp, None)
 
             
 
