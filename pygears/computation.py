@@ -17,7 +17,6 @@
 # ***************************************************************************
 
 import numpy as np
-from scipy import optimize as opt
 
 
 def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
@@ -34,31 +33,32 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     Returns:
         (float, float): distance between gears [length], pressure angle of the assembly [rad]
     """
-    def inv(x): return np.tan(x) - x
+    def inv(x): 
+        return np.tan(x) - x
+
     inv_alpha_w = inv(alpha) + 2 * np.tan(alpha) * (x1 + x2) / (t1 + t2)
 
-    def root_inv(x): return inv(x) - inv_alpha_w
-    alpha_w = opt.fsolve(root_inv, 0.)
+    def root_inv(x):
+        return inv(x) - inv_alpha_w
+
+    def d_root_inv(x):
+        return 1. / np.cos(x) - 1
+
+    alpha_w = find_root(alpha, root_inv, d_root_inv)
     dist = m * (t1 + t2) / 2 * np.cos(alpha) / np.cos(alpha_w)
     return dist, alpha_w
 
 
-def shifted_pitch_diameter(m, alpha, t1, x1):
-    """Summary
-
-    Args:
-        m (float): common module of both gears [length]
-        alpha (float): pressure-angle [rad]
-        t1 (int): number of teeth of gear1
-        x1 (float): relative profile-shift of gear1
-
-    Returns:
-        (float, float): distance between gears [length], pressure angle of the assembly [rad]
-    """
-    def inv(x): return np.tan(x) - x
-    inv_alpha_w = inv(alpha) + 2 * np.tan(alpha) * x1 / t1
-
-    def root_inv(x): return inv(x) - inv_alpha_w
-    alpha_w = opt.fsolve(root_inv, 0.)
-    pitch_diameter = m * t1  * np.cos(alpha) / np.cos(alpha_w)
-    return pitch_diameter, alpha_w
+def find_root(x0, f, df, epsilon=2e-10, max_iter=100):
+    x_n = x0
+    for i in range(max_iter):
+        f_xn = f(x_n)
+        if abs(f_xn) < epsilon:
+            return x_n
+        else:
+            df_xn = df(x_n)
+            if df_xn == 0:
+                return None
+            else:
+                x_n = x_n - f_xn / df_xn / 2  # adding (/ 2) to avoid oscillation
+    return None

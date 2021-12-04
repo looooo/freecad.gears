@@ -22,6 +22,7 @@ import numpy as np
 import FreeCAD
 from pygears import __version__
 from .features import InvoluteGear
+from pygears.computation import compute_shifted_gears
 
 class ViewProviderGearConnector(object):
     def __init__(self, vobj, icon_fn=None):
@@ -66,8 +67,18 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle
             dw_master = fp.master_gear.dw
             dw_slave = fp.slave_gear.dw
+            dist = (dw_master + dw_slave) / 2
+            if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
+                dist, alpha_w = compute_shifted_gears(
+                    fp.master_gear.module,
+                    np.deg2rad(fp.master_gear.pressure_angle.Value),
+                    fp.master_gear.teeth,
+                    fp.slave_gear.teeth,
+                    fp.master_gear.shift,
+                    fp.slave_gear.shift)
+
             mat0 = FreeCAD.Matrix()  # unity matrix
-            trans = FreeCAD.Vector(dw_master + dw_slave) / 2
+            trans = FreeCAD.Vector(dist)
             mat0.move(trans)
             rot = FreeCAD.Rotation(FreeCAD.Vector(0,0,1), fp.angle1).toMatrix()
             angle2 = dw_master / dw_slave * fp.angle1.Value
