@@ -859,6 +859,7 @@ class CycloidGear(BaseGear):
         self.add_fillet_properties(obj)
         self.add_tolerance_properties(obj)
         self.add_cycloid_properties(obj)
+        self.add_computed_properties(obj)
         obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
@@ -873,6 +874,7 @@ class CycloidGear(BaseGear):
         obj.head = 0
         obj.head_fillet = 0
         obj.root_fillet = 0
+        obj.dw = obj.module * obj.teeth
         obj.Proxy = self
 
     def add_helical_properties(self, obj):
@@ -892,9 +894,13 @@ class CycloidGear(BaseGear):
         obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloid", "inner_diameter divided by module (hypocycloid)")
         obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
+    def add_computed_properties(self, obj):
+        obj.addProperty("App::PropertyLength", "dw", "computed", "pitch diameter", 1)
+
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
+        fp.dw = fp.module * fp.teeth
         fp.gear.z1 = fp.inner_diameter
         fp.gear.z2 = fp.outer_diameter
         fp.gear.clearance = fp.clearance
