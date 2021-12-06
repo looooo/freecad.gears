@@ -21,7 +21,7 @@ import copy
 import numpy as np
 import FreeCAD
 from pygears import __version__
-from .features import InvoluteGear, CycloidGear
+from .features import InvoluteGear, CycloidGear, InvoluteGearRack, CycloidGearRack
 from pygears.computation import compute_shifted_gears
 
 class ViewProviderGearConnector(object):
@@ -36,9 +36,6 @@ class ViewProviderGearConnector(object):
 
     def getIcon(self):
         return self.icon_fn
-
-    def claimChildren(self):
-        return [self.vobj.Object.master_gear, self.vobj.Object.slave_gear]
 
     def __getstate__(self):
         return {"icon_fn": self.icon_fn}
@@ -90,6 +87,25 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+
+        if ((isinstance(fp.master_gear.Proxy, InvoluteGear) and isinstance(fp.slave_gear.Proxy, InvoluteGearRack))
+            or (isinstance(fp.master_gear.Proxy, CycloidGear) and isinstance(fp.slave_gear.Proxy, CycloidGearRack))):
+            fp.master_gear.Placement.Rotation.Angle = np.deg2rad(fp.angle2.Value)
+            angle_master = fp.master_gear.Placement.Rotation.Angle
+            dw_master = fp.master_gear.dw.Value
+            dw_slave = 0
+            dist = -(dw_master + dw_slave) / 2
+            mat0 = FreeCAD.Matrix()  # unity matrix
+            mat0.move(FreeCAD.Vector(dist, 0, 0))
+            mat1 = FreeCAD.Matrix()
+            mat1.move(FreeCAD.Vector(0, np.deg2rad(fp.angle1.Value) * dw_master / 2, 0))
+            mat2 = FreeCAD.Matrix()
+            mat2.move(FreeCAD.Vector(0, -np.deg2rad(fp.angle2.Value) * dw_master / 2, 0))
+            rot = FreeCAD.Rotation(FreeCAD.Vector(0,0,1), fp.angle1).toMatrix()
+            mat3 = rot * mat2 *mat1 * mat0
+            mat3.move(fp.master_gear.Placement.Base)
+            fp.slave_gear.Placement = mat3
+
         if isinstance(fp.master_gear.Proxy, CycloidGear) and isinstance(fp.slave_gear.Proxy, CycloidGear):
             fp.master_gear.Placement.Rotation.Angle = np.deg2rad(fp.angle2.Value)
             angle_master = fp.master_gear.Placement.Rotation.Angle
@@ -97,7 +113,7 @@ class GearConnector(object):
             dw_slave = fp.slave_gear.dw
             dist = (dw_master + dw_slave) / 2
             mat0 = FreeCAD.Matrix()  # unity matrix
-            trans = FreeCAD.Vector(dist)
+            trans = FreeCAD.Vector(dist, 0, 0)
             mat0.move(trans)
             rot = FreeCAD.Rotation(FreeCAD.Vector(0,0,1), fp.angle1).toMatrix()
             angle2 = dw_master / dw_slave * fp.angle1.Value
@@ -109,6 +125,7 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+
     def execute(self, fp):
         self.onChanged(fp, None)
 
