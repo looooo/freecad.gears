@@ -654,8 +654,8 @@ class CycloidGearRack(BaseGear):
         phi_o = np.linspace(0, phi_o_end, numpoints)
         y_i = r_i * (np.cos(phi_i) - 1)
         y_o = r_o * (1 - np.cos(phi_o))
-        x_i = r_i * (np.sin(phi_i) - phi_i) - np.pi / 4
-        x_o = r_o * (phi_o - np.sin(phi_o)) - np.pi / 4
+        x_i = r_i * (np.sin(phi_i) - phi_i) - m * np.pi / 4
+        x_o = r_o * (phi_o - np.sin(phi_o)) - m * np.pi / 4
         x = x_i.tolist()[:-1] + x_o.tolist()
         y = y_i.tolist()[:-1] + y_o.tolist()
         points = np.array([y, x]).T
