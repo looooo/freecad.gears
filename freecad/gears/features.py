@@ -1606,7 +1606,7 @@ def helicalextrusion(face, height, angle, double_helix=False):
     """
     A helical extrusion using the BRepOffsetAPI
     face -- the face to extrude (may contain holes, i.e. more then one wires)
-    height -- the hight of the extrusion, normal to the face
+    height -- the height of the extrusion, normal to the face
     angle -- the twist angle of the extrusion in radians
 
     returns a solid
@@ -1618,7 +1618,7 @@ def helicalextrusion(face, height, angle, double_helix=False):
     if double_helix:
         spine = Part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
         spine.translate(App.Vector(0, 0, height / 2.0))
-        face = face.translated(App.Vector(0, 0, height / 2.0)) # don't transfrom our argument
+        face = face.translated(App.Vector(0, 0, height / 2.0)) # don't transform our argument
     else:
         spine = Part.makeHelix(pitch, height, radius, cone_angle, direction)
     def make_pipe(path, profile):
