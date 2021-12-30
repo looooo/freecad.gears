@@ -22,7 +22,7 @@ from ._functions import rotation, reflection
 
 
 class CycloidTooth():
-    def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.12, backlash=0.00, head=0.0):
+    def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.25, backlash=0.00, head=0.0):
         self.m = m
         self.z = z
         self.clearance = clearance
@@ -37,8 +37,8 @@ class CycloidTooth():
         self.d2 = self.z2 * self.m
         self.phi = self.m * pi
         self.d = self.z * self.m
-        self.da = self.d + 2*self.m + self.head * self.m
-        self.di = self.d - 2*self.m - self.clearance * self.m
+        self.da = self.d + 2 * (1 + self.head) * self.m
+        self.di = self.d - 2 * (1 + self.clearance) * self.m
         self.phipart = 2 * pi / self.z
 
     def epicycloid_x(self):
