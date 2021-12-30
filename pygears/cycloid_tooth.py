@@ -25,10 +25,11 @@ from ._functions import rotation, reflection
 
 
 class CycloidTooth():
-    def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.12, backlash=0.00):
+    def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.12, backlash=0.00, head=0.0):
         self.m = m
         self.z = z
         self.clearance = clearance
+        self.head = head
         self.backlash = backlash
         self.z1 = z1
         self.z2 = z2
@@ -39,7 +40,7 @@ class CycloidTooth():
         self.d2 = self.z2 * self.m
         self.phi = self.m * pi
         self.d = self.z * self.m
-        self.da = self.d + 2*self.m
+        self.da = self.d + 2*self.m + self.head * self.m
         self.di = self.d - 2*self.m - self.clearance * self.m
         self.phipart = 2 * pi / self.z
 
@@ -103,5 +104,5 @@ class CycloidTooth():
 
     def _update(self):
         self.__init__(m=self.m, z=self.z, z1=self.z1, z2=self.z2,
-                      clearance=self.clearance, backlash=self.backlash)
+                      clearance=self.clearance, backlash=self.backlash, head=self.head)
 
