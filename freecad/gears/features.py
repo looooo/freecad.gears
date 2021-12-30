@@ -478,6 +478,7 @@ class CycloidGear(BaseGear):
             "App::PropertyBool", "double_helix", "gear_parameter", "double helix")
         obj.addProperty(
             "App::PropertyFloat", "clearance", "gear_parameter", "clearance")
+        self._add_head_property(obj)
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "precision", "number of points for spline")
         obj.addProperty("App::PropertyAngle", "beta", "gear_parameter", "beta")
@@ -498,12 +499,21 @@ class CycloidGear(BaseGear):
         obj.double_helix = False
         obj.Proxy = self
 
+    def _add_head_property(self, obj):
+        obj.addProperty("App::PropertyFloat", "head", "gear_parameter",
+            "head * modul = additional length of addendum")
+        obj.head = 0.0
+
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
         fp.gear.z = fp.teeth
         fp.gear.z1 = fp.inner_diameter.Value
         fp.gear.z2 = fp.outer_diameter.Value
         fp.gear.clearance = fp.clearance
+        # check backward compatibility:
+        if not "head" in fp.PropertiesList:
+            self._add_head_property(fp)
+        fp.gear.head = fp.head
         fp.gear.backlash = fp.backlash.Value
         fp.gear._update()
 
