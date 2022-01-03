@@ -606,7 +606,7 @@ class CycloidGearRack(BaseGear):
         obj.teeth = 15
         obj.module = '1. mm'
         obj.inner_diameter = 7.5
-        obj.outer_diameter= 7.5
+        obj.outer_diameter = 7.5
         obj.height = '5. mm'
         obj.thickness = '5 mm'
         obj.beta = '0. deg'
@@ -863,8 +863,8 @@ class CycloidGear(BaseGear):
         obj.gear = self.cycloid_tooth
         obj.teeth = 15
         obj.module = '1. mm'
-        obj.inner_diameter = 7.5
-        obj.outer_diameter = 7.5
+        obj.setExpression('inner_diameter', 'teeth / 2') # teeth/2 makes the hypocycloid a straight line to the center
+        obj.outer_diameter = 7.5 # we don't know the mating gear, so we just set the default to mesh with our default
         obj.beta = '0. deg'
         obj.height = '5. mm'
         obj.clearance = 0.25
