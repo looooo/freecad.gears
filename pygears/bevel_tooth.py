@@ -30,6 +30,7 @@ class BevelTooth(object):
         self.z = z
         self.clearance = clearance
         self.backlash = backlash
+        self.angular_backlash = backlash / (z * module / 2)
         self.module = module
 
         self.involute_end = arccos(
@@ -108,7 +109,7 @@ class BevelTooth(object):
         intersection_point = intersection_line_circle(xy[i], point, r_cut)
         xy = array([intersection_point] + list(xy[i+1:]))
         xyz = [[p[0], p[1], 1] for p in xy]
-        backlash_rot = rotation3D(self.backlash / 4)
+        backlash_rot = rotation3D(self.angular_backlash / 2)
         xyz = backlash_rot(xyz)
         return(xyz)
 

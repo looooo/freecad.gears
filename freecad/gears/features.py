@@ -194,7 +194,8 @@ class InvoluteGear(BaseGear):
                         "computed", "transverse_pitch", 1)
 
     def add_tolerance_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance",
+            "The arc length on the pitch circle by which the tooth thicknes is reduced.")
         obj.addProperty("App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
         obj.addProperty(
             "App::PropertyFloat", "clearance", "tolerance", "clearance")
@@ -358,7 +359,8 @@ class InternalInvoluteGear(BaseGear):
         obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
 
     def add_tolerance_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance",
+            "The arc length on the pitch circle by which the tooth thicknes is reduced.")
         obj.addProperty("App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction")
         obj.addProperty("App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
         obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
@@ -887,7 +889,8 @@ class CycloidGear(BaseGear):
 
     def add_tolerance_properties(self, obj):
         obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
-        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash in mm")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance",
+            "The arc length on the pitch circle by which the tooth thicknes is reduced.")
         obj.addProperty("App::PropertyFloat", "head", "tolerance", "head_value * modul_value = additional length of head")
 
     def add_cycloid_properties(self, obj):
@@ -969,7 +972,8 @@ class BevelGear(BaseGear):
         obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
         obj.addProperty("App::PropertyInteger", "numpoints", "precision", "number of points for spline")
         obj.addProperty("App::PropertyBool", "reset_origin", "base", "if value is true the gears outer face will match the z=0 plane")
-        obj.addProperty("App::PropertyLength", "backlash", "tolerance", "backlash in mm")
+        obj.addProperty("App::PropertyLength", "backlash", "tolerance",
+            "The arc length on the pitch circle by which the tooth thicknes is reduced.")
         obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
         obj.addProperty("App::PropertyAngle", "beta","helical", "angle used for spiral bevel-gears")
         obj.gear = self.bevel_tooth
