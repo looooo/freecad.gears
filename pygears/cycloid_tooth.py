@@ -40,6 +40,7 @@ class CycloidTooth():
         self.da = self.d + 2 * (1 + self.head) * self.m
         self.di = self.d - 2 * (1 + self.clearance) * self.m
         self.phipart = 2 * pi / self.z
+        self.angular_backlash = self.backlash / (self.d / 2)
 
     def epicycloid_x(self):
         def func(t):
@@ -92,7 +93,7 @@ class CycloidTooth():
         pts_outer = transpose([pts_outer_x, pts_outer_y])
         pts_inner = transpose([pts_inner_x, pts_inner_y])
         pts1 = vstack([pts_inner[:-2], pts_outer])
-        rot = rotation(self.phipart / 4 - self.backlash)
+        rot = rotation(self.phipart / 4 - self.angular_backlash / 2)
         pts1 = rot(pts1)
         ref = reflection(0.)
         pts2 = ref(pts1)[::-1]

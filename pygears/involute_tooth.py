@@ -69,6 +69,7 @@ class InvoluteTooth():
         self.involute_rot2 = 1 / self.z * \
             (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
         self.involute_rot = self.involute_rot1 + self.involute_rot2
+        self.angular_backlash = self.backlash / (self.d / 2)
         self.involute_start = 0.
         if self.dg <= self.df:
             self.involute_start = sqrt(self.df ** 2 - self.dg ** 2) / self.dg
@@ -81,7 +82,7 @@ class InvoluteTooth():
         y = array(list(map(fy, pts)))
         xy = transpose([x, y])
         rotate = rotation(
-            self.undercut_rot + self.phipart / 2 - self.backlash / 4)
+            self.undercut_rot + self.phipart / 2 - self.angular_backlash / 2)
         xy = rotate(xy)
         return(array(xy))
 
@@ -91,7 +92,7 @@ class InvoluteTooth():
         x = array(list(map(fx, pts)))
         fy = self.involute_function_y()
         y = array(list(map(fy, pts)))
-        rot = rotation(self.involute_rot - self.backlash / 4)
+        rot = rotation(self.involute_rot - self.angular_backlash / 2)
         xy = rot(transpose(array([x, y])))
         return(xy)
 
