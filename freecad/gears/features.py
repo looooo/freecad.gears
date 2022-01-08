@@ -188,8 +188,13 @@ class InvoluteGear(BaseGear):
                         "computed", "outside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
-        obj.addProperty("App::PropertyLength", "dw",
-                        "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
+        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
+        obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
+            "The angle by which this gear can turn without moving the mating gear.")
+        obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
+        obj.setEditorMode('angular_backlash', 1) # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty("App::PropertyLength", "transverse_pitch",
                         "computed", "transverse_pitch", 1)
 
@@ -225,7 +230,6 @@ class InvoluteGear(BaseGear):
         fp.gear._update()
 
         # computed properties
-        fp.dw = "{}mm".format(fp.gear.dw)
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
         fp.da = "{}mm".format(fp.gear.da)
         fp.df = "{}mm".format(fp.gear.df)
@@ -350,7 +354,13 @@ class InternalInvoluteGear(BaseGear):
                         "computed", "root diameter", 1)
 
     def add_computed_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "dw", "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
+        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
+        obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
+            "The angle by which this gear can turn without moving the mating gear.")
+        obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
+        obj.setEditorMode('angular_backlash', 1) # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty("App::PropertyLength", "transverse_pitch", "computed", "transverse_pitch", 1)
         obj.addProperty("App::PropertyLength", "outside_diameter", "computed", "Outside diameter", 1)
 
@@ -394,7 +404,6 @@ class InternalInvoluteGear(BaseGear):
         fp.gear._update()
 
         # computed properties
-        fp.dw = "{}mm".format(fp.gear.dw)
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
         fp.outside_diameter = fp.dw + 2 * fp.thickness
         # checksbackwardcompatibility:
@@ -876,7 +885,6 @@ class CycloidGear(BaseGear):
         obj.head = 0
         obj.head_fillet = 0
         obj.root_fillet = 0
-        obj.dw = obj.module * obj.teeth
         obj.Proxy = self
 
     def add_helical_properties(self, obj):
@@ -898,7 +906,13 @@ class CycloidGear(BaseGear):
         obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
     def add_computed_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "dw", "computed", "pitch diameter", 1)
+        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
+        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
+        obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
+            "The angle by which this gear can turn without moving the mating gear.")
+        obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
+        obj.setEditorMode('angular_backlash', 1) # set read-only after setting the expression, else it won't be visible. bug?
 
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
@@ -976,6 +990,13 @@ class BevelGear(BaseGear):
             "The arc length on the pitch circle by which the tooth thicknes is reduced.")
         obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
         obj.addProperty("App::PropertyAngle", "beta","helical", "angle used for spiral bevel-gears")
+        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
+        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
+        obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
+            "The angle by which this gear can turn without moving the mating gear.")
+        obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
+        obj.setEditorMode('angular_backlash', 1) # set read-only after setting the expression, else it won't be visible. bug?
         obj.gear = self.bevel_tooth
         obj.module = '1. mm'
         obj.teeth = 15
