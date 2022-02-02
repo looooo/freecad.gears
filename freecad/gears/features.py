@@ -539,6 +539,10 @@ class InvoluteGearRack(BaseGear):
         obj.addProperty(
             "App::PropertyAngle", "pressure_angle", "involute", "pressure angle")
 
+    def add_fillet_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "head_fillet", "fillets", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
+
     def generate_gear_shape(self, fp):
         fp.rack.m = fp.module.Value
         fp.rack.z = fp.teeth
@@ -614,6 +618,7 @@ class CycloidGearRack(BaseGear):
         self.add_computed_properties(obj)
         self.add_tolerance_properties(obj)
         self.add_cycloid_properties(obj)
+        self.add_fillet_properties(obj)
         obj.teeth = 15
         obj.module = '1. mm'
         obj.inner_diameter = 7.5
@@ -651,6 +656,10 @@ class CycloidGearRack(BaseGear):
         obj.addProperty("App::PropertyFloat", "inner_diameter", "cycloid", "inner_diameter divided by module (hypocycloid)")
         obj.addProperty("App::PropertyFloat", "outer_diameter", "cycloid", "outer_diameter divided by module (epicycloid)")
 
+    def add_fillet_properties(self, obj):
+        obj.addProperty("App::PropertyFloat", "head_fillet", "fillets", "a fillet for the tooth-head, radius = head_fillet x module")
+        obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
+    
     def generate_gear_shape(self, obj):
         numpoints = obj.numpoints
         m = obj.module.Value
@@ -675,6 +684,13 @@ class CycloidGearRack(BaseGear):
         line_1 = [points[-1], points_1[0]]
         line_2 = [points_1[-1], points[0] + np.array([0., m * np.pi])]
         tooth = points_to_wire([points, line_1, points_1, line_2])
+        head_fillet = obj.head_fillet
+        if head_fillet != 0:
+            edges = tooth.Edges
+            fillet1 = fillet_between_edges(edges[0], edges[1], m * head_fillet)
+            fillet2 = fillet_between_edges(fillet1[-1], edges[2], m * head_fillet)
+            tooth = Wire(fillet1[:-1] + fillet2 + edges[3:])
+
         teeth = [tooth]
         for i in range(obj.teeth - 1):
             tooth = copy.deepcopy(tooth)
