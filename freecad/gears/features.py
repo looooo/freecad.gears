@@ -499,6 +499,7 @@ class InvoluteGearRack(BaseGear):
         self.add_computed_properties(obj)
         self.add_tolerance_properties(obj)
         self.add_involute_properties(obj)
+        self.add_fillet_properties(obj)
         obj.rack = self.involute_rack
         obj.teeth = 15
         obj.module = '1. mm'
@@ -543,49 +544,114 @@ class InvoluteGearRack(BaseGear):
         obj.addProperty("App::PropertyFloat", "head_fillet", "fillets", "a fillet for the tooth-head, radius = head_fillet x module")
         obj.addProperty("App::PropertyFloat", "root_fillet", "fillets", "a fillet for the tooth-root, radius = root_fillet x module")
 
-    def generate_gear_shape(self, fp):
-        fp.rack.m = fp.module.Value
-        fp.rack.z = fp.teeth
-        fp.rack.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
-        fp.rack.thickness = fp.thickness.Value
-        fp.rack.beta = fp.beta.Value * np.pi / 180.
-        fp.rack.head = fp.head
+    def generate_gear_shape(self, obj):
+        obj.rack.m = obj.module.Value
+        obj.rack.z = obj.teeth
+        obj.rack.pressure_angle = obj.pressure_angle.Value * np.pi / 180.
+        obj.rack.thickness = obj.thickness.Value
+        obj.rack.beta = obj.beta.Value * np.pi / 180.
+        obj.rack.head = obj.head
         # checksbackwardcompatibility:
-        if "clearance" in fp.PropertiesList:
-            fp.rack.clearance = fp.clearance
-        if "properties_from_tool" in fp.PropertiesList:
-            fp.rack.properties_from_tool = fp.properties_from_tool
-        if "add_endings" in fp.PropertiesList:
-            fp.rack.add_endings = fp.add_endings
-        if "simplified" in fp.PropertiesList:
-            fp.rack.simplified = fp.simplified
-        fp.rack._update()
+        if "clearance" in obj.PropertiesList:
+            obj.rack.clearance = obj.clearance
+        if "properties_from_tool" in obj.PropertiesList:
+            obj.rack.properties_from_tool = obj.properties_from_tool
+        if "add_endings" in obj.PropertiesList:
+            obj.rack.add_endings = obj.add_endings
+        if "simplified" in obj.PropertiesList:
+            obj.rack.simplified = obj.simplified
+        obj.rack._update()
 
-        # computed properties
-        if "transverse_pitch" in fp.PropertiesList:
-            fp.transverse_pitch = "{} mm".format(fp.rack.compute_properties()[2])
+        obj.transverse_pitch = "{} mm".format(obj.module.Value * np.pi)
+        m = obj.module.Value
+        t = obj.thickness.Value
+        c = obj.clearance
+        h = obj.head
+        alpha = obj.pressure_angle.Value * np.pi / 180.
+        head_fillet = obj.head_fillet
+        root_fillet = obj.root_fillet
+        x1 = -m * np.pi / 2
+        y1 = -m * (1 + c)
+        y2 = y1
+        x2 = -m * np.pi / 4 + y2 * np.tan(alpha)
+        y3 = m * (1 + h)
+        x3 = -m * np.pi / 4 + y3 * np.tan(alpha)
+        x4 = -x3
+        x5 = -x2
+        x6 = -x1
+        y4 = y3
+        y5 = y2
+        y6 = y1
+        p1 = np.array([y1, x1])
+        p2 = np.array([y2, x2])
+        p3 = np.array([y3, x3])
+        p4 = np.array([y4, x4])
+        p5 = np.array([y5, x5])
+        p6 = np.array([y6, x6])
+        line1 = [p1, p2]
+        line2 = [p2, p3]
+        line3 = [p3, p4]
+        line4 = [p4, p5]
+        line5 = [p5, p6]
+        tooth = Wire(points_to_wire([line1, line2, line3, line4, line5]))
+        edges = tooth.Edges
+        edges = insert_fillet(edges, 0, m * root_fillet)
+        edges = insert_fillet(edges, 2, m * head_fillet)
+        edges = insert_fillet(edges, 4, m * head_fillet)
+        edges = insert_fillet(edges, 6, m * root_fillet)
 
-        pts = fp.rack.points()
-        pol = Wire(makePolygon(list(map(fcvec, pts))))
-        
-        if fp.height.Value == 0:
+        tooth_edges = [e for e in edges if e is not None]
+        p_end = np.array(tooth_edges[-2].lastVertex().Point[:-1])
+        p_start = np.array(tooth_edges[1].firstVertex().Point[:-1])
+        p_start += np.array([0, np.pi * m])
+        edge = points_to_wire([[p_end, p_start]]).Edges
+        tooth = Wire(tooth_edges[1:-1] + edge)
+        teeth = [tooth]
+
+        for i in range(obj.teeth - 1):
+            tooth = copy.deepcopy(tooth)
+            tooth.translate(App.Vector(0, np.pi * m, 0))
+            teeth.append(tooth)
+
+        teeth[-1] = Wire(teeth[-1].Edges[:-1])
+
+        if obj.add_endings:
+            teeth = [Wire(tooth_edges[0])] + teeth
+            last_edge = tooth_edges[-1]
+            last_edge.translate(App.Vector(0, np.pi * m * (obj.teeth - 1), 0))
+            teeth = teeth + [Wire(last_edge)]
+
+        p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])
+        p_end = np.array(teeth[-1].Edges[-1].lastVertex().Point[:-1])
+        p_start_1 = p_start - np.array([obj.thickness.Value, 0.])
+        p_end_1 = p_end - np.array([obj.thickness.Value, 0.])
+
+        line6 = [p_start, p_start_1]
+        line7 = [p_start_1, p_end_1]
+        line8 = [p_end_1, p_end]
+
+        bottom = points_to_wire([line6, line7, line8])
+
+        pol = Wire([bottom] + teeth)
+
+        if obj.height.Value == 0:
             return pol
-        elif fp.beta.Value == 0:
+        elif obj.beta.Value == 0:
             face = Face(Wire(pol))
-            return face.extrude(fcvec([0., 0., fp.height.Value]))
-        elif fp.double_helix:
-            beta = fp.beta.Value * np.pi / 180.
+            return face.extrude(fcvec([0., 0., obj.height.Value]))
+        elif obj.double_helix:
+            beta = obj.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
             pol2.translate(
-                fcvec([0., np.tan(beta) * fp.height.Value / 2, fp.height.Value / 2]))
+                fcvec([0., np.tan(beta) * obj.height.Value / 2, obj.height.Value / 2]))
             pol3 = Part.Wire(pol)
-            pol3.translate(fcvec([0., 0., fp.height.Value]))
+            pol3.translate(fcvec([0., 0., obj.height.Value]))
             return makeLoft([pol, pol2, pol3], True, True)
         else:
-            beta = fp.beta.Value * np.pi / 180.
+            beta = obj.beta.Value * np.pi / 180.
             pol2 = Part.Wire(pol)
             pol2.translate(
-                fcvec([0., np.tan(beta) * fp.height.Value, fp.height.Value]))
+                fcvec([0., np.tan(beta) * obj.height.Value, obj.height.Value]))
             return makeLoft([pol, pol2], True)
 
     def __getstate__(self):

@@ -76,91 +76,91 @@ class BaseCommand(object):
 
 
 class CreateInvoluteGear(BaseCommand):
-    NAME = "involutegear"
+    NAME = "InvoluteGear"
     GEAR_FUNCTION = InvoluteGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
-    MenuText = 'Involute gear'
+    MenuText = 'Involute Gear'
     ToolTip = 'Create an external involute gear'
 
 
 class CreateInternalInvoluteGear(BaseCommand):
-    NAME = "internalinvolutegear"
+    NAME = "InternalInvoluteGear"
     GEAR_FUNCTION = InternalInvoluteGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'internalinvolutegear.svg')
-    MenuText = 'Internal involute gear'
+    MenuText = 'Internal Involute Gear'
     ToolTip = 'Create an internal involute gear'
 
 
 class CreateInvoluteRack(BaseCommand):
-    NAME = "involuterack"
+    NAME = "InvoluteRack"
     GEAR_FUNCTION = InvoluteGearRack
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
-    MenuText = 'Involute rack'
+    MenuText = 'Involute Rack'
     ToolTip = 'Create an Involute rack'
 
 class CreateCycloidRack(BaseCommand):
-    NAME = "Cycloidrack"
+    NAME = "CycloidRack"
     GEAR_FUNCTION = CycloidGearRack
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidrack.svg')
-    MenuText = 'Cycloid rack'
+    MenuText = 'Cycloid Rack'
     ToolTip = 'Create an Cycloid rack'
 
 
 class CreateCrownGear(BaseCommand):
-    NAME = "crowngear"
+    NAME = "CrownGear"
     GEAR_FUNCTION = CrownGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'crowngear.svg')
-    MenuText = 'Crown gear'
+    MenuText = 'Crown Gear'
     ToolTip = 'Create a Crown gear'
 
 
 class CreateCycloidGear(BaseCommand):
-    NAME = "cycloidgear"
+    NAME = "CycloidGear"
     GEAR_FUNCTION = CycloidGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidgear.svg')
-    MenuText = 'Cycloid gear'
+    MenuText = 'Cycloid Gear'
     ToolTip = 'Create a Cycloid gear'
 
 
 class CreateBevelGear(BaseCommand):
-    NAME = "bevelgear"
+    NAME = "BevelGear"
     GEAR_FUNCTION = BevelGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
-    MenuText = 'Bevel gear'
+    MenuText = 'Bevel Gear'
     ToolTip = 'Create a Bevel gear'
 
 class CreateHypoCycloidGear(BaseCommand):
-    NAME = "hypocycloidgear"
+    NAME = "HypocycloidGear"
     GEAR_FUNCTION = HypoCycloidGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'hypocycloidgear.svg')
-    MenuText = 'HypoCycloid gear'
+    MenuText = 'HypoCycloid Gear'
     ToolTip = 'Create a HypoCycloid gear with its pins'
 
 
 class CreateWormGear(BaseCommand):
-    NAME = "wormgear"
+    NAME = "WormGear"
     GEAR_FUNCTION = WormGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'wormgear.svg')
-    MenuText = 'Worm gear'
+    MenuText = 'Worm Gear'
     ToolTip = 'Create a Worm gear'
 
 
 class CreateTimingGear(BaseCommand):
-    NAME = "timinggear"
+    NAME = "TimingGear"
     GEAR_FUNCTION = TimingGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'timinggear.svg')
-    MenuText = 'Timing gear'
+    MenuText = 'Timing Gear'
     ToolTip = 'Create a Timing gear'
 
 class CreateLanternGear(BaseCommand):
-    NAME = "lanterngear"
+    NAME = "LanternGear"
     GEAR_FUNCTION = LanternGear
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'lanterngear.svg')
-    MenuText = 'Lantern gear'
+    MenuText = 'Lantern Gear'
     ToolTip = 'Create a Lantern gear'
 
 class CreateGearConnector(BaseCommand):
-    NAME = "gearconnector"
+    NAME = "GearConnector"
     GEAR_FUNCTION = GearConnector
     Pixmap = os.path.join(BaseCommand.ICONDIR, 'gearconnector.svg')
     MenuText = 'Combine two gears'
