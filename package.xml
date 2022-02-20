@@ -7,13 +7,17 @@
   <maintainer email="sppedflyer@gmail.com">looooo</maintainer>
   <license file="LICENSE">GPL 3</license>
   <url type="repository" branch="develop">https://github.com/looooo/freecad.gears</url>
-  <icon>freecad/gears/icons/gearworkbench.svg</icon> <!-- If you include your icon here, you don't have to submit it to the main FreeCAD repo -->
+  <url type="bugtracker">https://github.com/looooo/freecad.gears/issues</url>
+  <url type="documentation">https://wiki.freecad.org/FCGear_Workbench</url>
+  <icon>freecad/gears/icons/gearworkbench.svg</icon>
 
   <content>
     <workbench>
       <classname>GearWorkbench</classname>
       <subdirectory>./</subdirectory>
       <freecadmin>0.19</freecadmin>
+      <tag>gear</tag>
+      <tag>gears</tag>
     </workbench>
   </content>
 
