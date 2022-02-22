@@ -594,6 +594,7 @@ class InvoluteGearRack(BaseGear):
         line4 = [p4, p5]
         line5 = [p5, p6]
         tooth = Wire(points_to_wire([line1, line2, line3, line4, line5]))
+
         edges = tooth.Edges
         edges = insert_fillet(edges, 0, m * root_fillet)
         edges = insert_fillet(edges, 2, m * head_fillet)
@@ -734,6 +735,8 @@ class CycloidGearRack(BaseGear):
         r_o = obj.outer_diameter / 2 * m
         c = obj.clearance
         h = obj.head
+        head_fillet = obj.head_fillet
+        root_fillet = obj.root_fillet
         phi_i_end = np.arccos(1 - m / r_i * (1 + c))
         phi_o_end = np.arccos(1 - m / r_o * (1 + h))
         phi_i = np.linspace(phi_i_end, 0, numpoints)
@@ -748,47 +751,50 @@ class CycloidGearRack(BaseGear):
         mirror = reflection(0)
         points_1 = mirror(points)[::-1]
         line_1 = [points[-1], points_1[0]]
-        line_2 = [points_1[-1], points[0] + np.array([0., m * np.pi])]
-        tooth = points_to_wire([points, line_1, points_1, line_2])
-        head_fillet = obj.head_fillet
-        if head_fillet != 0:
-            edges = tooth.Edges
-            fillet1 = fillet_between_edges(edges[0], edges[1], m * head_fillet)
-            fillet2 = fillet_between_edges(fillet1[-1], edges[2], m * head_fillet)
-            tooth = Wire(fillet1[:-1] + fillet2 + edges[3:])
+        line_2 = [points_1[-1], np.array([-(1 + c) * m , m * np.pi / 2])]
+        line_0 = [np.array([-(1 + c) * m , -m * np.pi / 2]), points[0]]
+        tooth = points_to_wire([line_0, points, line_1, points_1, line_2])
 
+        edges = tooth.Edges
+        edges = insert_fillet(edges, 0, m * root_fillet)
+        edges = insert_fillet(edges, 2, m * head_fillet)
+        edges = insert_fillet(edges, 4, m * head_fillet)
+        edges = insert_fillet(edges, 6, m * root_fillet)
+
+        tooth_edges = [e for e in edges if e is not None]
+        p_end = np.array(tooth_edges[-2].lastVertex().Point[:-1])
+        p_start = np.array(tooth_edges[1].firstVertex().Point[:-1])
+        p_start += np.array([0, np.pi * m])
+        edge = points_to_wire([[p_end, p_start]]).Edges
+        tooth = Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
+
         for i in range(obj.teeth - 1):
             tooth = copy.deepcopy(tooth)
             tooth.translate(App.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
+
         teeth[-1] = Wire(teeth[-1].Edges[:-1])
 
-        # extending the profile
         if obj.add_endings:
-            p_0 = np.array([y[0], -np.pi / 2 * m])
-            p_1 = p_0 + np.array([-t, 0.])
-            p_3 = np.array([y[0], - np.pi / 2 * m + obj.teeth * m * np.pi])
-            p_2 = p_3 + np.array([-t, 0.])
-            p_end = points_1[-1] + np.array([0, np.pi * m * (obj.teeth - 1)])
-            line_3 = np.array([p_0, points[0]])
-            line_4 = np.array([p_end, p_3])
-            l_ext_1 = points_to_wire([line_3])
-            l_ext_2 = points_to_wire([line_4])
-            l_ext_3 = points_to_wire([np.array([p_0, p_1])])
-            l_ext_4 = points_to_wire([np.array([p_1, p_2])])
-            l_ext_5 = points_to_wire([np.array([p_2, p_3])])
-            pol = Wire([l_ext_4, l_ext_3, l_ext_1] + teeth + [l_ext_2, l_ext_5])
-        else:
-            p_0 = points[0]
-            p_1 = p_0 + np.array([-t, 0.])
-            p_3 = points_1[-1] + np.array([0, np.pi * m * (obj.teeth - 1)])
-            p_2 = p_3 + np.array([-t, 0.])
-            l_ext_3 = points_to_wire([np.array([p_0, p_1])])
-            l_ext_4 = points_to_wire([np.array([p_1, p_2])])
-            l_ext_5 = points_to_wire([np.array([p_2, p_3])])
-            pol = Wire([l_ext_4, l_ext_3] + teeth + [l_ext_5])
-        
+            teeth = [Wire(tooth_edges[0])] + teeth
+            last_edge = tooth_edges[-1]
+            last_edge.translate(App.Vector(0, np.pi * m * (obj.teeth - 1), 0))
+            teeth = teeth + [Wire(last_edge)]
+
+        p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])
+        p_end = np.array(teeth[-1].Edges[-1].lastVertex().Point[:-1])
+        p_start_1 = p_start - np.array([obj.thickness.Value, 0.])
+        p_end_1 = p_end - np.array([obj.thickness.Value, 0.])
+
+        line6 = [p_start, p_start_1]
+        line7 = [p_start_1, p_end_1]
+        line8 = [p_end_1, p_end]
+
+        bottom = points_to_wire([line6, line7, line8])
+
+        pol = Wire([bottom] + teeth)
+
         if obj.height.Value == 0:
             return pol
         elif obj.beta.Value == 0:
