@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>freecad.gears workbench</name>
+  <description>A gear workbench for FreeCAD</description>
+  <version>1.0</version>
+  <date>2022-02-07</date>
+  <maintainer email="sppedflyer@gmail.com">looooo</maintainer>
+  <license file="LICENSE">GPL 3</license>
+  <url type="repository" branch="develop">https://github.com/looooo/freecad.gears</url>
+  <url type="bugtracker">https://github.com/looooo/freecad.gears/issues</url>
+  <url type="documentation">https://wiki.freecad.org/FCGear_Workbench</url>
+  <icon>freecad/gears/icons/gearworkbench.svg</icon>
+
+  <content>
+    <workbench>
+      <classname>GearWorkbench</classname>
+      <subdirectory>./</subdirectory>
+      <freecadmin>0.19</freecadmin>
+      <tag>gear</tag>
+      <tag>gears</tag>
+    </workbench>
+  </content>
+
+</package>
