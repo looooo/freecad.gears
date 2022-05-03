@@ -287,7 +287,7 @@ class InvoluteGearRack(BaseGear):
         obj.beta = '0. deg'
         obj.clearance = 0.25
         obj.head = 0.
-        obj.properties_from_tool = True
+        obj.properties_from_tool = False
         obj.add_endings = True
         obj.simplified = False
         self.obj = obj
