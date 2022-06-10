@@ -1815,31 +1815,25 @@ def fillet_between_edges(edge_1, edge_2, radius):
     # assuming edges are in a plane
     # extracting vertices
     try:
-        from OCC.Core import ChFi2d
-        from OCC import Core
+        from Part import ChFi2d
     except ImportError:
-        App.Console.PrintWarning("python-occ not available")
-        App.Console.PrintWarning("2d fillets not yet possible")
+        App.Console.PrintWarning("Your freecad version has no python bindings for 2d-fillets")
         return [edge_1, edge_2]
 
-    api = ChFi2d.ChFi2d_FilletAPI()
-    p1 = np.array([*edge_1.valueAt(edge_1.FirstParameter)])
-    p2 = np.array([*edge_1.valueAt(edge_1.LastParameter)])
-    p3 = np.array([*edge_2.valueAt(edge_2.FirstParameter)])
-    p4 = np.array([*edge_2.valueAt(edge_2.LastParameter)])
+    api = ChFi2d.FilletAPI()
+    p1 = edge_1.valueAt(edge_1.FirstParameter)
+    p2 = edge_1.valueAt(edge_1.LastParameter)
+    p3 = edge_2.valueAt(edge_2.FirstParameter)
+    p4 = edge_2.valueAt(edge_2.LastParameter)
     t1 = p2 - p1
     t2 = p4 - p3
-    n = np.cross(t1, t2)
-    pln = Core.gp.gp_Pln(Core.gp.gp_Pnt(*p1), Core.gp.gp_Dir(*n))
-    occ_e1 = Core.TopoDS.topods_Edge(Part.__toPythonOCC__(edge_1))
-    occ_e2 = Core.TopoDS.topods_Edge(Part.__toPythonOCC__(edge_2))
-    api.Init(occ_e1, occ_e2, pln)
-    if api.Perform(radius) > 0:
-        occ_p0 = Core.gp.gp_Pnt(*((p2 + p3) / 2))
-        occ_arc = api.Result(occ_p0, occ_e1, occ_e2)
-        return Part.Wire([Part.__fromPythonOCC__(occ_e1),
-                Part.__fromPythonOCC__(occ_arc),
-                Part.__fromPythonOCC__(occ_e2)]).Edges
+    n = t1.cross(t2)
+    pln = Part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
+    api.init(edge_1, edge_2, pln)
+    if api.perform(radius) > 0:
+        p0 = (p2 + p3) / 2
+        fillet, e1, e2 = api.result(p0)
+        return Part.Wire([e1, fillet, e2]).Edges
     else:
         return None
 
