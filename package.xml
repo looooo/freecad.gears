@@ -6,6 +6,7 @@
   <date>2022-02-07</date>
   <maintainer email="sppedflyer@gmail.com">looooo</maintainer>
   <license file="LICENSE">GPL 3</license>
+  <dep>scipy</dep>
   <url type="repository" branch="develop">https://github.com/looooo/freecad.gears</url>
   <url type="bugtracker">https://github.com/looooo/freecad.gears/issues</url>
   <url type="documentation">https://wiki.freecad.org/FCGear_Workbench</url>
