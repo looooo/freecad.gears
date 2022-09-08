@@ -1312,7 +1312,12 @@ class TimingGear(BaseGear):
                     'pitch': 5.0,  'u': 0.5715,  'h': 1.93,
                     'H': 3.81,  'r0': 1.44,  'r1': 2.57,
                     'rs': 0.416,  'offset': 1.03
-                    }
+                    },
+            "htd8":  {
+                    'pitch': 8.0,  'u': 0.9144,  'h': 3.088,
+                    'H': 6.096,  'r0': 2.304,  'r1': 4.112,
+                    'rs': 0.6656,  'offset': 1.648
+                    } 
             }
 
     def __init__(self, obj):
@@ -1330,7 +1335,7 @@ class TimingGear(BaseGear):
         obj.addProperty( "App::PropertyLength", "rs", "computed", "radius of third arc", 1)
         obj.addProperty( "App::PropertyLength", "offset", "computed", "x-offset of second arc-midpoint", 1)
         obj.teeth = 15
-        obj.type = ['gt2', 'gt3', 'gt5']
+        obj.type = ['gt2', 'gt3', 'gt5', 'htd8']
         obj.height = '5. mm'
 
         self.obj = obj
