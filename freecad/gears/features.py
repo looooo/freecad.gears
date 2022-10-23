@@ -561,9 +561,8 @@ class InvoluteGearRack(BaseGear):
         if "simplified" in obj.PropertiesList:
             obj.rack.simplified = obj.simplified
         obj.rack._update()
-
-        obj.transverse_pitch = "{} mm".format(obj.module.Value * np.pi)
-        m = obj.module.Value
+        m, m_n, pitch, pressure_angle_t = obj.rack.compute_properties()
+        obj.transverse_pitch = "{} mm".format(pitch)
         t = obj.thickness.Value
         c = obj.clearance
         h = obj.head
