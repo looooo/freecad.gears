@@ -188,8 +188,9 @@ class InvoluteGear(BaseGear):
                         "computed", "outside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
+        obj.addProperty("App::PropertyLength", "traverse_module", "traverse module of the generated gear", 1)
         obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
-        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
+        obj.setExpression('dw', 'teeth * traverse_module') # calculate via expression to ease usage for placement
         obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
             "The angle by which this gear can turn without moving the mating gear.")
@@ -227,6 +228,9 @@ class InvoluteGear(BaseGear):
         # checksbackwardcompatibility:
         if "properties_from_tool" in fp.PropertiesList:
             fp.gear.properties_from_tool = fp.properties_from_tool
+            fp.traverse_module = fp.module / np.cos(fp.gear.beta)
+        else:
+            fp.traverse_module = fp.module
         fp.gear._update()
 
         # computed properties
