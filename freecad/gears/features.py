@@ -188,7 +188,7 @@ class InvoluteGear(BaseGear):
                         "computed", "outside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
-        obj.addProperty("App::PropertyLength", "traverse_module", "traverse module of the generated gear", 1)
+        obj.addProperty("App::PropertyLength", "traverse_module", "computed", "traverse module of the generated gear", 1)
         obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
         obj.setExpression('dw', 'teeth * traverse_module') # calculate via expression to ease usage for placement
         obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
