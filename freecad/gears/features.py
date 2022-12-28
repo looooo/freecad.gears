@@ -157,6 +157,7 @@ class InvoluteGear(BaseGear):
         obj.root_fillet = 0
         self.obj = obj
         obj.Proxy = self
+        self.compute_traverse_properties(obj)
 
     def add_gear_properties(self, obj):
         obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
@@ -213,35 +214,38 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "accuracy", "number of points for spline")
 
-    def generate_gear_shape(self, fp):
-        fp.gear.double_helix = fp.double_helix
-        fp.gear.m_n = fp.module.Value
-        fp.gear.z = fp.teeth
-        fp.gear.undercut = fp.undercut
-        fp.gear.shift = fp.shift
-        fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.
-        fp.gear.beta = fp.beta.Value * np.pi / 180
-        fp.gear.clearance = fp.clearance
-        fp.gear.backlash = fp.backlash.Value * \
-            (-fp.reversed_backlash + 0.5) * 2.
-        fp.gear.head = fp.head
-        # checksbackwardcompatibility:
-        if "properties_from_tool" in fp.PropertiesList:
-            fp.gear.properties_from_tool = fp.properties_from_tool
-            fp.traverse_module = fp.module / np.cos(fp.gear.beta)
+    def compute_traverse_properties(self, obj):
+        if "properties_from_tool" in obj.PropertiesList:
+            obj.gear.properties_from_tool = obj.properties_from_tool
+            obj.traverse_module = obj.module / np.cos(obj.gear.beta)
         else:
-            fp.traverse_module = fp.module
-        fp.gear._update()
+            obj.traverse_module = obj.module
 
-        # computed properties
-        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
-        fp.da = "{}mm".format(fp.gear.da)
-        fp.df = "{}mm".format(fp.gear.df)
+        obj.transverse_pitch = "{}mm".format(obj.gear.pitch)
+        obj.da = "{}mm".format(obj.gear.da)
+        obj.df = "{}mm".format(obj.gear.df)
 
-        if not fp.simple:
+    def generate_gear_shape(self, obj):
+        obj.gear.double_helix = obj.double_helix
+        obj.gear.m_n = obj.module.Value
+        obj.gear.z = obj.teeth
+        obj.gear.undercut = obj.undercut
+        obj.gear.shift = obj.shift
+        obj.gear.pressure_angle = obj.pressure_angle.Value * np.pi / 180.
+        obj.gear.beta = obj.beta.Value * np.pi / 180
+        obj.gear.clearance = obj.clearance
+        obj.gear.backlash = obj.backlash.Value * \
+            (-obj.reversed_backlash + 0.5) * 2.
+        obj.gear.head = obj.head
+        obj.gear._update()
 
-            pts = fp.gear.points(num=fp.numpoints)
-            rot = rotation(-fp.gear.phipart)
+        self.compute_traverse_properties(obj)
+
+
+        if not obj.simple:
+
+            pts = obj.gear.points(num=obj.numpoints)
+            rot = rotation(-obj.gear.phipart)
             rotated_pts = list(map(rot, pts))
             pts.append([pts[-1][-1],rotated_pts[0][0]])
             pts += rotated_pts
@@ -249,9 +253,9 @@ class InvoluteGear(BaseGear):
             edges = tooth.Edges
 
             # head-fillet:
-            r_head = float(fp.head_fillet * fp.module)
-            r_root = float(fp.root_fillet * fp.module)
-            if fp.undercut and r_root != 0.:
+            r_head = float(obj.head_fillet * obj.module)
+            r_root = float(obj.root_fillet * obj.module)
+            if obj.undercut and r_root != 0.:
                 r_root = 0.
                 App.Console.PrintWarning("root fillet is not allowed if undercut is computed")
             if len(tooth.Edges) == 11:
@@ -281,19 +285,19 @@ class InvoluteGear(BaseGear):
             edges = [e for e in edges if e is not None]
 
             tooth = Wire(edges)
-            profile = rotate_tooth(tooth, fp.teeth)
+            profile = rotate_tooth(tooth, obj.teeth)
 
-            if fp.height.Value == 0:
+            if obj.height.Value == 0:
                 return profile
             base = Face(profile)
-            if fp.beta.Value == 0:
-                return base.extrude(App.Vector(0, 0, fp.height.Value))
+            if obj.beta.Value == 0:
+                return base.extrude(App.Vector(0, 0, obj.height.Value))
             else:
-                twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
-                return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
+                twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
+                return helicalextrusion(base, obj.height.Value, twist_angle, obj.double_helix)
         else:
-            rw = fp.gear.dw / 2
-            return Part.makeCylinder(rw, fp.height.Value)
+            rw = obj.gear.dw / 2
+            return Part.makeCylinder(rw, obj.height.Value)
 
     def __getstate__(self):
         return None
