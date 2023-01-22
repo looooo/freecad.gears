@@ -362,8 +362,6 @@ class InternalInvoluteGear(BaseGear):
 
     def add_computed_properties(self, obj):
         obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
-        obj.setExpression('dw', 'teeth * module') # calculate via expression to ease usage for placement
-        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
             "The angle by which this gear can turn without moving the mating gear.")
         obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
@@ -405,11 +403,11 @@ class InternalInvoluteGear(BaseGear):
         fp.gear.backlash = fp.backlash.Value * \
             (fp.reversed_backlash - 0.5) * 2. # negate "reversed_backslash", for "internal"
         fp.gear.head = fp.clearance # swap head and clearance to become "internal"
-        # checksbackwardcompatibility:
-        if "properties_from_tool" in fp.PropertiesList:
-            fp.gear.properties_from_tool = fp.properties_from_tool
+        fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
 
+        fp.dw = "{}mm".format(fp.gear.dw)
+        
         # computed properties
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
         fp.outside_diameter = fp.dw + 2 * fp.thickness
