@@ -190,9 +190,7 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
         obj.addProperty("App::PropertyLength", "traverse_module", "computed", "traverse module of the generated gear", 1)
-        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
-        obj.setExpression('dw', 'teeth * traverse_module') # calculate via expression to ease usage for placement
-        obj.setEditorMode('dw', 1) # set read-only after setting the expression, else it won't be visible. bug?
+        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.", 1)
         obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
             "The angle by which this gear can turn without moving the mating gear.")
         obj.setExpression('angular_backlash', 'backlash / dw * 360° / pi') # calculate via expression to ease usage for placement
@@ -215,8 +213,7 @@ class InvoluteGear(BaseGear):
                         "accuracy", "number of points for spline")
 
     def compute_traverse_properties(self, obj):
-        if "properties_from_tool" in obj.PropertiesList:
-            obj.gear.properties_from_tool = obj.properties_from_tool
+        if obj.properties_from_tool:
             obj.traverse_module = obj.module / np.cos(obj.gear.beta)
         else:
             obj.traverse_module = obj.module
@@ -224,6 +221,7 @@ class InvoluteGear(BaseGear):
         obj.transverse_pitch = "{}mm".format(obj.gear.pitch)
         obj.da = "{}mm".format(obj.gear.da)
         obj.df = "{}mm".format(obj.gear.df)
+        obj.dw = "{}mm".format(obj.gear.dw)
 
     def generate_gear_shape(self, obj):
         obj.gear.double_helix = obj.double_helix
@@ -237,8 +235,9 @@ class InvoluteGear(BaseGear):
         obj.gear.backlash = obj.backlash.Value * \
             (-obj.reversed_backlash + 0.5) * 2.
         obj.gear.head = obj.head
-        obj.gear._update()
+        obj.gear.properties_from_tool = obj.properties_from_tool
 
+        obj.gear._update()
         self.compute_traverse_properties(obj)
 
 
