@@ -189,7 +189,7 @@ class InvoluteGear(BaseGear):
                         "computed", "outside diameter", 1)
         obj.addProperty("App::PropertyLength", "df",
                         "computed", "root diameter", 1)
-        obj.addProperty("App::PropertyLength", "traverse_module", "computed", "traverse module of the generated gear", 1)
+        self.add_traverse_module_property(obj)
         obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.", 1)
         obj.addProperty("App::PropertyAngle", "angular_backlash", "computed",
             "The angle by which this gear can turn without moving the mating gear.")
@@ -211,8 +211,14 @@ class InvoluteGear(BaseGear):
         obj.addProperty("App::PropertyBool", "simple", "accuracy", "simple")
         obj.addProperty("App::PropertyInteger", "numpoints",
                         "accuracy", "number of points for spline")
+        
+    def add_traverse_module_property(self, obj):
+        obj.addProperty("App::PropertyLength", "traverse_module", "computed", "traverse module of the generated gear", 1)
 
     def compute_traverse_properties(self, obj):
+        # traverse_module added recently, if old freecad doc is loaded without it, it will not exist when generate_gear_shape() is called
+        if not hasattr(obj, 'traverse_module'):
+            self.add_traverse_module_property(obj)
         if obj.properties_from_tool:
             obj.traverse_module = obj.module / np.cos(obj.gear.beta)
         else:
