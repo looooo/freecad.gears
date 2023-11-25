@@ -17,7 +17,6 @@
 # ***************************************************************************
 
 import os
-import copy
 import numpy as np
 import FreeCAD
 from pygears import __version__
