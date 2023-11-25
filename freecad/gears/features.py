@@ -18,7 +18,6 @@
 
 from __future__ import division
 import os
-import copy
 
 import numpy as np
 import math
@@ -620,7 +619,7 @@ class InvoluteGearRack(BaseGear):
         teeth = [tooth]
 
         for i in range(obj.teeth - 1):
-            tooth = copy.deepcopy(tooth)
+            tooth = tooth.copy()
             tooth.translate(App.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
 
@@ -780,7 +779,7 @@ class CycloidGearRack(BaseGear):
         teeth = [tooth]
 
         for i in range(obj.teeth - 1):
-            tooth = copy.deepcopy(tooth)
+            tooth = tooth.copy()
             tooth.translate(App.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
 
