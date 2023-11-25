@@ -180,7 +180,6 @@ class InvoluteRack(object):
             self.simplified = False
 
     def points(self, num=10):
-        import copy
         m, m_n, pitch, pressure_angle_t = self.compute_properties()
 
         a = (2 + self.head + self.clearance) * m_n * tan(pressure_angle_t)
@@ -198,7 +197,7 @@ class InvoluteRack(object):
                 tooth = trans(tooth).tolist()
             else:
                 tooth = trans(tooth).tolist()
-                teeth.append(copy.deepcopy(tooth))
+                teeth.append(tooth.copy())
                 if self.simplified and (i == 3):
                     teeth[-1].pop()
                     teeth[-1].pop()
