@@ -72,11 +72,11 @@ class ViewProviderGear(object):
         self._check_attr()
         return self.icon_fn
 
-    def __getstate__(self):
+    def dumps(self):
         self._check_attr()
         return {"icon_fn": self.icon_fn}
 
-    def __setstate__(self, state):
+    def loads(self, state):
         if state and "icon_fn" in state:
             self.icon_fn = state["icon_fn"]
 
@@ -117,6 +117,13 @@ class BaseGear(object):
         This method has to return the TopoShape of the gear.
         """
         raise NotImplementedError("generate_gear_shape not implemented")
+
+    def loads(self, state):
+        pass
+
+    def dumps(self):
+        pass
+
 
 class InvoluteGear(BaseGear):
 
@@ -303,11 +310,6 @@ class InvoluteGear(BaseGear):
             rw = obj.gear.dw / 2
             return Part.makeCylinder(rw, obj.height.Value)
 
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
 
 class InternalInvoluteGear(BaseGear):
     """FreeCAD internal involute gear
@@ -664,11 +666,6 @@ class InvoluteGearRack(BaseGear):
                 fcvec([0., np.tan(beta) * obj.height.Value, obj.height.Value]))
             return makeLoft([pol, pol2], True)
 
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
 
 class CycloidGearRack(BaseGear):
 
@@ -939,11 +936,6 @@ class CrownGear(BaseGear):
             cut_shapes.append(loft)
         return solid.cut(cut_shapes)
 
-    def __getstate__(self):
-        pass
-
-    def __setstate__(self, state):
-        pass
 
 
 class CycloidGear(BaseGear):
@@ -1058,11 +1050,6 @@ class CycloidGear(BaseGear):
             twist_angle = fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
             return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
 
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
 
 
 class BevelGear(BaseGear):
@@ -1190,11 +1177,6 @@ class BevelGear(BaseGear):
         new_phi = np.sqrt(np.linalg.norm(point)) * phi
         return rotation3D(new_phi)(point)
 
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
 
 
 class WormGear(BaseGear):
@@ -1299,11 +1281,6 @@ class WormGear(BaseGear):
                                      h * np.tan(beta) * 2 / d)
             return shape
 
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
 
 
 class TimingGear(BaseGear):
@@ -1464,11 +1441,6 @@ class TimingGear(BaseGear):
         else:
             return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
-    def __getstate__(self):
-        pass
-
-    def __setstate__(self, state):
-        pass
 
 
 class LanternGear(BaseGear):
@@ -1550,11 +1522,6 @@ class LanternGear(BaseGear):
         else:
             return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
 
-    def __getstate__(self):
-        pass
-
-    def __setstate__(self, state):
-        pass
 
 class HypoCycloidGear(BaseGear):
 
@@ -1750,11 +1717,6 @@ class HypoCycloidGear(BaseGear):
         if to_be_fused:
             return Part.makeCompound(to_be_fused)
 
-    def __getstate__(self):
-        pass
-
-    def __setstate__(self, state):
-        pass
 
 def part_arc_from_points_and_center(p_1, p_2, m):
     p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)
