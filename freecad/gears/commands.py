@@ -19,8 +19,23 @@
 import os
 import FreeCAD
 import FreeCADGui as Gui
-from .features import ViewProviderGear, InvoluteGear, InternalInvoluteGear, InvoluteGearRack, CycloidGearRack
-from .features import CycloidGear, BevelGear, CrownGear, WormGear, TimingGear, LanternGear, HypoCycloidGear, BaseGear
+from .features import (
+    ViewProviderGear,
+    InvoluteGear,
+    InternalInvoluteGear,
+    InvoluteGearRack,
+    CycloidGearRack,
+)
+from .features import (
+    CycloidGear,
+    BevelGear,
+    CrownGear,
+    WormGear,
+    TimingGear,
+    LanternGear,
+    HypoCycloidGear,
+    BaseGear,
+)
 from .connector import GearConnector, ViewProviderGearConnector
 
 
@@ -40,8 +55,9 @@ class BaseCommand(object):
 
     def Activated(self):
         Gui.doCommandGui("import freecad.gears.commands")
-        Gui.doCommandGui("freecad.gears.commands.{}.create()".format(
-            self.__class__.__name__))
+        Gui.doCommandGui(
+            "freecad.gears.commands.{}.create()".format(self.__class__.__name__)
+        )
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
 
@@ -54,7 +70,9 @@ class BaseCommand(object):
             part = Gui.ActiveDocument.ActiveView.getActiveObject("part")
 
             if body:
-                obj = FreeCAD.ActiveDocument.addObject("PartDesign::FeaturePython", cls.NAME)
+                obj = FreeCAD.ActiveDocument.addObject(
+                    "PartDesign::FeaturePython", cls.NAME
+                )
             else:
                 obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
             ViewProviderGear(obj.ViewObject, cls.Pixmap)
@@ -70,101 +88,107 @@ class BaseCommand(object):
         return obj
 
     def GetResources(self):
-        return {'Pixmap': self.Pixmap,
-                'MenuText': self.MenuText,
-                'ToolTip': self.ToolTip}
+        return {
+            "Pixmap": self.Pixmap,
+            "MenuText": self.MenuText,
+            "ToolTip": self.ToolTip,
+        }
 
 
 class CreateInvoluteGear(BaseCommand):
     NAME = "InvoluteGear"
     GEAR_FUNCTION = InvoluteGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involutegear.svg')
-    MenuText = 'Involute Gear'
-    ToolTip = 'Create an external involute gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "involutegear.svg")
+    MenuText = "Involute Gear"
+    ToolTip = "Create an external involute gear"
 
 
 class CreateInternalInvoluteGear(BaseCommand):
     NAME = "InternalInvoluteGear"
     GEAR_FUNCTION = InternalInvoluteGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'internalinvolutegear.svg')
-    MenuText = 'Internal Involute Gear'
-    ToolTip = 'Create an internal involute gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "internalinvolutegear.svg")
+    MenuText = "Internal Involute Gear"
+    ToolTip = "Create an internal involute gear"
 
 
 class CreateInvoluteRack(BaseCommand):
     NAME = "InvoluteRack"
     GEAR_FUNCTION = InvoluteGearRack
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'involuterack.svg')
-    MenuText = 'Involute Rack'
-    ToolTip = 'Create an Involute rack'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "involuterack.svg")
+    MenuText = "Involute Rack"
+    ToolTip = "Create an Involute rack"
+
 
 class CreateCycloidRack(BaseCommand):
     NAME = "CycloidRack"
     GEAR_FUNCTION = CycloidGearRack
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidrack.svg')
-    MenuText = 'Cycloid Rack'
-    ToolTip = 'Create an Cycloid rack'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "cycloidrack.svg")
+    MenuText = "Cycloid Rack"
+    ToolTip = "Create an Cycloid rack"
 
 
 class CreateCrownGear(BaseCommand):
     NAME = "CrownGear"
     GEAR_FUNCTION = CrownGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'crowngear.svg')
-    MenuText = 'Crown Gear'
-    ToolTip = 'Create a Crown gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "crowngear.svg")
+    MenuText = "Crown Gear"
+    ToolTip = "Create a Crown gear"
 
 
 class CreateCycloidGear(BaseCommand):
     NAME = "CycloidGear"
     GEAR_FUNCTION = CycloidGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'cycloidgear.svg')
-    MenuText = 'Cycloid Gear'
-    ToolTip = 'Create a Cycloid gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "cycloidgear.svg")
+    MenuText = "Cycloid Gear"
+    ToolTip = "Create a Cycloid gear"
 
 
 class CreateBevelGear(BaseCommand):
     NAME = "BevelGear"
     GEAR_FUNCTION = BevelGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'bevelgear.svg')
-    MenuText = 'Bevel Gear'
-    ToolTip = 'Create a Bevel gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "bevelgear.svg")
+    MenuText = "Bevel Gear"
+    ToolTip = "Create a Bevel gear"
+
 
 class CreateHypoCycloidGear(BaseCommand):
     NAME = "HypocycloidGear"
     GEAR_FUNCTION = HypoCycloidGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'hypocycloidgear.svg')
-    MenuText = 'HypoCycloid Gear'
-    ToolTip = 'Create a HypoCycloid gear with its pins'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "hypocycloidgear.svg")
+    MenuText = "HypoCycloid Gear"
+    ToolTip = "Create a HypoCycloid gear with its pins"
 
 
 class CreateWormGear(BaseCommand):
     NAME = "WormGear"
     GEAR_FUNCTION = WormGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'wormgear.svg')
-    MenuText = 'Worm Gear'
-    ToolTip = 'Create a Worm gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "wormgear.svg")
+    MenuText = "Worm Gear"
+    ToolTip = "Create a Worm gear"
 
 
 class CreateTimingGear(BaseCommand):
     NAME = "TimingGear"
     GEAR_FUNCTION = TimingGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'timinggear.svg')
-    MenuText = 'Timing Gear'
-    ToolTip = 'Create a Timing gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "timinggear.svg")
+    MenuText = "Timing Gear"
+    ToolTip = "Create a Timing gear"
+
 
 class CreateLanternGear(BaseCommand):
     NAME = "LanternGear"
     GEAR_FUNCTION = LanternGear
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'lanterngear.svg')
-    MenuText = 'Lantern Gear'
-    ToolTip = 'Create a Lantern gear'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "lanterngear.svg")
+    MenuText = "Lantern Gear"
+    ToolTip = "Create a Lantern gear"
+
 
 class CreateGearConnector(BaseCommand):
     NAME = "GearConnector"
     GEAR_FUNCTION = GearConnector
-    Pixmap = os.path.join(BaseCommand.ICONDIR, 'gearconnector.svg')
-    MenuText = 'Combine two gears'
-    ToolTip = 'Combine two gears'
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "gearconnector.svg")
+    MenuText = "Combine two gears"
+    ToolTip = "Combine two gears"
 
     def Activated(self):
         gear1 = Gui.Selection.getSelection()[0]

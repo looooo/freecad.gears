@@ -19,22 +19,26 @@
 import os
 import FreeCADGui as Gui
 import FreeCAD as App
+
 __dirname__ = os.path.dirname(__file__)
 
 try:
     from FreeCADGui import Workbench
 except ImportError as e:
     App.Console.PrintWarning(
-        "you are using the GearWorkbench with an old version of FreeCAD (<0.16)")
+        "you are using the GearWorkbench with an old version of FreeCAD (<0.16)"
+    )
     App.Console.PrintWarning(
-        "the class Workbench is loaded, although not imported: magic")
+        "the class Workbench is loaded, although not imported: magic"
+    )
 
 
 class GearWorkbench(Workbench):
     """glider workbench"""
+
     MenuText = "Gear"
     ToolTip = "Gear Workbench"
-    Icon = os.path.join(__dirname__,  'icons', 'gearworkbench.svg')
+    Icon = os.path.join(__dirname__, "icons", "gearworkbench.svg")
     commands = [
         "CreateInvoluteGear",
         "CreateInternalInvoluteGear",
@@ -47,13 +51,18 @@ class GearWorkbench(Workbench):
         "CreateTimingGear",
         "CreateLanternGear",
         "CreateHypoCycloidGear",
-        "CreateGearConnector"]
+        "CreateGearConnector",
+    ]
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
-        from .commands import CreateCycloidGear, CreateInvoluteGear, CreateInternalInvoluteGear
+        from .commands import (
+            CreateCycloidGear,
+            CreateInvoluteGear,
+            CreateInternalInvoluteGear,
+        )
         from .commands import CreateBevelGear, CreateInvoluteRack, CreateCrownGear
         from .commands import CreateWormGear, CreateTimingGear, CreateLanternGear
         from .commands import CreateHypoCycloidGear, CreateCycloidRack
@@ -62,18 +71,18 @@ class GearWorkbench(Workbench):
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
         # Gui.addIconPath(App.getHomePath()+"Mod/gear/icons/")
-        Gui.addCommand('CreateInvoluteGear', CreateInvoluteGear())
-        Gui.addCommand('CreateInternalInvoluteGear', CreateInternalInvoluteGear())
-        Gui.addCommand('CreateCycloidGear', CreateCycloidGear())
-        Gui.addCommand('CreateCycloidRack', CreateCycloidRack())
-        Gui.addCommand('CreateBevelGear', CreateBevelGear())
-        Gui.addCommand('CreateInvoluteRack', CreateInvoluteRack())
-        Gui.addCommand('CreateCrownGear', CreateCrownGear())
-        Gui.addCommand('CreateWormGear', CreateWormGear())
-        Gui.addCommand('CreateTimingGear', CreateTimingGear())
-        Gui.addCommand('CreateLanternGear', CreateLanternGear())
-        Gui.addCommand('CreateHypoCycloidGear', CreateHypoCycloidGear())
-        Gui.addCommand('CreateGearConnector', CreateGearConnector())
+        Gui.addCommand("CreateInvoluteGear", CreateInvoluteGear())
+        Gui.addCommand("CreateInternalInvoluteGear", CreateInternalInvoluteGear())
+        Gui.addCommand("CreateCycloidGear", CreateCycloidGear())
+        Gui.addCommand("CreateCycloidRack", CreateCycloidRack())
+        Gui.addCommand("CreateBevelGear", CreateBevelGear())
+        Gui.addCommand("CreateInvoluteRack", CreateInvoluteRack())
+        Gui.addCommand("CreateCrownGear", CreateCrownGear())
+        Gui.addCommand("CreateWormGear", CreateWormGear())
+        Gui.addCommand("CreateTimingGear", CreateTimingGear())
+        Gui.addCommand("CreateLanternGear", CreateLanternGear())
+        Gui.addCommand("CreateHypoCycloidGear", CreateHypoCycloidGear())
+        Gui.addCommand("CreateGearConnector", CreateGearConnector())
 
     def Activated(self):
         pass
