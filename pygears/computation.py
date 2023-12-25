@@ -33,7 +33,8 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     Returns:
         (float, float): distance between gears [length], pressure angle of the assembly [rad]
     """
-    def inv(x): 
+
+    def inv(x):
         return np.tan(x) - x
 
     inv_alpha_w = inv(alpha) + 2 * np.tan(alpha) * (x1 + x2) / (t1 + t2)
@@ -42,7 +43,7 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
         return inv(x) - inv_alpha_w
 
     def d_root_inv(x):
-        return 1. / np.cos(x) - 1
+        return 1.0 / np.cos(x) - 1
 
     alpha_w = find_root(alpha, root_inv, d_root_inv)
     dist = m * (t1 + t2) / 2 * np.cos(alpha) / np.cos(alpha_w)

@@ -21,7 +21,7 @@ from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
 from ._functions import rotation, reflection
 
 
-class CycloidTooth():
+class CycloidTooth:
     def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.25, backlash=0.00, head=0.0):
         self.m = m
         self.z = z
@@ -44,40 +44,58 @@ class CycloidTooth():
 
     def epicycloid_x(self):
         def func(t):
-            return(((self.d2 + self.d) * cos(t))/2. - (self.d2 * cos((1 + self.d / self.d2) * t))/2.)
-        return(func)
+            return ((self.d2 + self.d) * cos(t)) / 2.0 - (
+                self.d2 * cos((1 + self.d / self.d2) * t)
+            ) / 2.0
+
+        return func
 
     def epicycloid_y(self):
         def func(t):
-            return(((self.d2 + self.d) * sin(t))/2. - (self.d2 * sin((1 + self.d / self.d2) * t))/2.)
-        return(func)
+            return ((self.d2 + self.d) * sin(t)) / 2.0 - (
+                self.d2 * sin((1 + self.d / self.d2) * t)
+            ) / 2.0
+
+        return func
 
     def hypocycloid_x(self):
         def func(t):
-            return((self.d - self.d1)*cos(t)/2 + self.d1/2 * cos((self.d / self.d1 - 1) * t))
-        return(func)
+            return (self.d - self.d1) * cos(t) / 2 + self.d1 / 2 * cos(
+                (self.d / self.d1 - 1) * t
+            )
+
+        return func
 
     def hypocycloid_y(self):
         def func(t):
-            return((self.d - self.d1)*sin(t)/2 - self.d1/2 * sin((self.d/self.d1 - 1)*t))
-        return(func)
+            return (self.d - self.d1) * sin(t) / 2 - self.d1 / 2 * sin(
+                (self.d / self.d1 - 1) * t
+            )
+
+        return func
 
     def inner_end(self):
-        return(
-            -((self.d1*arccos((2*self.d1**2 - self.di**2 -
-                               2*self.d1*self.d + self.d**2)/(2.*self.d1 *
-                                                              (self.d1 - self.d))))/self.d)
+        return -(
+            (
+                self.d1
+                * arccos(
+                    (2 * self.d1**2 - self.di**2 - 2 * self.d1 * self.d + self.d**2)
+                    / (2.0 * self.d1 * (self.d1 - self.d))
+                )
+            )
+            / self.d
         )
 
     def outer_end(self):
-        return(
-            (self.d2*arccos((2*self.d2**2 - self.da**2 +
-                             2*self.d2*self.d + self.d**2) /
-                            (2.*self.d2*(self.d2 + self.d))))/self.d
-        )
+        return (
+            self.d2
+            * arccos(
+                (2 * self.d2**2 - self.da**2 + 2 * self.d2 * self.d + self.d**2)
+                / (2.0 * self.d2 * (self.d2 + self.d))
+            )
+        ) / self.d
 
     def points(self, num=10):
-
         inner_x = self.hypocycloid_x()
         inner_y = self.hypocycloid_y()
         outer_x = self.epicycloid_x()
@@ -95,12 +113,18 @@ class CycloidTooth():
         pts1 = vstack([pts_inner[:-2], pts_outer])
         rot = rotation(self.phipart / 4 - self.angular_backlash / 2)
         pts1 = rot(pts1)
-        ref = reflection(0.)
+        ref = reflection(0.0)
         pts2 = ref(pts1)[::-1]
         one_tooth = [pts1, array([pts1[-1], pts2[0]]), pts2]
-        return(one_tooth)
+        return one_tooth
 
     def _update(self):
-        self.__init__(m=self.m, z=self.z, z1=self.z1, z2=self.z2,
-                      clearance=self.clearance, backlash=self.backlash, head=self.head)
-
+        self.__init__(
+            m=self.m,
+            z=self.z,
+            z1=self.z1,
+            z2=self.z2,
+            clearance=self.clearance,
+            backlash=self.backlash,
+            head=self.head,
+        )
