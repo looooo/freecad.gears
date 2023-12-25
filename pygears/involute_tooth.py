@@ -94,6 +94,13 @@ class InvoluteTooth():
         y = array(list(map(fy, pts)))
         rot = rotation(self.involute_rot - self.angular_backlash / 2)
         xy = rot(transpose(array([x, y])))
+        # The points should not leave the angular range of one side of the tooth, either by overshooting
+        # the tip (and so having to double back to create the other side) or by overlapping with the
+        # adjacent tooth at the base.
+        no_self_cross_at_tip_filter = xy[:, 1] <= 0
+        xy = xy[no_self_cross_at_tip_filter]
+        no_self_cross_at_base_filter = -arctan(xy[:,1] / xy[:, 0]) < self.phipart / 2
+        xy = xy[no_self_cross_at_base_filter]
         return(xy)
 
     def points(self, num=10):
