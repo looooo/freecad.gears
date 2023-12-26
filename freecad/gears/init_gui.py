@@ -91,7 +91,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
         )
 
 class GearWorkbench(Workbench):
-    """glider workbench"""
+    """A freecad workbench aiming at gear design"""
 
     MenuText = "Gear"
     ToolTip = "Gear Workbench"
