@@ -17,6 +17,7 @@
 # ***************************************************************************
 
 import os
+import sys
 import FreeCADGui as Gui
 import FreeCAD as App
 
@@ -32,6 +33,62 @@ except ImportError as e:
         "the class Workbench is loaded, although not imported: magic"
     )
 
+
+if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+    # only works with 0.21.2 and above
+
+    FC_MAJOR_VER_REQUIRED = 0
+    FC_MINOR_VER_REQUIRED = 21
+    FC_PATCH_VER_REQUIRED = 2
+    FC_COMMIT_REQUIRED = 33772
+
+    # Check FreeCAD version
+    App.Console.PrintLog("Checking FreeCAD version\n")
+    ver = App.Version()
+    major_ver = int(ver[0])
+    minor_vers = ver[1].split(".")
+    minor_ver = int(minor_vers[0])
+    if minor_vers[1:] and minor_vers[1]:
+        patch_ver = int(minor_vers[1])
+    else:
+        patch_ver = 0
+    gitver = ver[2].split()
+    if gitver:
+        gitver = gitver[0]
+    if gitver and gitver != "Unknown":
+        gitver = int(gitver)
+    else:
+        # If we don't have the git version, assume it's OK.
+        gitver = FC_COMMIT_REQUIRED
+
+    if major_ver < FC_MAJOR_VER_REQUIRED or (
+        major_ver == FC_MAJOR_VER_REQUIRED
+        and (
+            minor_ver < FC_MINOR_VER_REQUIRED
+            or (
+                minor_ver == FC_MINOR_VER_REQUIRED
+                and (
+                    patch_ver < FC_PATCH_VER_REQUIRED
+                    or (
+                        patch_ver == FC_PATCH_VER_REQUIRED
+                        and gitver < FC_COMMIT_REQUIRED
+                    )
+                )
+            )
+        )
+    ):
+        App.Console.PrintWarning(
+            "FreeCAD version (currently {}.{}.{} ({})) must be at least {}.{}.{} ({}) in order to work with Python 3.11 and above\n".format(
+                int(ver[0]),
+                minor_ver,
+                patch_ver,
+                gitver,
+                FC_MAJOR_VER_REQUIRED,
+                FC_MINOR_VER_REQUIRED,
+                FC_PATCH_VER_REQUIRED,
+                FC_COMMIT_REQUIRED,
+            )
+        )
 
 class GearWorkbench(Workbench):
     """glider workbench"""
