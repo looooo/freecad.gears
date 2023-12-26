@@ -18,6 +18,7 @@
 
 from __future__ import division
 import os
+import sys
 
 import numpy as np
 import math
@@ -94,13 +95,22 @@ class ViewProviderGear(object):
         self._check_attr()
         return self.icon_fn
 
-    def dumps(self):
-        self._check_attr()
-        return {"icon_fn": self.icon_fn}
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+        def dumps(self):
+            self._check_attr()
+            return {"icon_fn": self.icon_fn}
 
-    def loads(self, state):
-        if state and "icon_fn" in state:
-            self.icon_fn = state["icon_fn"]
+        def loads(self, state):
+            if state and "icon_fn" in state:
+                self.icon_fn = state["icon_fn"]
+    else:
+        def __getstate__(self):
+            self._check_attr()
+            return {"icon_fn": self.icon_fn}
+
+        def __setstate__(self, state):
+            if state and "icon_fn" in state:
+                self.icon_fn = state["icon_fn"]
 
 
 class BaseGear(object):
@@ -147,11 +157,18 @@ class BaseGear(object):
         """
         raise NotImplementedError("generate_gear_shape not implemented")
 
-    def loads(self, state):
-        pass
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+        def loads(self, state):
+            pass
 
-    def dumps(self):
-        pass
+        def dumps(self):
+            pass
+    else:
+        def __setstate__(self, state):
+            pass
+
+        def __getstate__(self):
+            pass
 
 
 class InvoluteGear(BaseGear):
