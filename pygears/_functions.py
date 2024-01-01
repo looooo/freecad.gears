@@ -22,9 +22,11 @@ from numpy.linalg import solve, norm
 
 
 def reflection(angle):
-    mat = array([[cos(2 * angle), -sin(2 * angle)], [-sin(2 * angle), -cos(2 * angle)]])
+    mat = array([[cos(2 * angle), -sin(2 * angle)],
+                 [-sin(2 * angle), -cos(2 * angle)]])
 
     def func(x):
+        # why not use mat @ x???
         return dot(x, mat)
 
     return func
@@ -40,6 +42,7 @@ def reflection3D(angle):
     )
 
     def func(x):
+        # why not use mat @ x
         return dot(x, mat)
 
     return func
