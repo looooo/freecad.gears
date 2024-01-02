@@ -17,16 +17,16 @@
 # ***************************************************************************
 
 import os
+import sys
 import numpy as np
 import FreeCAD
 from pygears import __version__
-from .features import (
-    InvoluteGear,
-    CycloidGear,
-    InvoluteGearRack,
-    CycloidGearRack,
-    InternalInvoluteGear,
-)
+
+from .involutegear import InvoluteGear
+from .internalinvolutegear import InternalInvoluteGear
+from .involutegearrack import InvoluteGearRack
+from .cycloidgear import CycloidGear
+from .cycloidgearrack import CycloidGearRack
 from pygears.computation import compute_shifted_gears
 
 
@@ -42,12 +42,20 @@ class ViewProviderGearConnector(object):
 
     def getIcon(self):
         return self.icon_fn
+    
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+        def dumps(self):
+            return {"icon_fn": self.icon_fn}
 
-    def __getstate__(self):
-        return {"icon_fn": self.icon_fn}
+        def loads(self, state):
+            self.icon_fn = state["icon_fn"]
+    else:
+        def __getstate__(self):
+            return {"icon_fn": self.icon_fn}
 
-    def __setstate__(self, state):
-        self.icon_fn = state["icon_fn"]
+        def __setstate__(self, state):
+            self.icon_fn = state["icon_fn"]
+
 
 
 class GearConnector(object):

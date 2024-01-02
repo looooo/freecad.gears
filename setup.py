@@ -9,6 +9,6 @@ setup(
     maintainer_email="sppedflyer@gmail.com",
     url="https://github.com/looooo/FCGear",
     description="gears for FreeCAD",
-    install_requires=["numpy"],
+    install_requires=["numpy", "scipy"],
     include_package_data=True,
 )

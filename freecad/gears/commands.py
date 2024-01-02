@@ -22,20 +22,21 @@ import FreeCADGui as Gui
 
 from .features import (
     ViewProviderGear,
-    InvoluteGear,
-    InternalInvoluteGear,
-    InvoluteGearRack,
-    CycloidGearRack,
-    CycloidGear,
-    BevelGear,
-    CrownGear,
-    WormGear,
-    TimingGear,
-    LanternGear,
     HypoCycloidGear,
     BaseGear,
 )
-from .timing_gear_t import TimingGearT
+from .timinggear_t import TimingGearT
+from .involutegear import InvoluteGear
+from .internalinvolutegear import InternalInvoluteGear
+from .involutegearrack import InvoluteGearRack
+from .cycloidgearrack import CycloidGearRack
+from .crowngear import CrownGear
+from .cycloidgear import CycloidGear
+from .bevelgear import BevelGear
+from .wormgear import WormGear
+from .timinggear import TimingGear
+from .lanterngear import LanternGear
+
 
 from .connector import GearConnector, ViewProviderGearConnector
 
