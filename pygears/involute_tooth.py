@@ -125,7 +125,7 @@ class InvoluteTooth:
         y = array(list(map(fy, pts)))
         xy = transpose([x, y])
         rotate = rotation(
-            - self.undercut_rot - self.phipart / 2 + self.angular_backlash / 2
+            -self.undercut_rot - self.phipart / 2 + self.angular_backlash / 2
         )
         xy = rotate(xy)
         return array(xy)
@@ -136,7 +136,7 @@ class InvoluteTooth:
         x = array(list(map(fx, pts)))
         fy = self.involute_function_y()
         y = array(list(map(fy, pts)))
-        rot = rotation(- self.involute_rot + self.angular_backlash / 2)
+        rot = rotation(-self.involute_rot + self.angular_backlash / 2)
         xy = rot(transpose(array([x, y])))
         return xy
 

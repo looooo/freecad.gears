@@ -110,7 +110,7 @@ class CycloidTooth:
         pts_outer = transpose([pts_outer_x, pts_outer_y])
         pts_inner = transpose([pts_inner_x, pts_inner_y])
         pts1 = vstack([pts_inner[:-2], pts_outer])
-        rot = rotation(- self.phipart / 4 + self.angular_backlash / 2)
+        rot = rotation(-self.phipart / 4 + self.angular_backlash / 2)
         pts1 = rot(pts1)
         ref = reflection(0.0)
         pts2 = ref(pts1)[::-1]

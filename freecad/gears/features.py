@@ -20,6 +20,7 @@
 # this file is only for backwards compatibility, and will be deleted in the future
 
 from freecad import app
+
 app.Console.PrintWarning("This file is deprecated, this warning is a very bad sign ;)")
 
 from .timinggear_t import TimingGearT

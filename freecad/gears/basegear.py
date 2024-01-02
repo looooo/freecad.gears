@@ -23,7 +23,6 @@ from freecad import app
 from freecad import part
 
 import numpy as np
-import math
 
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center

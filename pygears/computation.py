@@ -44,9 +44,9 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
 
     def d_root_inv(x):
         return 1.0 / np.cos(x) - 1
-    
+
     # use scipy (sp.optimize.minimize(f, f0, df).x) here (as we depent on scipy anyways)
-    alpha_w = find_root(alpha, root_inv, d_root_inv)  
+    alpha_w = find_root(alpha, root_inv, d_root_inv)
     dist = m * (t1 + t2) / 2 * np.cos(alpha) / np.cos(alpha_w)
     return dist, alpha_w
 

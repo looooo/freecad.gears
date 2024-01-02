@@ -175,9 +175,7 @@ class GearConnector(object):
             mat1 = app.Matrix()
             mat1.move(app.Vector(0, np.deg2rad(fp.angle1.Value) * dw_master / 2, 0))
             mat2 = app.Matrix()
-            mat2.move(
-                app.Vector(0, -np.deg2rad(fp.angle2.Value) * dw_master / 2, 0)
-            )
+            mat2.move(app.Vector(0, -np.deg2rad(fp.angle2.Value) * dw_master / 2, 0))
             rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
             mat3 = rot * mat2 * mat1 * mat0
             mat3.move(fp.master_gear.Placement.Base)
