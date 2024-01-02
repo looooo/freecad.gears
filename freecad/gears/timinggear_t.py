@@ -25,7 +25,7 @@ import Part
 
 from pygears._functions import rotation, reflection
 
-from .basegear import BaseGear, fcvec
+from .features import BaseGear, fcvec
 
 
 class TimingGearT(BaseGear):

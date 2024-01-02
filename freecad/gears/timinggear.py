@@ -22,7 +22,7 @@ import Part
 import numpy as np
 
 from pygears._functions import reflection
-from .basegear import BaseGear, part_arc_from_points_and_center
+from .features import BaseGear, part_arc_from_points_and_center
 
 
 class TimingGear(BaseGear):
