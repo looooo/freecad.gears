@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -25,11 +24,12 @@ from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
 from .features import (
-    BaseGear, 
-    points_to_wire, 
-    insert_fillet, 
-    helicalextrusion, 
-    rotate_tooth)
+    BaseGear,
+    points_to_wire,
+    insert_fillet,
+    helicalextrusion,
+    rotate_tooth,
+)
 
 
 class InvoluteGear(BaseGear):

@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -23,10 +22,7 @@ import Part
 import numpy as np
 
 from pygears._functions import reflection
-from .features import (
-    BaseGear, 
-    part_arc_from_points_and_center
-)
+from .features import BaseGear, part_arc_from_points_and_center
 
 
 class TimingGear(BaseGear):
@@ -287,4 +283,3 @@ class TimingGear(BaseGear):
             return wi
         else:
             return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
-

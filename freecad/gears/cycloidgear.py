@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -25,11 +24,12 @@ from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
 from .features import (
-    BaseGear, 
-    points_to_wire, 
-    insert_fillet, 
-    helicalextrusion, 
-    rotate_tooth)
+    BaseGear,
+    points_to_wire,
+    insert_fillet,
+    helicalextrusion,
+    rotate_tooth,
+)
 
 
 class CycloidGear(BaseGear):
@@ -191,4 +191,3 @@ class CycloidGear(BaseGear):
                 fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
             )
             return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
-

@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -85,8 +84,9 @@ class LanternGear(BaseGear):
                 + 2 * r_r * np.sin(phi_min)
             )
 
-        phi_min = sp.optimize.root(
-            find_phi_min, (phi_max + r_r / r_0 * 4) / 5).x[0]  # , r_r / r_0, phi_max)
+        phi_min = sp.optimize.root(find_phi_min, (phi_max + r_r / r_0 * 4) / 5).x[
+            0
+        ]  # , r_r / r_0, phi_max)
 
         # phi_min = 0 # r_r / r_0
         phi = np.linspace(phi_min, phi_max, fp.num_profiles)
@@ -131,4 +131,3 @@ class LanternGear(BaseGear):
             return wi
         else:
             return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
-

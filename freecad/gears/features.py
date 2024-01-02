@@ -36,7 +36,6 @@ from pygears._functions import (
 )
 
 
-
 def fcvec(x):
     if len(x) == 2:
         return App.Vector(x[0], x[1], 0)
@@ -69,6 +68,7 @@ class ViewProviderGear(object):
         return self.icon_fn
 
     if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+
         def dumps(self):
             self._check_attr()
             return {"icon_fn": self.icon_fn}
@@ -77,6 +77,7 @@ class ViewProviderGear(object):
             if state and "icon_fn" in state:
                 self.icon_fn = state["icon_fn"]
     else:
+
         def __getstate__(self):
             self._check_attr()
             return {"icon_fn": self.icon_fn}
@@ -131,12 +132,14 @@ class BaseGear(object):
         raise NotImplementedError("generate_gear_shape not implemented")
 
     if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+
         def loads(self, state):
             pass
 
         def dumps(self):
             pass
     else:
+
         def __setstate__(self, state):
             pass
 

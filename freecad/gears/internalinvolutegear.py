@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -25,11 +24,12 @@ from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
 from .features import (
-    BaseGear, 
-    points_to_wire, 
-    insert_fillet, 
-    helicalextrusion, 
-    rotate_tooth)
+    BaseGear,
+    points_to_wire,
+    insert_fillet,
+    helicalextrusion,
+    rotate_tooth,
+)
 
 
 class InternalInvoluteGear(BaseGear):
@@ -246,4 +246,3 @@ class InternalInvoluteGear(BaseGear):
             inner_circle.reverse()
             base = Part.Face([outer_circle, inner_circle])
             return base.extrude(App.Vector(0, 0, fp.height.Value))
-

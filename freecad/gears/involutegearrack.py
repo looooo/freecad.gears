@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -24,12 +23,8 @@ import Part
 import numpy as np
 from pygears.involute_tooth import InvoluteRack
 
-from .features import (
-    BaseGear,
-    fcvec,
-    points_to_wire,
-    insert_fillet
-    )
+from .features import BaseGear, fcvec, points_to_wire, insert_fillet
+
 
 class InvoluteGearRack(BaseGear):
 
@@ -242,4 +237,3 @@ class InvoluteGearRack(BaseGear):
                 fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
             )
             return Part.makeLoft([pol, pol2], True)
-
