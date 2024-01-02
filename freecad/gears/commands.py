@@ -20,7 +20,7 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 
-from .features import (
+from .basegear import (
     ViewProviderGear,
     HypoCycloidGear,
     BaseGear,

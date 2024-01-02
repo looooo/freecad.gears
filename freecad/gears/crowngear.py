@@ -24,7 +24,7 @@ import Part
 
 import numpy as np
 
-from .features import BaseGear, fcvec
+from .basegear import BaseGear, fcvec
 
 
 class CrownGear(BaseGear):

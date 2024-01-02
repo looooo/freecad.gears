@@ -23,7 +23,7 @@ import numpy as np
 from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
-from .features import (
+from .basegear import (
     BaseGear,
     points_to_wire,
     insert_fillet,

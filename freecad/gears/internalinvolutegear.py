@@ -23,7 +23,7 @@ import numpy as np
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
-from .features import (
+from .basegear import (
     BaseGear,
     points_to_wire,
     insert_fillet,
