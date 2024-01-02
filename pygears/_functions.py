@@ -16,7 +16,6 @@
 # *                                                                         *
 # ***************************************************************************
 
-from __future__ import division
 from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
 from numpy.linalg import solve, norm
 
@@ -26,7 +25,8 @@ def reflection(angle):
                  [-sin(2 * angle), -cos(2 * angle)]])
 
     def func(x):
-        # why not use mat @ x???
+        # we do not use matrix-multiplication here because this is meant to work 
+        # on an array of points
         return dot(x, mat)
 
     return func
@@ -50,7 +50,8 @@ def reflection3D(angle):
 
 def rotation(angle, midpoint=None):
     midpoint = midpoint or [0.0, 0.0]
-    mat = array([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]])
+    mat = array([[cos(angle), -sin(angle)], 
+                 [sin(angle), cos(angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
@@ -63,7 +64,9 @@ def rotation(angle, midpoint=None):
 
 def rotation3D(angle):
     mat = array(
-        [[cos(angle), -sin(angle), 0.0], [sin(angle), cos(angle), 0.0], [0.0, 0.0, 1.0]]
+        [[cos(angle), -sin(angle), 0.0], 
+         [sin(angle), cos(angle), 0.0], 
+         [0.0, 0.0, 1.0]]
     )
 
     def func(xx):
@@ -74,7 +77,8 @@ def rotation3D(angle):
 
 def translation(vec):
     def trans(x):
-        return [x[0] + vec[0], x[1] + vec[1]]
+        return [x[0] + vec[0], 
+                x[1] + vec[1]]
 
     def func(x):
         return array(list(map(trans, x)))

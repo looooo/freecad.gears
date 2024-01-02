@@ -16,8 +16,6 @@
 # *                                                                         *
 # ***************************************************************************
 
-from __future__ import division
-from __future__ import division
 from numpy import (
     cos,
     sin,
@@ -28,7 +26,6 @@ from numpy import (
     array,
     linspace,
     transpose,
-    vstack,
     sqrt,
 )
 from ._functions import rotation3D, reflection3D, intersection_line_circle

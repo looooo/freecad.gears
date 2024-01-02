@@ -16,7 +16,6 @@
 # *                                                                         *
 # ***************************************************************************
 
-from __future__ import division
 from numpy import (
     tan,
     cos,
