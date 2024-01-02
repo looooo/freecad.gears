@@ -23,10 +23,7 @@ import scipy as sp
 import FreeCAD as App
 import Part
 
-from pygears._functions import (
-    rotation,
-    reflection
-)
+from pygears._functions import rotation, reflection
 
 from .features import BaseGear, fcvec
 
@@ -36,8 +33,15 @@ class TimingGearT(BaseGear):
         print("hello gear")
         obj.addProperty("App::PropertyLength", "pitch", "base", "pitch of gear")
         obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
-        obj.addProperty("App::PropertyLength", "tooth_height", "base", "radial height of tooth")
-        obj.addProperty("App::PropertyLength", "u", "base", "radial distance from tooth-head to pitch circle")
+        obj.addProperty(
+            "App::PropertyLength", "tooth_height", "base", "radial height of tooth"
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "u",
+            "base",
+            "radial distance from tooth-head to pitch circle",
+        )
         obj.addProperty("App::PropertyAngle", "alpha", "base", "angle of tooth flanks")
         obj.addProperty("App::PropertyLength", "height", "base", "extrusion height")
         obj.pitch = "5. mm"
@@ -48,30 +52,30 @@ class TimingGearT(BaseGear):
         obj.height = "5 mm"
         self.obj = obj
         obj.Proxy = self
-    
+
     def generate_gear_shape(self, fp):
         print("generate gear shape")
         pitch = fp.pitch.Value
         teeth = fp.teeth
         u = fp.u.Value
         tooth_height = fp.tooth_height.Value
-        alpha = fp.alpha.Value / 180. * np.pi  # we need radiant
+        alpha = fp.alpha.Value / 180.0 * np.pi  # we need radiant
         height = fp.height.Value
 
-        r_p = pitch * teeth / 2. / np.pi
+        r_p = pitch * teeth / 2.0 / np.pi
         gamma_0 = pitch / r_p
         gamma_1 = gamma_0 / 4
 
-        p_A = np.array([
-            np.cos(-gamma_1),
-            np.sin(-gamma_1)
-            ]) * (r_p - u - tooth_height / 2)
-    
+        p_A = np.array([np.cos(-gamma_1), np.sin(-gamma_1)]) * (
+            r_p - u - tooth_height / 2
+        )
+
         def line(s):
-            p = p_A + np.array([
-                np.cos(alpha / 2 - gamma_1),
-                np.sin(alpha / 2 - gamma_1)
-            ]) * s
+            p = (
+                p_A
+                + np.array([np.cos(alpha / 2 - gamma_1), np.sin(alpha / 2 - gamma_1)])
+                * s
+            )
             return p
 
         def dist_p1(s):
@@ -79,14 +83,14 @@ class TimingGearT(BaseGear):
 
         def dist_p2(s):
             return (np.linalg.norm(line(s)) - (r_p - u)) ** 2
-        
-        s1 = sp.optimize.minimize(dist_p1, 0.).x
-        s2 = sp.optimize.minimize(dist_p2, 0.).x
+
+        s1 = sp.optimize.minimize(dist_p1, 0.0).x
+        s2 = sp.optimize.minimize(dist_p2, 0.0).x
 
         p_1 = line(s1)
         p_2 = line(s2)
 
-        mirror = reflection(0.)  # reflect the points at the x-axis
+        mirror = reflection(0.0)  # reflect the points at the x-axis
         p_3, p_4 = mirror(np.array([p_2, p_1]))
 
         rot = rotation(-gamma_0)  # why is the rotation in wrong direction ???
@@ -97,7 +101,7 @@ class TimingGearT(BaseGear):
         l3 = Part.LineSegment(fcvec(p_3), fcvec(p_4)).toShape()
         l4 = Part.LineSegment(fcvec(p_4), fcvec(p_5)).toShape()
         w = Part.Wire([l1, l2, l3, l4])
-        
+
         # now using a FreeCAD Matrix (this will turn in the right direction)
         rot = App.Matrix()
         rot.rotateZ(gamma_0)
@@ -110,4 +114,4 @@ class TimingGearT(BaseGear):
             return contour
         else:
             face = Part.Face(Part.Wire(wires))
-            return face.extrude(App.Vector(0., 0., height))
+            return face.extrude(App.Vector(0.0, 0.0, height))

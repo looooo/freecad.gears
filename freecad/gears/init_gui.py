@@ -90,6 +90,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
             )
         )
 
+
 class GearWorkbench(Workbench):
     """A freecad workbench aiming at gear design"""
 
@@ -129,7 +130,7 @@ class GearWorkbench(Workbench):
             CreateLanternGear,
             CreateHypoCycloidGear,
             CreateCycloidRack,
-            CreateGearConnector
+            CreateGearConnector,
         )
 
         self.appendToolbar("Gear", self.commands)

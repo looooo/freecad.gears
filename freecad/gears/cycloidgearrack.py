@@ -25,12 +25,7 @@ import Part
 import numpy as np
 
 from pygears._functions import reflection
-from .features import (
-    BaseGear,
-    fcvec,
-    points_to_wire,
-    insert_fillet
-    )
+from .features import BaseGear, fcvec, points_to_wire, insert_fillet
 
 
 class CycloidGearRack(BaseGear):

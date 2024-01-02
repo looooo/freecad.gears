@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
@@ -29,6 +28,7 @@ from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
 from .features import BaseGear, make_bspline_wire
+
 
 class HypoCycloidGear(BaseGear):
 
@@ -281,4 +281,3 @@ class HypoCycloidGear(BaseGear):
 
         if to_be_fused:
             return Part.makeCompound(to_be_fused)
-

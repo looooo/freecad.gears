@@ -42,20 +42,21 @@ class ViewProviderGearConnector(object):
 
     def getIcon(self):
         return self.icon_fn
-    
+
     if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+
         def dumps(self):
             return {"icon_fn": self.icon_fn}
 
         def loads(self, state):
             self.icon_fn = state["icon_fn"]
     else:
+
         def __getstate__(self):
             return {"icon_fn": self.icon_fn}
 
         def __setstate__(self, state):
             self.icon_fn = state["icon_fn"]
-
 
 
 class GearConnector(object):
