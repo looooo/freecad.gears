@@ -119,7 +119,7 @@ class BevelGear(BaseGear):
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
         pts = list(fp.gear.points(num=fp.numpoints))
-        rot = rotation3D(2 * np.pi / fp.teeth)
+        rot = rotation3D(- 2 * np.pi / fp.teeth)
         # if fp.beta.Value != 0:
         #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
@@ -142,7 +142,7 @@ class BevelGear(BaseGear):
         else:
             for scale_i in np.linspace(scale_0, scale_1, 20):
                 # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
-                # rot = rotation3D(beta_i)
+                # rot = rotation3D(- beta_i)
                 # points = [rot(pt) * scale_i for pt in pts]
                 angle = (
                     fp.beta.Value
@@ -203,4 +203,4 @@ class BevelGear(BaseGear):
 
     def spherical_rot(self, point, phi):
         new_phi = np.sqrt(np.linalg.norm(point)) * phi
-        return rotation3D(new_phi)(point)
+        return rotation3D(- new_phi)(point)

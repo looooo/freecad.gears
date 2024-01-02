@@ -213,13 +213,13 @@ class BevelTooth(object):
         intersection_point = intersection_line_circle(xy[i], point, r_cut)
         xy = array([intersection_point] + list(xy[i + 1 :]))
         xyz = [[p[0], p[1], 1] for p in xy]
-        backlash_rot = rotation3D(self.angular_backlash / 2)
+        backlash_rot = rotation3D(- self.angular_backlash / 2)
         xyz = backlash_rot(xyz)
         return xyz
 
     def points(self, num=10):
         pts = self.involute_points(num=num)
-        rot = rotation3D(-pi / self.z / 2)
+        rot = rotation3D(pi / self.z / 2)
         pts = rot(pts)
         ref = reflection3D(pi / 2)
         pts1 = ref(pts)[::-1]

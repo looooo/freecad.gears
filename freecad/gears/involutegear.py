@@ -206,7 +206,7 @@ class InvoluteGear(BaseGear):
 
         if not obj.simple:
             pts = obj.gear.points(num=obj.numpoints)
-            rot = rotation(-obj.gear.phipart)
+            rot = rotation(obj.gear.phipart)
             rotated_pts = list(map(rot, pts))
             pts.append([pts[-1][-1], rotated_pts[0][0]])
             pts += rotated_pts

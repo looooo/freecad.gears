@@ -112,7 +112,7 @@ class LanternGear(BaseGear):
             app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
         ).toShape()
 
-        rot = rotation(-np.pi * 2 / teeth)
+        rot = rotation(np.pi * 2 / teeth)
         p_3 = rot(np.array([p_2_end]))[0]
         # l = part.LineSegment(fcvec(p_1_end), fcvec(p_3)).toShape()
         l = part_arc_from_points_and_center(

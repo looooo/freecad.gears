@@ -33,7 +33,7 @@ class _GearProfile(object):
         if self.rot3D:
             rot = rotation3D(np.pi * 2 / self.z)
         else:
-            rot = rotation(-np.pi * 2 / self.z)
+            rot = rotation(np.pi * 2 / self.z)
         profile = tooth
         for i in range(self.z - 1):
             tooth = rot(tooth).tolist()

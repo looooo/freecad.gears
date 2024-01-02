@@ -155,7 +155,7 @@ class CycloidGear(BaseGear):
         fp.gear._update()
 
         pts = fp.gear.points(num=fp.numpoints)
-        rot = rotation(-fp.gear.phipart)
+        rot = rotation(fp.gear.phipart)
         rotated_pts = list(map(rot, pts))
         pts.append([pts[-1][-1], rotated_pts[0][0]])
         pts += rotated_pts

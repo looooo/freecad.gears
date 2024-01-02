@@ -93,7 +93,7 @@ class TimingGearT(BaseGear):
         mirror = reflection(0.0)  # reflect the points at the x-axis
         p_3, p_4 = mirror(np.array([p_2, p_1]))
 
-        rot = rotation(-gamma_0)  # why is the rotation in wrong direction ???
+        rot = rotation(gamma_0)  # why is the rotation in wrong direction ???
         p_5 = rot(np.array([p_1]))[0]  # the rotation expects a list of points
 
         l1 = part.LineSegment(fcvec(p_1), fcvec(p_2)).toShape()

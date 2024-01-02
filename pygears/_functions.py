@@ -42,7 +42,6 @@ def reflection3D(angle):
     )
 
     def func(x):
-        # why not use mat @ x
         return dot(x, mat)
 
     return func
@@ -50,8 +49,8 @@ def reflection3D(angle):
 
 def rotation(angle, midpoint=None):
     midpoint = midpoint or [0.0, 0.0]
-    mat = array([[cos(angle), -sin(angle)], 
-                 [sin(angle), cos(angle)]])
+    mat = array([[cos(angle), sin(angle)], 
+                 [-sin(angle), cos(angle)]])
     midpoint = array(midpoint)
     vec = midpoint - dot(midpoint, mat)
     trans = translation(vec)
@@ -64,8 +63,8 @@ def rotation(angle, midpoint=None):
 
 def rotation3D(angle):
     mat = array(
-        [[cos(angle), -sin(angle), 0.0], 
-         [sin(angle), cos(angle), 0.0], 
+        [[cos(angle), sin(angle), 0.0], 
+         [-sin(angle), cos(angle), 0.0], 
          [0.0, 0.0, 1.0]]
     )
 
