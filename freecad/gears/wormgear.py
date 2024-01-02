@@ -23,7 +23,7 @@ import numpy as np
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
-from .features import BaseGear, helicalextrusion, fcvec
+from .basegear import BaseGear, helicalextrusion, fcvec
 
 
 class WormGear(BaseGear):
