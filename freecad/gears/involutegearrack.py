@@ -23,7 +23,7 @@ import Part
 import numpy as np
 from pygears.involute_tooth import InvoluteRack
 
-from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
+from .features import BaseGear, fcvec, points_to_wire, insert_fillet
 
 
 class InvoluteGearRack(BaseGear):

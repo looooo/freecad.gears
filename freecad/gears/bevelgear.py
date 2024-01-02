@@ -23,7 +23,7 @@ import numpy as np
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D
 
-from .basegear import BaseGear, fcvec, make_bspline_wire
+from .features import BaseGear, fcvec, make_bspline_wire
 
 
 class BevelGear(BaseGear):

@@ -20,7 +20,11 @@ import os
 import FreeCAD
 import FreeCADGui as Gui
 
-from .basegear import ViewProviderGear, BaseGear
+from .features import (
+    ViewProviderGear,
+    HypoCycloidGear,
+    BaseGear,
+)
 from .timinggear_t import TimingGearT
 from .involutegear import InvoluteGear
 from .internalinvolutegear import InternalInvoluteGear
@@ -32,7 +36,7 @@ from .bevelgear import BevelGear
 from .wormgear import WormGear
 from .timinggear import TimingGear
 from .lanterngear import LanternGear
-from .hypocycloidgear import HypoCycloidGear
+
 
 from .connector import GearConnector, ViewProviderGearConnector
 

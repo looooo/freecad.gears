@@ -27,7 +27,7 @@ import Part
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, make_bspline_wire
+from .features import BaseGear, make_bspline_wire
 
 
 class HypoCycloidGear(BaseGear):

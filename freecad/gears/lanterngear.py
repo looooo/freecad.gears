@@ -25,7 +25,7 @@ import scipy as sp
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, fcvec, part_arc_from_points_and_center
+from .features import BaseGear, fcvec, part_arc_from_points_and_center
 
 
 class LanternGear(BaseGear):
