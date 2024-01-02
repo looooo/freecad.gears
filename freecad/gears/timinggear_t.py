@@ -20,7 +20,7 @@
 import numpy as np
 import scipy as sp
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 from pygears._functions import rotation, reflection
@@ -103,7 +103,7 @@ class TimingGearT(BaseGear):
         w = Part.Wire([l1, l2, l3, l4])
 
         # now using a FreeCAD Matrix (this will turn in the right direction)
-        rot = App.Matrix()
+        rot = app.Matrix()
         rot.rotateZ(gamma_0)
         wires = []
         for i in range(teeth):
@@ -114,4 +114,4 @@ class TimingGearT(BaseGear):
             return contour
         else:
             face = Part.Face(Part.Wire(wires))
-            return face.extrude(App.Vector(0.0, 0.0, height))
+            return face.extrude(app.Vector(0.0, 0.0, height))

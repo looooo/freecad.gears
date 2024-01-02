@@ -17,8 +17,8 @@
 # ***************************************************************************
 
 import os
-import FreeCAD
-import FreeCADGui as Gui
+from freecad import app
+from freecad import gui
 
 from .basegear import ViewProviderGear, BaseGear
 
@@ -48,33 +48,33 @@ class BaseCommand(object):
         pass
 
     def IsActive(self):
-        if FreeCAD.ActiveDocument is None:
+        if app.ActiveDocument is None:
             return False
         else:
             return True
 
     def Activated(self):
-        Gui.doCommandGui("import freecad.gears.commands")
-        Gui.doCommandGui(
+        gui.doCommandGui("import freecad.gears.commands")
+        gui.doCommandGui(
             "freecad.gears.commands.{}.create()".format(self.__class__.__name__)
         )
-        FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
+        app.ActiveDocument.recompute()
+        gui.SendMsgToActiveView("ViewFit")
 
     @classmethod
     def create(cls):
-        if FreeCAD.GuiUp:
+        if app.GuiUp:
             # borrowed from threaded profiles
             # puts the gear into an active container
-            body = Gui.ActiveDocument.ActiveView.getActiveObject("pdbody")
-            part = Gui.ActiveDocument.ActiveView.getActiveObject("part")
+            body = gui.ActiveDocument.ActiveView.getActiveObject("pdbody")
+            part = gui.ActiveDocument.ActiveView.getActiveObject("part")
 
             if body:
-                obj = FreeCAD.ActiveDocument.addObject(
+                obj = app.ActiveDocument.addObject(
                     "PartDesign::FeaturePython", cls.NAME
                 )
             else:
-                obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
+                obj = app.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
             ViewProviderGear(obj.ViewObject, cls.Pixmap)
             cls.GEAR_FUNCTION(obj)
 
@@ -83,7 +83,7 @@ class BaseCommand(object):
             elif part:
                 part.Group += [obj]
         else:
-            obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
+            obj = app.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
             cls.GEAR_FUNCTION(obj)
         return obj
 
@@ -199,17 +199,17 @@ class CreateGearConnector(BaseCommand):
     ToolTip = "Combine two gears"
 
     def Activated(self):
-        gear1 = Gui.Selection.getSelection()[0]
+        gear1 = gui.Selection.getSelection()[0]
         assert isinstance(gear1.Proxy, BaseGear)
 
-        gear2 = Gui.Selection.getSelection()[1]
+        gear2 = gui.Selection.getSelection()[1]
         assert isinstance(gear2.Proxy, BaseGear)
 
         # check if selected objects are beams
 
-        obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
+        obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
         GearConnector(obj, gear1, gear2)
         ViewProviderGearConnector(obj.ViewObject)
 
-        FreeCAD.ActiveDocument.recompute()
+        app.ActiveDocument.recompute()
         return obj

@@ -16,7 +16,7 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 import numpy as np
@@ -185,7 +185,7 @@ class CycloidGear(BaseGear):
             return profile
         base = Part.Face(profile)
         if fp.beta.Value == 0:
-            return base.extrude(App.Vector(0, 0, fp.height.Value))
+            return base.extrude(app.Vector(0, 0, fp.height.Value))
         else:
             twist_angle = (
                 fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d

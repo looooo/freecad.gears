@@ -19,9 +19,8 @@
 import math
 
 import numpy as np
-import scipy as sp
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 from pygears.bevel_tooth import BevelTooth
@@ -195,16 +194,16 @@ class HypoCycloidGear(BaseGear):
         minRadius = self.calc_pressure_limit(p, d, e, n, minAngle * math.pi / 180.0)
         maxRadius = self.calc_pressure_limit(p, d, e, n, maxAngle * math.pi / 180.0)
         # unused
-        # Part.Wire(Part.makeCircle(minRadius,App.Vector(-e, 0, 0)))
-        # Part.Wire(Part.makeCircle(maxRadius,App.Vector(-e, 0, 0)))
+        # Part.Wire(Part.makeCircle(minRadius, app.Vector(-e, 0, 0)))
+        # Part.Wire(Part.makeCircle(maxRadius, app.Vector(-e, 0, 0)))
 
-        App.Console.PrintMessage("Generating cam disk\r\n")
+        app.Console.PrintMessage("Generating cam disk\r\n")
         # generate the cam profile - note: shifted in -x by eccentricicy amount
         i = 0
         x = self.calc_x(p, d, e, n, q * i / float(n))
         y = self.calc_y(p, d, e, n, q * i / n)
         x, y = self.check_limit(x, y, maxRadius, minRadius, c)
-        points = [App.Vector(x - e, y, 0)]
+        points = [app.Vector(x - e, y, 0)]
         for i in range(0, s):
             x = self.calc_x(p, d, e, n, q * (i + 1) / n)
             y = self.calc_y(p, d, e, n, q * (i + 1) / n)
@@ -213,10 +212,10 @@ class HypoCycloidGear(BaseGear):
 
         wi = make_bspline_wire([points])
         wires = []
-        mat = App.Matrix()
-        mat.move(App.Vector(e, 0.0, 0.0))
+        mat = app.Matrix()
+        mat.move(app.Vector(e, 0.0, 0.0))
         mat.rotateZ(2 * np.pi / n)
-        mat.move(App.Vector(-e, 0.0, 0.0))
+        mat.move(app.Vector(-e, 0.0, 0.0))
         for _ in range(n):
             wi = wi.transformGeometry(mat)
             wires.append(wi)
@@ -225,7 +224,7 @@ class HypoCycloidGear(BaseGear):
         # add a circle in the center of the cam
         if fp.hole_radius.Value:
             centerCircle = Part.Face(
-                Part.Wire(Part.makeCircle(fp.hole_radius.Value, App.Vector(-e, 0, 0)))
+                Part.Wire(Part.makeCircle(fp.hole_radius.Value, app.Vector(-e, 0, 0)))
             )
             cam = cam.cut(centerCircle)
 
@@ -234,34 +233,34 @@ class HypoCycloidGear(BaseGear):
             if fp.disk_height.Value == 0:
                 to_be_fused.append(cam)
             else:
-                to_be_fused.append(cam.extrude(App.Vector(0, 0, fp.disk_height.Value)))
+                to_be_fused.append(cam.extrude(app.Vector(0, 0, fp.disk_height.Value)))
 
         # secondary cam disk
         if fp.show_disk1 == True:
-            App.Console.PrintMessage("Generating secondary cam disk\r\n")
+            app.Console.PrintMessage("Generating secondary cam disk\r\n")
             second_cam = cam.copy()
-            mat = App.Matrix()
+            mat = app.Matrix()
             mat.rotateZ(np.pi)
-            mat.move(App.Vector(-e, 0, 0))
+            mat.move(app.Vector(-e, 0, 0))
             if n % 2 == 0:
                 mat.rotateZ(np.pi / n)
-            mat.move(App.Vector(e, 0, 0))
+            mat.move(app.Vector(e, 0, 0))
             second_cam = second_cam.transformGeometry(mat)
             if fp.disk_height.Value == 0:
                 to_be_fused.append(second_cam)
             else:
                 to_be_fused.append(
-                    second_cam.extrude(App.Vector(0, 0, -fp.disk_height.Value))
+                    second_cam.extrude(app.Vector(0, 0, -fp.disk_height.Value))
                 )
 
         # pins
         if fp.show_pins == True:
-            App.Console.PrintMessage("Generating pins\r\n")
+            app.Console.PrintMessage("Generating pins\r\n")
             pins = []
             for i in range(0, n + 1):
                 x = p * n * math.cos(2 * math.pi / (n + 1) * i)
                 y = p * n * math.sin(2 * math.pi / (n + 1) * i)
-                pins.append(Part.Wire(Part.makeCircle(d / 2, App.Vector(x, y, 0))))
+                pins.append(Part.Wire(Part.makeCircle(d / 2, app.Vector(x, y, 0))))
 
             pins = Part.Face(pins)
 
@@ -273,9 +272,9 @@ class HypoCycloidGear(BaseGear):
                     z_offset += -fp.disk_height.Value / 2
             # extrude
             if z_offset != 0:
-                pins.translate(App.Vector(0, 0, z_offset))
+                pins.translate(app.Vector(0, 0, z_offset))
             if fp.pin_height != 0:
-                pins = pins.extrude(App.Vector(0, 0, fp.pin_height.Value))
+                pins = pins.extrude(app.Vector(0, 0, fp.pin_height.Value))
 
             to_be_fused.append(pins)
 

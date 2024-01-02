@@ -19,7 +19,7 @@
 import os
 import sys
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 import numpy as np
@@ -179,7 +179,7 @@ class CycloidGearRack(BaseGear):
 
         for i in range(obj.teeth - 1):
             tooth = tooth.copy()
-            tooth.translate(App.Vector(0, np.pi * m, 0))
+            tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
 
         teeth[-1] = Part.Wire(teeth[-1].Edges[:-1])
@@ -187,7 +187,7 @@ class CycloidGearRack(BaseGear):
         if obj.add_endings:
             teeth = [Part.Wire(tooth_edges[0])] + teeth
             last_edge = tooth_edges[-1]
-            last_edge.translate(App.Vector(0, np.pi * m * (obj.teeth - 1), 0))
+            last_edge.translate(app.Vector(0, np.pi * m * (obj.teeth - 1), 0))
             teeth = teeth + [Part.Wire(last_edge)]
 
         p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])

@@ -16,10 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+import numpy as np
+
+from freecad import app
 import Part
 
-import numpy as np
 
 from pygears._functions import reflection
 from .basegear import BaseGear, part_arc_from_points_and_center
@@ -176,9 +177,9 @@ class TimingGear(BaseGear):
             arcs.append(part_arc_from_points_and_center(xn4, xn2, mn_34).toShape())
             arcs.append(
                 Part.Arc(
-                    App.Vector(*xn2, 0.0),
-                    App.Vector(0, rp - h, 0.0),
-                    App.Vector(*x2, 0.0),
+                    app.Vector(*xn2, 0.0),
+                    app.Vector(0, rp - h, 0.0),
+                    app.Vector(*x2, 0.0),
                 ).toShape()
             )
             arcs.append(part_arc_from_points_and_center(x2, x4, m_34).toShape())
@@ -272,7 +273,7 @@ class TimingGear(BaseGear):
 
         wire = Part.Wire(arcs)
         wires = [wire]
-        rot = App.Matrix()
+        rot = app.Matrix()
         rot.rotateZ(np.pi * 2 / fp.teeth)
         for _ in range(fp.teeth - 1):
             wire = wire.transformGeometry(rot)
@@ -282,4 +283,4 @@ class TimingGear(BaseGear):
         if fp.height.Value == 0:
             return wi
         else:
-            return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
+            return Part.Face(wi).extrude(app.Vector(0, 0, fp.height))

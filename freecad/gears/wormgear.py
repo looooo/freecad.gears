@@ -16,10 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+import numpy as np
+
+from freecad import app
 import Part
 
-import numpy as np
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -102,8 +103,8 @@ class WormGear(BaseGear):
         phi_1 = 2 * z_1 / m / t
         c1 = Part.makeCircle(
             r_1,
-            App.Vector(0, 0, 0),
-            App.Vector(0, 0, 1),
+            app.Vector(0, 0, 0),
+            app.Vector(0, 0, 1),
             np.rad2deg(phi_0),
             np.rad2deg(phi_1),
         )
@@ -121,8 +122,8 @@ class WormGear(BaseGear):
         phi_3 = 2 * z_3 / m / t
         c2 = Part.makeCircle(
             r_2,
-            App.Vector(0, 0, 0),
-            App.Vector(0, 0, 1),
+            app.Vector(0, 0, 0),
+            app.Vector(0, 0, 1),
             np.rad2deg(phi_2),
             np.rad2deg(phi_3),
         )
@@ -138,7 +139,7 @@ class WormGear(BaseGear):
         wire = Part.Wire([c1, bsp1, c2, bsp2])
         w_all = [wire]
 
-        rot = App.Matrix()
+        rot = app.Matrix()
         rot.rotateZ(2 * np.pi / t)
         for i in range(1, t):
             w_all.append(w_all[-1].transformGeometry(rot))

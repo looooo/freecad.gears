@@ -16,10 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+import numpy as np
+
+from freecad import app
 import Part
 
-import numpy as np
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -235,7 +236,7 @@ class InternalInvoluteGear(BaseGear):
                 return Part.makeCompound([outer_circle, profile])
             base = Part.Face([outer_circle, profile])
             if fp.beta.Value == 0:
-                return base.extrude(App.Vector(0, 0, fp.height.Value))
+                return base.extrude(app.Vector(0, 0, fp.height.Value))
             else:
                 twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
                 return helicalextrusion(
@@ -245,4 +246,4 @@ class InternalInvoluteGear(BaseGear):
             inner_circle = Part.Wire(Part.makeCircle(fp.dw / 2.0))
             inner_circle.reverse()
             base = Part.Face([outer_circle, inner_circle])
-            return base.extrude(App.Vector(0, 0, fp.height.Value))
+            return base.extrude(app.Vector(0, 0, fp.height.Value))

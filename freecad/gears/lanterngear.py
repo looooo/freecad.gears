@@ -16,11 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
-import Part
-
 import numpy as np
 import scipy as sp
+
+from freecad import app
+import Part
 
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
@@ -109,7 +109,7 @@ class LanternGear(BaseGear):
         p_12 = np.array([r_0 - r_r, 0.0])
 
         arc = Part.Arc(
-            App.Vector(*p_1, 0.0), App.Vector(*p_12, 0.0), App.Vector(*p_2, 0.0)
+            app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
         ).toShape()
 
         rot = rotation(-np.pi * 2 / teeth)
@@ -121,7 +121,7 @@ class LanternGear(BaseGear):
         w = Part.Wire([w_2, arc, w_1, l])
         wires = [w]
 
-        rot = App.Matrix()
+        rot = app.Matrix()
         for _ in range(teeth - 1):
             rot.rotateZ(np.pi * 2 / teeth)
             wires.append(w.transformGeometry(rot))
@@ -130,4 +130,4 @@ class LanternGear(BaseGear):
         if fp.height.Value == 0:
             return wi
         else:
-            return Part.Face(wi).extrude(App.Vector(0, 0, fp.height))
+            return Part.Face(wi).extrude(app.Vector(0, 0, fp.height))

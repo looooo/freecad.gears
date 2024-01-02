@@ -16,7 +16,7 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 import numpy as np
@@ -109,7 +109,7 @@ class BevelGear(BaseGear):
         fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
         max_height = fp.gear.module * fp.teeth / 2 / np.tan(fp.gear.pitch_angle)
         if fp.height >= max_height:
-            App.Console.PrintWarning(
+            app.Console.PrintWarning(
                 "height must be smaller than {}".format(max_height)
             )
         fp.gear.backlash = fp.backlash.Value
@@ -158,7 +158,7 @@ class BevelGear(BaseGear):
                 wires.append(make_bspline_wire(points))
         shape = Part.makeLoft(wires, True)
         if fp.reset_origin:
-            mat = App.Matrix()
+            mat = app.Matrix()
             mat.A33 = -1
             mat.move(fcvec([0, 0, scale_1]))
             shape = shape.transformGeometry(mat)

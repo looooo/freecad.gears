@@ -17,7 +17,10 @@
 # ***************************************************************************
 
 
-# this file is only for backwards compatibility
+# this file is only for backwards compatibility, and will be deleted in the future
+
+from warnings import warn
+warn('This file is deprecated and will be deleted in the future', DeprecationWarning, stacklevel=2)
 
 from .timinggear_t import TimingGearT
 from .involutegear import InvoluteGear

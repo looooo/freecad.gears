@@ -19,24 +19,21 @@
 import os
 import sys
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 import numpy as np
 import math
 
 from pygears import __version__
-from pygears.involute_tooth import InvoluteTooth, InvoluteRack
-from pygears.cycloid_tooth import CycloidTooth
-from pygears.bevel_tooth import BevelTooth
 from pygears._functions import arc_from_points_and_center
 
 
 def fcvec(x):
     if len(x) == 2:
-        return App.Vector(x[0], x[1], 0)
+        return app.Vector(x[0], x[1], 0)
     else:
-        return App.Vector(x[0], x[1], x[2])
+        return app.Vector(x[0], x[1], x[2])
 
 
 class ViewProviderGear(object):
@@ -95,7 +92,7 @@ class BaseGear(object):
         # Needed to make this object "attachable",
         # aka able to attach parameterically to other objects
         # cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
-        if int(App.Version()[1]) >= 19:
+        if int(app.Version()[1]) >= 19:
             obj.addExtension("Part::AttachExtensionPython")
         else:
             obj.addExtension("Part::AttachExtensionPython", obj)
@@ -146,7 +143,7 @@ class BaseGear(object):
 def part_arc_from_points_and_center(p_1, p_2, m):
     p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)
     return Part.Arc(
-        App.Vector(*p_1, 0.0), App.Vector(*p_12, 0.0), App.Vector(*p_2, 0.0)
+        app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
     )
 
 
@@ -165,9 +162,9 @@ def helicalextrusion(face, height, angle, double_helix=False):
     direction = bool(angle < 0)
     if double_helix:
         spine = Part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
-        spine.translate(App.Vector(0, 0, height / 2.0))
+        spine.translate(app.Vector(0, 0, height / 2.0))
         face = face.translated(
-            App.Vector(0, 0, height / 2.0)
+            app.Vector(0, 0, height / 2.0)
         )  # don't transform our argument
     else:
         spine = Part.makeHelix(pitch, height, radius, cone_angle, direction)
@@ -193,8 +190,8 @@ def helicalextrusion(face, height, angle, double_helix=False):
     top_face = Part.Face(top_wires)
     shell_faces.append(top_face)
     if double_helix:
-        origin = App.Vector(0, 0, height / 2.0)
-        xy_normal = App.Vector(0, 0, 1)
+        origin = app.Vector(0, 0, height / 2.0)
+        xy_normal = app.Vector(0, 0, 1)
         mirror_xy = lambda f: f.mirror(origin, xy_normal)
         bottom_faces = list(map(mirror_xy, shell_faces))
         shell_faces.extend(bottom_faces)
@@ -244,7 +241,7 @@ def points_to_wire(pts):
 
 
 def rotate_tooth(base_tooth, num_teeth):
-    rot = App.Matrix()
+    rot = app.Matrix()
     rot.rotateZ(2 * np.pi / num_teeth)
     flat_shape = [base_tooth]
     for t in range(num_teeth - 1):
@@ -258,7 +255,7 @@ def fillet_between_edges(edge_1, edge_2, radius):
     try:
         from Part import ChFi2d
     except ImportError:
-        App.Console.PrintWarning(
+        app.Console.PrintWarning(
             "Your freecad version has no python bindings for 2d-fillets"
         )
         return [edge_1, edge_2]

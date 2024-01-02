@@ -16,10 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-import FreeCAD as App
+import numpy as np
+
+from freecad import app
 import Part
 
-import numpy as np
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -217,7 +218,7 @@ class InvoluteGear(BaseGear):
             r_root = float(obj.root_fillet * obj.module)
             if obj.undercut and r_root != 0.0:
                 r_root = 0.0
-                App.Console.PrintWarning(
+                app.Console.PrintWarning(
                     "root fillet is not allowed if undercut is computed"
                 )
             if len(tooth.Edges) == 11:
@@ -253,7 +254,7 @@ class InvoluteGear(BaseGear):
                 return profile
             base = Part.Face(profile)
             if obj.beta.Value == 0:
-                return base.extrude(App.Vector(0, 0, obj.height.Value))
+                return base.extrude(app.Vector(0, 0, obj.height.Value))
             else:
                 twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
                 return helicalextrusion(

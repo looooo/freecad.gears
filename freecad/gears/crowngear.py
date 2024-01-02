@@ -19,7 +19,7 @@
 import os
 import sys
 
-import FreeCAD as App
+from freecad import app
 import Part
 
 import numpy as np
@@ -55,7 +55,7 @@ class CrownGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-        App.Console.PrintMessage(
+        app.Console.PrintMessage(
             "Gear module: Crown gear created, preview_mode = true for improved performance. "
             "Set preview_mode property to false when ready to cut teeth."
         )
@@ -112,7 +112,7 @@ class CrownGear(BaseGear):
         outer_circle = Part.Wire(Part.makeCircle(outer_diameter / 2.0))
         inner_circle.reverse()
         face = Part.Face([outer_circle, inner_circle])
-        solid = face.extrude(App.Vector([0.0, 0.0, -fp.thickness.Value]))
+        solid = face.extrude(app.Vector([0.0, 0.0, -fp.thickness.Value]))
         if fp.preview_mode:
             return solid
 
@@ -134,7 +134,7 @@ class CrownGear(BaseGear):
             poly = Part.Wire(Part.makePolygon(list(map(fcvec, pts))))
             polies.append(poly)
         loft = Part.makeLoft(polies, True)
-        rot = App.Matrix()
+        rot = app.Matrix()
         rot.rotateZ(2 * np.pi / t)
         cut_shapes = []
         for _ in range(t):
