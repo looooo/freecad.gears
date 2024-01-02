@@ -19,7 +19,7 @@
 import numpy as np
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
@@ -191,7 +191,7 @@ class InternalInvoluteGear(BaseGear):
         fp.da = "{}mm".format(fp.gear.df)  # swap addednum and dedendum for "internal"
         fp.df = "{}mm".format(fp.gear.da)  # swap addednum and dedendum for "internal"
 
-        outer_circle = Part.Wire(Part.makeCircle(fp.outside_diameter / 2.0))
+        outer_circle = part.Wire(part.makeCircle(fp.outside_diameter / 2.0))
         outer_circle.reverse()
         if not fp.simple:
             # head-fillet:
@@ -230,11 +230,11 @@ class InternalInvoluteGear(BaseGear):
             edges = edges[edge_range[0] : edge_range[1]]
             edges = [e for e in edges if e is not None]
 
-            tooth = Part.Wire(edges)
+            tooth = part.Wire(edges)
             profile = rotate_tooth(tooth, fp.teeth)
             if fp.height.Value == 0:
-                return Part.makeCompound([outer_circle, profile])
-            base = Part.Face([outer_circle, profile])
+                return part.makeCompound([outer_circle, profile])
+            base = part.Face([outer_circle, profile])
             if fp.beta.Value == 0:
                 return base.extrude(app.Vector(0, 0, fp.height.Value))
             else:
@@ -243,7 +243,7 @@ class InternalInvoluteGear(BaseGear):
                     base, fp.height.Value, twist_angle, fp.double_helix
                 )
         else:
-            inner_circle = Part.Wire(Part.makeCircle(fp.dw / 2.0))
+            inner_circle = part.Wire(part.makeCircle(fp.dw / 2.0))
             inner_circle.reverse()
-            base = Part.Face([outer_circle, inner_circle])
+            base = part.Face([outer_circle, inner_circle])
             return base.extrude(app.Vector(0, 0, fp.height.Value))

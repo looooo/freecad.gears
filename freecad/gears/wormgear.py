@@ -19,7 +19,7 @@
 import numpy as np
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
@@ -101,7 +101,7 @@ class WormGear(BaseGear):
         # create a circle from phi=0 to phi_1 with r_1
         phi_0 = 2 * z_0 / m / t
         phi_1 = 2 * z_1 / m / t
-        c1 = Part.makeCircle(
+        c1 = part.makeCircle(
             r_1,
             app.Vector(0, 0, 0),
             app.Vector(0, 0, 1),
@@ -113,14 +113,14 @@ class WormGear(BaseGear):
         z_values = np.linspace(z_1, z_2, 10)
         r_values = np.linspace(r_1, r_2, 10)
         points = helical_projection(r_values, z_values)
-        bsp1 = Part.BSplineCurve()
+        bsp1 = part.BSplineCurve()
         bsp1.interpolate(list(map(fcvec, points)))
         bsp1 = bsp1.toShape()
 
         # create circle from phi_2 to phi_3
         phi_2 = 2 * z_2 / m / t
         phi_3 = 2 * z_3 / m / t
-        c2 = Part.makeCircle(
+        c2 = part.makeCircle(
             r_2,
             app.Vector(0, 0, 0),
             app.Vector(0, 0, 1),
@@ -132,11 +132,11 @@ class WormGear(BaseGear):
         z_values = np.linspace(z_3, z_4, 10)
         r_values = np.linspace(r_2, r_1, 10)
         points = helical_projection(r_values, z_values)
-        bsp2 = Part.BSplineCurve()
+        bsp2 = part.BSplineCurve()
         bsp2.interpolate(list(map(fcvec, points)))
         bsp2 = bsp2.toShape()
 
-        wire = Part.Wire([c1, bsp1, c2, bsp2])
+        wire = part.Wire([c1, bsp1, c2, bsp2])
         w_all = [wire]
 
         rot = app.Matrix()
@@ -144,9 +144,9 @@ class WormGear(BaseGear):
         for i in range(1, t):
             w_all.append(w_all[-1].transformGeometry(rot))
 
-        full_wire = Part.Wire(w_all)
+        full_wire = part.Wire(w_all)
         if h == 0:
             return full_wire
         else:
-            shape = helicalextrusion(Part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
+            shape = helicalextrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
             return shape

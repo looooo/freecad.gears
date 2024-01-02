@@ -17,7 +17,7 @@
 # ***************************************************************************
 
 from freecad import app
-import Part
+from freecad import part
 
 import numpy as np
 from pygears.bevel_tooth import BevelTooth
@@ -156,7 +156,7 @@ class BevelGear(BaseGear):
                     for pt in pts
                 ]
                 wires.append(make_bspline_wire(points))
-        shape = Part.makeLoft(wires, True)
+        shape = part.makeLoft(wires, True)
         if fp.reset_origin:
             mat = app.Matrix()
             mat.A33 = -1
@@ -196,10 +196,10 @@ class BevelGear(BaseGear):
         surfs = []
         w_t = zip(*w)
         for i in w_t:
-            b = Part.BSplineSurface()
+            b = part.BSplineSurface()
             b.interpolate(i)
             surfs.append(b)
-        return Part.Shape(surfs)
+        return part.Shape(surfs)
 
     def spherical_rot(self, point, phi):
         new_phi = np.sqrt(np.linalg.norm(point)) * phi

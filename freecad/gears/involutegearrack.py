@@ -19,7 +19,7 @@
 import numpy as np
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.involute_tooth import InvoluteRack
 from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
@@ -173,7 +173,7 @@ class InvoluteGearRack(BaseGear):
         line3 = [p3, p4]
         line4 = [p4, p5]
         line5 = [p5, p6]
-        tooth = Part.Wire(points_to_wire([line1, line2, line3, line4, line5]))
+        tooth = part.Wire(points_to_wire([line1, line2, line3, line4, line5]))
 
         edges = tooth.Edges
         edges = insert_fillet(edges, 0, m * root_fillet)
@@ -186,7 +186,7 @@ class InvoluteGearRack(BaseGear):
         p_start = np.array(tooth_edges[1].firstVertex().Point[:-1])
         p_start += np.array([0, np.pi * m])
         edge = points_to_wire([[p_end, p_start]]).Edges
-        tooth = Part.Wire(tooth_edges[1:-1] + edge)
+        tooth = part.Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
 
         for i in range(obj.teeth - 1):
@@ -194,13 +194,13 @@ class InvoluteGearRack(BaseGear):
             tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
 
-        teeth[-1] = Part.Wire(teeth[-1].Edges[:-1])
+        teeth[-1] = part.Wire(teeth[-1].Edges[:-1])
 
         if obj.add_endings:
-            teeth = [Part.Wire(tooth_edges[0])] + teeth
+            teeth = [part.Wire(tooth_edges[0])] + teeth
             last_edge = tooth_edges[-1]
             last_edge.translate(app.Vector(0, np.pi * m * (obj.teeth - 1), 0))
-            teeth = teeth + [Part.Wire(last_edge)]
+            teeth = teeth + [part.Wire(last_edge)]
 
         p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])
         p_end = np.array(teeth[-1].Edges[-1].lastVertex().Point[:-1])
@@ -213,26 +213,26 @@ class InvoluteGearRack(BaseGear):
 
         bottom = points_to_wire([line6, line7, line8])
 
-        pol = Part.Wire([bottom] + teeth)
+        pol = part.Wire([bottom] + teeth)
 
         if obj.height.Value == 0:
             return pol
         elif obj.beta.Value == 0:
-            face = Part.Face(Part.Wire(pol))
+            face = part.Face(part.Wire(pol))
             return face.extrude(fcvec([0.0, 0.0, obj.height.Value]))
         elif obj.double_helix:
             beta = obj.beta.Value * np.pi / 180.0
-            pol2 = Part.Wire(pol)
+            pol2 = part.Wire(pol)
             pol2.translate(
                 fcvec([0.0, np.tan(beta) * obj.height.Value / 2, obj.height.Value / 2])
             )
-            pol3 = Part.Wire(pol)
+            pol3 = part.Wire(pol)
             pol3.translate(fcvec([0.0, 0.0, obj.height.Value]))
-            return Part.makeLoft([pol, pol2, pol3], True, True)
+            return part.makeLoft([pol, pol2, pol3], True, True)
         else:
             beta = obj.beta.Value * np.pi / 180.0
-            pol2 = Part.Wire(pol)
+            pol2 = part.Wire(pol)
             pol2.translate(
                 fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
             )
-            return Part.makeLoft([pol, pol2], True)
+            return part.makeLoft([pol, pol2], True)

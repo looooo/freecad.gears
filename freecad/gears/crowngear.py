@@ -20,7 +20,7 @@ import os
 import sys
 
 from freecad import app
-import Part
+from freecad import part
 
 import numpy as np
 
@@ -108,10 +108,10 @@ class CrownGear(BaseGear):
     def generate_gear_shape(self, fp):
         inner_diameter = fp.module.Value * fp.teeth
         outer_diameter = inner_diameter + fp.height.Value * 2
-        inner_circle = Part.Wire(Part.makeCircle(inner_diameter / 2.0))
-        outer_circle = Part.Wire(Part.makeCircle(outer_diameter / 2.0))
+        inner_circle = part.Wire(part.makeCircle(inner_diameter / 2.0))
+        outer_circle = part.Wire(part.makeCircle(outer_diameter / 2.0))
         inner_circle.reverse()
-        face = Part.Face([outer_circle, inner_circle])
+        face = part.Face([outer_circle, inner_circle])
         solid = face.extrude(app.Vector([0.0, 0.0, -fp.thickness.Value]))
         if fp.preview_mode:
             return solid
@@ -131,9 +131,9 @@ class CrownGear(BaseGear):
         polies = []
         for r_i in np.linspace(r0, r1, fp.num_profiles):
             pts = self.profile(m, r_i, rm, t_c, t_i, alpha_w, y0, y1, y2)
-            poly = Part.Wire(Part.makePolygon(list(map(fcvec, pts))))
+            poly = part.Wire(part.makePolygon(list(map(fcvec, pts))))
             polies.append(poly)
-        loft = Part.makeLoft(polies, True)
+        loft = part.makeLoft(polies, True)
         rot = app.Matrix()
         rot.rotateZ(2 * np.pi / t)
         cut_shapes = []

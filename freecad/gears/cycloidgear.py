@@ -17,7 +17,7 @@
 # ***************************************************************************
 
 from freecad import app
-import Part
+from freecad import part
 
 import numpy as np
 from pygears.cycloid_tooth import CycloidTooth
@@ -178,12 +178,12 @@ class CycloidGear(BaseGear):
         edges = edges[edge_range[0] : edge_range[1]]
         edges = [e for e in edges if e is not None]
 
-        tooth = Part.Wire(edges)
+        tooth = part.Wire(edges)
 
         profile = rotate_tooth(tooth, fp.teeth)
         if fp.height.Value == 0:
             return profile
-        base = Part.Face(profile)
+        base = part.Face(profile)
         if fp.beta.Value == 0:
             return base.extrude(app.Vector(0, 0, fp.height.Value))
         else:

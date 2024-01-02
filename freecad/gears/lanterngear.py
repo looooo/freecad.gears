@@ -20,7 +20,7 @@ import numpy as np
 import scipy as sp
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
@@ -95,30 +95,30 @@ class LanternGear(BaseGear):
         xy1 = np.array([x, y]).T
         p_1 = xy1[0]
         p_1_end = xy1[-1]
-        bsp_1 = Part.BSplineCurve()
+        bsp_1 = part.BSplineCurve()
         bsp_1.interpolate(list(map(fcvec, xy1)))
         w_1 = bsp_1.toShape()
 
         xy2 = xy1 * np.array([1.0, -1.0])
         p_2 = xy2[0]
         p_2_end = xy2[-1]
-        bsp_2 = Part.BSplineCurve()
+        bsp_2 = part.BSplineCurve()
         bsp_2.interpolate(list(map(fcvec, xy2)))
         w_2 = bsp_2.toShape()
 
         p_12 = np.array([r_0 - r_r, 0.0])
 
-        arc = Part.Arc(
+        arc = part.Arc(
             app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
         ).toShape()
 
         rot = rotation(-np.pi * 2 / teeth)
         p_3 = rot(np.array([p_2_end]))[0]
-        # l = Part.LineSegment(fcvec(p_1_end), fcvec(p_3)).toShape()
+        # l = part.LineSegment(fcvec(p_1_end), fcvec(p_3)).toShape()
         l = part_arc_from_points_and_center(
             p_1_end, p_3, np.array([0.0, 0.0])
         ).toShape()
-        w = Part.Wire([w_2, arc, w_1, l])
+        w = part.Wire([w_2, arc, w_1, l])
         wires = [w]
 
         rot = app.Matrix()
@@ -126,8 +126,8 @@ class LanternGear(BaseGear):
             rot.rotateZ(np.pi * 2 / teeth)
             wires.append(w.transformGeometry(rot))
 
-        wi = Part.Wire(wires)
+        wi = part.Wire(wires)
         if fp.height.Value == 0:
             return wi
         else:
-            return Part.Face(wi).extrude(app.Vector(0, 0, fp.height))
+            return part.Face(wi).extrude(app.Vector(0, 0, fp.height))

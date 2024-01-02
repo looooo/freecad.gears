@@ -19,8 +19,8 @@
 
 # this file is only for backwards compatibility, and will be deleted in the future
 
-from warnings import warn
-warn('This file is deprecated and will be deleted in the future', DeprecationWarning, stacklevel=2)
+from freecad import app
+app.Console.PrintWarning("This file is deprecated, this warning is a very bad sign ;)")
 
 from .timinggear_t import TimingGearT
 from .involutegear import InvoluteGear

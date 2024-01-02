@@ -20,7 +20,7 @@ import os
 import sys
 
 from freecad import app
-import Part
+from freecad import part
 
 import numpy as np
 import math
@@ -142,7 +142,7 @@ class BaseGear(object):
 
 def part_arc_from_points_and_center(p_1, p_2, m):
     p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)
-    return Part.Arc(
+    return part.Arc(
         app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
     )
 
@@ -161,19 +161,19 @@ def helicalextrusion(face, height, angle, double_helix=False):
     cone_angle = 0
     direction = bool(angle < 0)
     if double_helix:
-        spine = Part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
+        spine = part.makeHelix(pitch, height / 2.0, radius, cone_angle, direction)
         spine.translate(app.Vector(0, 0, height / 2.0))
         face = face.translated(
             app.Vector(0, 0, height / 2.0)
         )  # don't transform our argument
     else:
-        spine = Part.makeHelix(pitch, height, radius, cone_angle, direction)
+        spine = part.makeHelix(pitch, height, radius, cone_angle, direction)
 
     def make_pipe(path, profile):
         """
         returns (shell, last_wire)
         """
-        mkPS = Part.BRepOffsetAPI.MakePipeShell(path)
+        mkPS = part.BRepOffsetAPI.MakePipeShell(path)
         mkPS.setFrenetMode(
             True
         )  # otherwise, the profile's normal would follow the path
@@ -187,7 +187,7 @@ def helicalextrusion(face, height, angle, double_helix=False):
         pipe_shell, top_wire = make_pipe(spine, wire)
         shell_faces.extend(pipe_shell.Faces)
         top_wires.append(top_wire)
-    top_face = Part.Face(top_wires)
+    top_face = part.Face(top_wires)
     shell_faces.append(top_face)
     if double_helix:
         origin = app.Vector(0, 0, height / 2.0)
@@ -197,34 +197,34 @@ def helicalextrusion(face, height, angle, double_helix=False):
         shell_faces.extend(bottom_faces)
         # TODO: why the heck is makeShell from this empty after mirroring?
         # ... and why the heck does it work when making an intermediate compound???
-        hacky_intermediate_compound = Part.makeCompound(shell_faces)
+        hacky_intermediate_compound = part.makeCompound(shell_faces)
         shell_faces = hacky_intermediate_compound.Faces
     else:
         shell_faces.append(face)  # the bottom is what we extruded
-    shell = Part.makeShell(shell_faces)
+    shell = part.makeShell(shell_faces)
     # shell.sewShape() # fill gaps that may result from accumulated tolerances. Needed?
     # shell = shell.removeSplitter() # refine. Needed?
-    return Part.makeSolid(shell)
+    return part.makeSolid(shell)
 
 
 def make_face(edge1, edge2):
     v1, v2 = edge1.Vertexes
     v3, v4 = edge2.Vertexes
-    e1 = Part.Wire(edge1)
-    e2 = Part.LineSegment(v1.Point, v3.Point).toShape().Edges[0]
+    e1 = part.Wire(edge1)
+    e2 = part.LineSegment(v1.Point, v3.Point).toShape().Edges[0]
     e3 = edge2
-    e4 = Part.LineSegment(v4.Point, v2.Point).toShape().Edges[0]
-    w = Part.Wire([e3, e4, e1, e2])
-    return Part.Face(w)
+    e4 = part.LineSegment(v4.Point, v2.Point).toShape().Edges[0]
+    w = part.Wire([e3, e4, e1, e2])
+    return part.Face(w)
 
 
 def make_bspline_wire(pts):
     wi = []
     for i in pts:
-        out = Part.BSplineCurve()
+        out = part.BSplineCurve()
         out.interpolate(list(map(fcvec, i)))
         wi.append(out.toShape())
-    return Part.Wire(wi)
+    return part.Wire(wi)
 
 
 def points_to_wire(pts):
@@ -232,12 +232,12 @@ def points_to_wire(pts):
     for i in pts:
         if len(i) == 2:
             # straight edge
-            out = Part.LineSegment(*list(map(fcvec, i)))
+            out = part.LineSegment(*list(map(fcvec, i)))
         else:
-            out = Part.BSplineCurve()
+            out = part.BSplineCurve()
             out.interpolate(list(map(fcvec, i)))
         wire.append(out.toShape())
-    return Part.Wire(wire)
+    return part.Wire(wire)
 
 
 def rotate_tooth(base_tooth, num_teeth):
@@ -246,7 +246,7 @@ def rotate_tooth(base_tooth, num_teeth):
     flat_shape = [base_tooth]
     for t in range(num_teeth - 1):
         flat_shape.append(flat_shape[-1].transformGeometry(rot))
-    return Part.Wire(flat_shape)
+    return part.Wire(flat_shape)
 
 
 def fillet_between_edges(edge_1, edge_2, radius):
@@ -268,12 +268,12 @@ def fillet_between_edges(edge_1, edge_2, radius):
     t1 = p2 - p1
     t2 = p4 - p3
     n = t1.cross(t2)
-    pln = Part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
+    pln = part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
     api.init(edge_1, edge_2, pln)
     if api.perform(radius) > 0:
         p0 = (p2 + p3) / 2
         fillet, e1, e2 = api.result(p0)
-        return Part.Wire([e1, fillet, e2]).Edges
+        return part.Wire([e1, fillet, e2]).Edges
     else:
         return None
 

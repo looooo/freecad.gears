@@ -19,7 +19,7 @@
 import numpy as np
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
@@ -247,12 +247,12 @@ class InvoluteGear(BaseGear):
             edges = edges[edge_range[0] : edge_range[1]]
             edges = [e for e in edges if e is not None]
 
-            tooth = Part.Wire(edges)
+            tooth = part.Wire(edges)
             profile = rotate_tooth(tooth, obj.teeth)
 
             if obj.height.Value == 0:
                 return profile
-            base = Part.Face(profile)
+            base = part.Face(profile)
             if obj.beta.Value == 0:
                 return base.extrude(app.Vector(0, 0, obj.height.Value))
             else:
@@ -262,4 +262,4 @@ class InvoluteGear(BaseGear):
                 )
         else:
             rw = obj.gear.dw / 2
-            return Part.makeCylinder(rw, obj.height.Value)
+            return part.makeCylinder(rw, obj.height.Value)

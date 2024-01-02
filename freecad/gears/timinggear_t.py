@@ -21,7 +21,7 @@ import numpy as np
 import scipy as sp
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears._functions import rotation, reflection
 
@@ -96,11 +96,11 @@ class TimingGearT(BaseGear):
         rot = rotation(-gamma_0)  # why is the rotation in wrong direction ???
         p_5 = rot(np.array([p_1]))[0]  # the rotation expects a list of points
 
-        l1 = Part.LineSegment(fcvec(p_1), fcvec(p_2)).toShape()
-        l2 = Part.LineSegment(fcvec(p_2), fcvec(p_3)).toShape()
-        l3 = Part.LineSegment(fcvec(p_3), fcvec(p_4)).toShape()
-        l4 = Part.LineSegment(fcvec(p_4), fcvec(p_5)).toShape()
-        w = Part.Wire([l1, l2, l3, l4])
+        l1 = part.LineSegment(fcvec(p_1), fcvec(p_2)).toShape()
+        l2 = part.LineSegment(fcvec(p_2), fcvec(p_3)).toShape()
+        l3 = part.LineSegment(fcvec(p_3), fcvec(p_4)).toShape()
+        l4 = part.LineSegment(fcvec(p_4), fcvec(p_5)).toShape()
+        w = part.Wire([l1, l2, l3, l4])
 
         # now using a FreeCAD Matrix (this will turn in the right direction)
         rot = app.Matrix()
@@ -109,9 +109,9 @@ class TimingGearT(BaseGear):
         for i in range(teeth):
             w = w.transformGeometry(rot)
             wires.append(w.copy())
-        contour = Part.Wire(wires)
+        contour = part.Wire(wires)
         if height == 0:
             return contour
         else:
-            face = Part.Face(Part.Wire(wires))
+            face = part.Face(part.Wire(wires))
             return face.extrude(app.Vector(0.0, 0.0, height))

@@ -21,7 +21,7 @@ import math
 import numpy as np
 
 from freecad import app
-import Part
+from freecad import part
 
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
@@ -194,8 +194,8 @@ class HypoCycloidGear(BaseGear):
         minRadius = self.calc_pressure_limit(p, d, e, n, minAngle * math.pi / 180.0)
         maxRadius = self.calc_pressure_limit(p, d, e, n, maxAngle * math.pi / 180.0)
         # unused
-        # Part.Wire(Part.makeCircle(minRadius, app.Vector(-e, 0, 0)))
-        # Part.Wire(Part.makeCircle(maxRadius, app.Vector(-e, 0, 0)))
+        # part.Wire(part.makeCircle(minRadius, app.Vector(-e, 0, 0)))
+        # part.Wire(part.makeCircle(maxRadius, app.Vector(-e, 0, 0)))
 
         app.Console.PrintMessage("Generating cam disk\r\n")
         # generate the cam profile - note: shifted in -x by eccentricicy amount
@@ -220,11 +220,11 @@ class HypoCycloidGear(BaseGear):
             wi = wi.transformGeometry(mat)
             wires.append(wi)
 
-        cam = Part.Face(Part.Wire(wires))
+        cam = part.Face(part.Wire(wires))
         # add a circle in the center of the cam
         if fp.hole_radius.Value:
-            centerCircle = Part.Face(
-                Part.Wire(Part.makeCircle(fp.hole_radius.Value, app.Vector(-e, 0, 0)))
+            centerCircle = part.Face(
+                part.Wire(part.makeCircle(fp.hole_radius.Value, app.Vector(-e, 0, 0)))
             )
             cam = cam.cut(centerCircle)
 
@@ -260,9 +260,9 @@ class HypoCycloidGear(BaseGear):
             for i in range(0, n + 1):
                 x = p * n * math.cos(2 * math.pi / (n + 1) * i)
                 y = p * n * math.sin(2 * math.pi / (n + 1) * i)
-                pins.append(Part.Wire(Part.makeCircle(d / 2, app.Vector(x, y, 0))))
+                pins.append(part.Wire(part.makeCircle(d / 2, app.Vector(x, y, 0))))
 
-            pins = Part.Face(pins)
+            pins = part.Face(pins)
 
             z_offset = -fp.pin_height.Value / 2
             if fp.center_pins == True:
@@ -279,4 +279,4 @@ class HypoCycloidGear(BaseGear):
             to_be_fused.append(pins)
 
         if to_be_fused:
-            return Part.makeCompound(to_be_fused)
+            return part.makeCompound(to_be_fused)
