@@ -27,7 +27,7 @@ from .basegear import (
     BaseGear,
     points_to_wire,
     insert_fillet,
-    helicalextrusion,
+    helical_extrusion,
     rotate_tooth,
 )
 
@@ -190,4 +190,4 @@ class CycloidGear(BaseGear):
             twist_angle = (
                 fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
             )
-            return helicalextrusion(base, fp.height.Value, twist_angle, fp.double_helix)
+            return helical_extrusion(base, fp.height.Value, twist_angle, fp.double_helix)

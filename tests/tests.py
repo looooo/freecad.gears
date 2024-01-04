@@ -2,7 +2,7 @@ import unittest
 
 from freecad import app
 from freecad import part
-from freecad.gears.basegear import helicalextrusion
+from freecad.gears.basegear import helical_extrusion
 
 
 
@@ -17,7 +17,7 @@ class GearTests(unittest.TestCase):
 
         a = part.Circle(m, n, r)
         face = part.Face(part.Wire(a.toShape()))
-        s = helicalextrusion(face, h, 1)
+        s = helical_extrusion(face, h, 1)
         
         # face 0 is the cylinder
         # face 1 is pointing in positive z direction

@@ -151,7 +151,7 @@ def part_arc_from_points_and_center(p_1, p_2, m):
     )
 
 
-def helicalextrusion(face, height, angle, double_helix=False):
+def helical_extrusion(face, height, angle, double_helix=False):
     """
     A helical extrusion using the BRepOffsetAPI
     face -- the face to extrude (may contain holes, i.e. more then one wires)

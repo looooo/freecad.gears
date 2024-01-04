@@ -24,7 +24,7 @@ from freecad import part
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, helicalextrusion, fcvec
+from .basegear import BaseGear, helical_extrusion, fcvec
 
 
 class WormGear(BaseGear):
@@ -148,5 +148,5 @@ class WormGear(BaseGear):
         if h == 0:
             return full_wire
         else:
-            shape = helicalextrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
+            shape = helical_extrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
             return shape

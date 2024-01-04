@@ -28,7 +28,7 @@ from .basegear import (
     BaseGear,
     points_to_wire,
     insert_fillet,
-    helicalextrusion,
+    helical_extrusion,
     rotate_tooth,
 )
 
@@ -257,7 +257,7 @@ class InvoluteGear(BaseGear):
                 return base.extrude(app.Vector(0, 0, obj.height.Value))
             else:
                 twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
-                return helicalextrusion(
+                return helical_extrusion(
                     base, obj.height.Value, twist_angle, obj.double_helix
                 )
         else:
