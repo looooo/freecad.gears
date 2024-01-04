@@ -22,7 +22,10 @@ class GearTests(unittest.TestCase):
         # face 0 is the cylinder
         # face 1 is pointing in positive z direction
         # face 2 is pointing in negative z direction
-        self.asserTrue((solid.Faces[1].normalAt(0,0) - n).Length < 10e-15)
-        self.asserTrue((solid.Faces[2].normalAt(0,0) + n).Length < 10e-15)
-        self.asserTrue(solid.Faces[1].valueAt(0,0)[2] - h < 10e-15)
-        self.asserTrue(solid.Faces[2].valueAt(0,0)[2] - 0. < 10e-15)
+        self.assertTrue((solid.Faces[1].normalAt(0,0) - normal).Length < 10e-15)
+        self.assertTrue((solid.Faces[2].normalAt(0,0) + normal).Length < 10e-15)
+        self.assertTrue(solid.Faces[1].valueAt(0,0)[2] - height < 10e-15)
+        self.assertTrue(solid.Faces[2].valueAt(0,0)[2] - 0. < 10e-15)
+
+if __name__ == "__main__":
+    unittest.main(verbosity=4)
