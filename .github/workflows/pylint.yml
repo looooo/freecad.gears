@@ -7,11 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: conda-incubator/setup-miniconda@v2
-      with:
-        python-version: "3.11"
+    - uses: mamba-org/setup-micromamba@v1
     - name: install dependencies
       run: |
+        mamba update --all
         mamba install freecad numpy scipy pylint
     - name: Analysing the code with pylint
       run: |
