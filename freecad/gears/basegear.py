@@ -18,24 +18,32 @@
 
 import os
 import sys
+import numpy as np
 
 from freecad import app
 from freecad import part
-
-import numpy as np
 
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center
 
 
 def fcvec(x):
+    """tranforms a list or numpy array to a FreeCAD Vector which is
+    always 3d
+
+    Args:
+        x (iterable): either a 2d or 3d vector
+
+    Returns:
+        freecad.app.Vector: _description_
+    """
     if len(x) == 2:
         return app.Vector(x[0], x[1], 0)
     else:
         return app.Vector(x[0], x[1], x[2])
 
 
-class ViewProviderGear(object):
+class ViewProviderGear():
     """
     The base Viewprovider for the gears
     """

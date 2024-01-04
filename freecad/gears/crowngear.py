@@ -16,18 +16,22 @@
 # *                                                                         *
 # ***************************************************************************
 
-import os
-import sys
+
+import numpy as np
 
 from freecad import app
 from freecad import part
-
-import numpy as np
 
 from .basegear import BaseGear, fcvec
 
 
 class CrownGear(BaseGear):
+    """
+        A crown gear (also known as a face gear or a contrate gear) is a gear 
+        which has teeth that project at right angles to the face of the wheel. 
+        In particular, a crown gear is a type of bevel gear where the pitch cone 
+        angle is 90 degrees. https://en.wikipedia.org/wiki/Crown_gear
+    """
     def __init__(self, obj):
         super(CrownGear, self).__init__(obj)
         obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
