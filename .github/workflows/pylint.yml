@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: mamba-org/setup-micromamba@v1
-    with:
+      with:
       init-shell: >-
       bash
     - name: install dependencies
