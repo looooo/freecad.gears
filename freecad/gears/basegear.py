@@ -36,6 +36,9 @@ def fcvec(x):
 
 
 class ViewProviderGear(object):
+    """
+    The base Viewprovider for the gears
+    """
     def __init__(self, obj, icon_fn=None):
         # Set this object to the proxy object of the actual view provider
         obj.Proxy = self
@@ -44,7 +47,9 @@ class ViewProviderGear(object):
         self.icon_fn = icon_fn or os.path.join(dirname, "icons", "involutegear.svg")
 
     def _check_attr(self):
-        """Check for missing attributes."""
+        """
+        Check for missing attributes.
+        """
         if not hasattr(self, "icon_fn"):
             setattr(
                 self,
@@ -248,7 +253,7 @@ def rotate_tooth(base_tooth, num_teeth):
     return part.Wire(flat_shape)
 
 
-def fillet_between_edges(edge_1, edge_2, radius):
+def fillet_between_edges(edge_1, edge_2, radius, p0=None):
     # assuming edges are in a plane
     # extracting vertices
     try:
@@ -270,19 +275,19 @@ def fillet_between_edges(edge_1, edge_2, radius):
     pln = part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
     api.init(edge_1, edge_2, pln)
     if api.perform(radius) > 0:
-        p0 = (p2 + p3) / 2
+        p0 = p0 or (p2 + p3) / 2
         fillet, e1, e2 = api.result(p0)
         return part.Wire([e1, fillet, e2]).Edges
     else:
         return None
 
 
-def insert_fillet(edges, pos, radius):
+def insert_fillet(edges, pos, radius, p0=None):
     assert pos < (len(edges) - 1)
     e1 = edges[pos]
     e2 = edges[pos + 1]
     if radius > 0:
-        fillet_edges = fillet_between_edges(e1, e2, radius)
+        fillet_edges = fillet_between_edges(e1, e2, radius, p0)
         if not fillet_edges:
             raise RuntimeError("fillet not possible")
     else:

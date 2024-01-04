@@ -224,9 +224,3 @@ class CycloidGearRack(BaseGear):
                 fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
             )
             return part.makeLoft([pol, pol2], True)
-
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None

@@ -21,7 +21,7 @@
 
 from freecad import app
 
-app.Console.PrintWarning("This file is deprecated, this warning is a very bad sign ;)")
+app.Console.PrintWarning(f"{__file__} is deprecated, just saving this file again should fix this warning")
 
 from .timinggear_t import TimingGearT
 from .involutegear import InvoluteGear
