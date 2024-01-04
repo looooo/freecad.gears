@@ -92,7 +92,7 @@ class ViewProviderGear():
                 self.icon_fn = state["icon_fn"]
 
 
-class BaseGear(object):
+class BaseGear():
     def __init__(self, obj):
         obj.addProperty(
             "App::PropertyString", "version", "version", "freecad.gears-version", 1
@@ -101,9 +101,11 @@ class BaseGear(object):
         self.make_attachable(obj)
 
     def make_attachable(self, obj):
-        # Needed to make this object "attachable",
-        # aka able to attach parameterically to other objects
-        # cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
+        """
+        Needed to make this object "attachable",
+        aka able to attach parameterically to other objects
+        cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
+        """
         if int(app.Version()[1]) >= 19:
             obj.addExtension("Part::AttachExtensionPython")
         else:
@@ -152,11 +154,19 @@ class BaseGear(object):
             pass
 
 
-def part_arc_from_points_and_center(p_1, p_2, m):
-    p_1, p_12, p_2 = arc_from_points_and_center(p_1, p_2, m)
-    return part.Arc(
-        app.Vector(*p_1, 0.0), app.Vector(*p_12, 0.0), app.Vector(*p_2, 0.0)
-    )
+def part_arc_from_points_and_center(point_1, point_2, center):
+    """_summary_
+
+    Args:
+        point_1 (list, np.array with 2 values): 2d point start of arc
+        point_1 (list, np.array with 2 values): 2d point end of arc
+        center (list, np.array with 2 values): the 2d center of the arc
+
+    Returns:
+        freecad.part.Arc: a arc with 
+    """
+    p_1, p_12, p_2 = arc_from_points_and_center(point_1, point_2, center)
+    return part.Arc(fcvec(p_1), fcvec(p_12), fcvec(p_2))
 
 
 def helical_extrusion(face, height, angle, double_helix=False):
