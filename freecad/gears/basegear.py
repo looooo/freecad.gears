@@ -253,41 +253,33 @@ def rotate_tooth(base_tooth, num_teeth):
     return part.Wire(flat_shape)
 
 
-def fillet_between_edges(edge_1, edge_2, radius, p0=None):
+def fillet_between_edges(edge_1, edge_2, radius, reversed=False):
     # assuming edges are in a plane
     # extracting vertices
-    try:
-        from Part import ChFi2d
-    except ImportError:
-        app.Console.PrintWarning(
-            "Your freecad version has no python bindings for 2d-fillets"
-        )
-        return [edge_1, edge_2]
-
-    api = ChFi2d.FilletAPI()
+    fillet2d_api = part.ChFi2d.FilletAPI()
     p1 = edge_1.valueAt(edge_1.FirstParameter)
     p2 = edge_1.valueAt(edge_1.LastParameter)
     p3 = edge_2.valueAt(edge_2.FirstParameter)
     p4 = edge_2.valueAt(edge_2.LastParameter)
     t1 = p2 - p1
     t2 = p4 - p3
-    n = t1.cross(t2)
+    n = t1.cross(t2) * (- reversed * 2 + 1)
     pln = part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
-    api.init(edge_1, edge_2, pln)
-    if api.perform(radius) > 0:
-        p0 = p0 or (p2 + p3) / 2
-        fillet, e1, e2 = api.result(p0)
+    fillet2d_api.init(edge_1, edge_2, pln)
+    if fillet2d_api.perform(radius) > 0:
+        p0 = (p2 + p1 + p3 + p4) / 4
+        fillet, e1, e2 = fillet2d_api.result(p0)
         return part.Wire([e1, fillet, e2]).Edges
     else:
         return None
 
 
-def insert_fillet(edges, pos, radius, p0=None):
+def insert_fillet(edges, pos, radius, reversed=False):
     assert pos < (len(edges) - 1)
     e1 = edges[pos]
     e2 = edges[pos + 1]
     if radius > 0:
-        fillet_edges = fillet_between_edges(e1, e2, radius, p0)
+        fillet_edges = fillet_between_edges(e1, e2, radius, reversed)
         if not fillet_edges:
             raise RuntimeError("fillet not possible")
     else:

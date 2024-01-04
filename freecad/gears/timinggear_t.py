@@ -69,8 +69,8 @@ class TimingGearT(BaseGear):
         obj.alpha = "40. deg"
         obj.height = "5 mm"
         obj.backlash = "0. mm"
-        obj.head_fillet = 0.
-        obj.root_fillet = 0.
+        obj.head_fillet = 0.4
+        obj.root_fillet = 0.4
         self.obj = obj
         obj.Proxy = self
 
@@ -116,11 +116,9 @@ class TimingGearT(BaseGear):
         mirror = reflection(0.0)  # reflect the points at the x-axis
         p_3, p_4 = mirror(np.array([p_2, p_1]))
 
-        rot = rotation(gamma_0)  # why is the rotation in wrong direction ???
+        # for the fillets we need some more points
+        rot = rotation(gamma_0)
         p_5, p_6, p_7 = rot(np.array([p_1, p_2, p_3]))  # the rotation expects a list of points
-
-        # for the fillets we need more points
-
 
 
         e1 = part.LineSegment(fcvec(p_1), fcvec(p_2)).toShape()
@@ -130,10 +128,11 @@ class TimingGearT(BaseGear):
         e5 = part.LineSegment(fcvec(p_5), fcvec(p_6)).toShape()
         e6 = part_arc_from_points_and_center(p_6, p_7, np.array([0., 0.])).toShape()
         edges = [e1, e2, e3, e4, e5, e6]
-        p0 = fcvec((p_4 + p_5) / 2)
         edges = insert_fillet(edges, 4, head_fillet)
-        edges = insert_fillet(edges, 3, root_fillet, p0)
-        edges = insert_fillet(edges, 2, root_fillet, p0)
+
+        # somehow we need to reverse the normal here
+        edges = insert_fillet(edges, 3, root_fillet, reversed=True)
+        edges = insert_fillet(edges, 2, root_fillet, reversed=True)
         edges = insert_fillet(edges, 1, head_fillet)
         edges = insert_fillet(edges, 0, head_fillet)
         edges = edges[2:-1]
