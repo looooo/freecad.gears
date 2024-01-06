@@ -30,7 +30,6 @@ from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_f
 
 class TimingGearT(BaseGear):
     def __init__(self, obj):
-        print("hello gear")
         obj.addProperty("App::PropertyLength", "pitch", "base", "pitch of gear")
         obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
         obj.addProperty(
