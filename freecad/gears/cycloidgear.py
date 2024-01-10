@@ -67,7 +67,7 @@ class CycloidGear(BaseGear):
         obj.beta = "0. deg"
         obj.height = "5. mm"
         obj.clearance = 0.25
-        obj.numpoints = 15
+        obj.numpoints = 20
         obj.backlash = "0.00 mm"
         obj.double_helix = False
         obj.head = 0

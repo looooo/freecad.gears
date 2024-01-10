@@ -94,7 +94,7 @@ class BevelGear(BaseGear):
         obj.pressure_angle = "20. deg"
         obj.pitch_angle = "45. deg"
         obj.height = "5. mm"
-        obj.numpoints = 6
+        obj.numpoints = 20
         obj.backlash = "0.00 mm"
         obj.clearance = 0.1
         obj.beta = "0 deg"

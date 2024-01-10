@@ -63,7 +63,7 @@ class InvoluteGear(BaseGear):
         obj.height = "5. mm"
         obj.clearance = 0.25
         obj.head = 0.0
-        obj.numpoints = 6
+        obj.numpoints = 20
         obj.double_helix = False
         obj.backlash = "0.00 mm"
         obj.reversed_backlash = False

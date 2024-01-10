@@ -80,7 +80,7 @@ class InternalInvoluteGear(BaseGear):
         obj.thickness = "5 mm"
         obj.clearance = 0.25
         obj.head = -0.4  # using head=0 and shift=0.5 may be better, but makes placeing the pinion less intuitive
-        obj.numpoints = 6
+        obj.numpoints = 20
         obj.double_helix = False
         obj.backlash = "0.00 mm"
         obj.reversed_backlash = False
