@@ -285,7 +285,7 @@ def fillet_between_edges(edge_1, edge_2, radius, reversed=False):
     pln = part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
     fillet2d_api.init(edge_1, edge_2, pln)
     if fillet2d_api.perform(radius) > 0:
-        p0 = (p2 + p1 + p3 + p4) / 4
+        p0 = (p2 + p1 + p3 + p4) / 2
         fillet, e1, e2 = fillet2d_api.result(p0)
         return part.Wire([e1, fillet, e2]).Edges
     else:
