@@ -20,6 +20,7 @@ from freecad import app
 from freecad import part
 
 import numpy as np
+from .translateutils import translate
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D
 
@@ -36,40 +37,84 @@ class BevelGear(BaseGear):
     def __init__(self, obj):
         super(BevelGear, self).__init__(obj)
         self.bevel_tooth = BevelTooth()
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-        obj.addProperty("App::PropertyAngle", "pitch_angle", "involute", "pitch_angle")
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("BevelGear", "number of teeth"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("BevelGear", "height"),
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "pitch_angle",
+            "involute",
+            translate("BevelGear", "pitch_angle"),
+        )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute_parameter",
-            "pressure_angle",
+            translate("BevelGear", "pressure_angle"),
         )
-        obj.addProperty("App::PropertyLength", "module", "base", "module")
-        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty(
+            "App::PropertyLength",
+            "module",
+            "base",
+            translate("BevelGear", "module"),
+        )
+        obj.addProperty(
+            "App::PropertyFloat",
+            "clearance",
+            "tolerance",
+            translate("BevelGear", "clearance"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "precision",
-            "number of points for spline",
+            translate("BevelGear", "number of points for spline"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "reset_origin",
             "base",
-            "if value is true the gears outer face will match the z=0 plane",
+            translate(
+                "BevelGear",
+                "if value is true the gears outer face will match the z=0 plane",
+            ),
         )
         obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            translate(
+                "BevelGear",
+                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            ),
         )
-        obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
         obj.addProperty(
-            "App::PropertyAngle", "beta", "helical", "angle used for spiral bevel-gears"
+            "App::PropertyPythonObject",
+            "gear",
+            "base",
+            translate("BevelGear", "test"),
         )
-        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.addProperty(
+            "App::PropertyAngle",
+            "beta",
+            "helical",
+            translate("BevelGear", "angle used for spiral bevel-gears"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "dw",
+            "computed",
+            translate("BevelGear", "The pitch diameter."),
+        )
         obj.setExpression(
             "dw", "teeth * module"
         )  # calculate via expression to ease usage for placement
@@ -80,7 +125,10 @@ class BevelGear(BaseGear):
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            "The angle by which this gear can turn without moving the mating gear.",
+            translate(
+                "BevelGear",
+                "The angle by which this gear can turn without moving the mating gear.",
+            ),
         )
         obj.setExpression(
             "angular_backlash", "backlash / dw * 360° / pi"

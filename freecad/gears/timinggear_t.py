@@ -23,6 +23,7 @@ import scipy as sp
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears._functions import rotation, reflection
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_fillet
@@ -30,37 +31,69 @@ from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_f
 
 class TimingGearT(BaseGear):
     def __init__(self, obj):
-        obj.addProperty("App::PropertyLength", "pitch", "base", "pitch of gear")
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyLength", "tooth_height", "base", "radial height of tooth"
+            "App::PropertyLength",
+            "pitch",
+            "base",
+            translate("TimingGearT", "pitch of gear"),
+        )
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("TimingGearT", "number of teeth"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "tooth_height",
+            "base",
+            translate("TimingGearT", "radial height of tooth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "u",
             "base",
-            "radial distance from tooth-head to pitch circle",
+            translate("TimingGearT", "radial distance from tooth-head to pitch circle"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            translate(
+                "TimingGearT"
+                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            "a fillet for the tooth-head, radius = head_fillet x module",
+            translate(
+                "TimingGearT",
+                "a fillet for the tooth-head, radius = head_fillet x module",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            "a fillet for the tooth-root, radius = root_fillet x module",
+            translate(
+                "TimingGearT",
+                "a fillet for the tooth-root, radius = root_fillet x module",
+            ),
         )
-        obj.addProperty("App::PropertyAngle", "alpha", "base", "angle of tooth flanks")
-        obj.addProperty("App::PropertyLength", "height", "base", "extrusion height")
+        obj.addProperty(
+            "App::PropertyAngle",
+            "alpha",
+            "base",
+            translate("TimingGearT", "angle of tooth flanks"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("TimingGearT", "extrusion height"),
+        )
         obj.pitch = "5. mm"
         obj.teeth = 15
         obj.tooth_height = "1.2 mm"
@@ -117,15 +150,16 @@ class TimingGearT(BaseGear):
 
         # for the fillets we need some more points
         rot = rotation(gamma_0)
-        p_5, p_6, p_7 = rot(np.array([p_1, p_2, p_3]))  # the rotation expects a list of points
-
+        p_5, p_6, p_7 = rot(
+            np.array([p_1, p_2, p_3])
+        )  # the rotation expects a list of points
 
         e1 = part.LineSegment(fcvec(p_1), fcvec(p_2)).toShape()
-        e2 = part_arc_from_points_and_center(p_2, p_3, np.array([0., 0.])).toShape()
+        e2 = part_arc_from_points_and_center(p_2, p_3, np.array([0.0, 0.0])).toShape()
         e3 = part.LineSegment(fcvec(p_3), fcvec(p_4)).toShape()
-        e4 = part_arc_from_points_and_center(p_4, p_5, np.array([0., 0.])).toShape()
+        e4 = part_arc_from_points_and_center(p_4, p_5, np.array([0.0, 0.0])).toShape()
         e5 = part.LineSegment(fcvec(p_5), fcvec(p_6)).toShape()
-        e6 = part_arc_from_points_and_center(p_6, p_7, np.array([0., 0.])).toShape()
+        e6 = part_arc_from_points_and_center(p_6, p_7, np.array([0.0, 0.0])).toShape()
         edges = [e1, e2, e3, e4, e5, e6]
         edges = insert_fillet(edges, 4, head_fillet)
 

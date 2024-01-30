@@ -21,7 +21,7 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-
+from .translateutils import translate
 from pygears._functions import reflection
 from .basegear import BaseGear, part_arc_from_points_and_center
 
@@ -104,36 +104,74 @@ class TimingGear(BaseGear):
 
     def __init__(self, obj):
         super(TimingGear, self).__init__(obj)
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
         obj.addProperty(
-            "App::PropertyEnumeration", "type", "base", "type of timing-gear"
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("TimingGear", "number of teeth"),
         )
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-        obj.addProperty("App::PropertyLength", "pitch", "computed", "pitch of gear", 1)
         obj.addProperty(
-            "App::PropertyLength", "h", "computed", "radial height of teeth", 1
+            "App::PropertyEnumeration",
+            "type",
+            "base",
+            translate("TimingGear", "type of timing-gear"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("TimingGear", "height"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "pitch",
+            "computed",
+            translate("TimingGear", "pitch of gear"),
+            1,
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "h",
+            "computed",
+            translate("TimingGear", "radial height of teeth"),
+            1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "u",
             "computed",
-            "radial difference between pitch diameter and head of gear",
+            translate(
+                "TimingGear",
+                "radial difference between pitch diameter and head of gear",
+            ),
             1,
         )
         obj.addProperty(
-            "App::PropertyLength", "r0", "computed", "radius of first arc", 1
+            "App::PropertyLength",
+            "r0",
+            "computed",
+            translate("TimingGear", "radius of first arc"),
+            1,
         )
         obj.addProperty(
-            "App::PropertyLength", "r1", "computed", "radius of second arc", 1
+            "App::PropertyLength",
+            "r1",
+            "computed",
+            translate("TimingGear", "radius of second arc"),
+            1,
         )
         obj.addProperty(
-            "App::PropertyLength", "rs", "computed", "radius of third arc", 1
+            "App::PropertyLength",
+            "rs",
+            "computed",
+            translate("TimingGear", "radius of third arc"),
+            1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "offset",
             "computed",
-            "x-offset of second arc-midpoint",
+            translate("TimingGear", "x-offset of second arc-midpoint"),
             1,
         )
         obj.teeth = 15

@@ -25,6 +25,7 @@ from freecad import app
 from pygears import __version__
 from pygears.computation import compute_shifted_gears
 
+from .translateutils import translate
 from .involutegear import InvoluteGear
 from .internalinvolutegear import InternalInvoluteGear
 from .involutegearrack import InvoluteGearRack
@@ -64,22 +65,38 @@ class ViewProviderGearConnector(object):
 class GearConnector(object):
     def __init__(self, obj, master_gear, slave_gear):
         obj.addProperty(
-            "App::PropertyString", "version", "version", "freecad.gears-version", 1
+            "App::PropertyString",
+            "version",
+            "version",
+            translate("GearConnector", "freecad.gears-version"),
+            1,
         )
-        obj.addProperty("App::PropertyLink", "master_gear", "gear", "master gear", 1)
-        obj.addProperty("App::PropertyLink", "slave_gear", "gear", "slave gear", 1)
+        obj.addProperty(
+            "App::PropertyLink",
+            "master_gear",
+            "gear",
+            translate("GearConnector", "master gear"),
+            1,
+        )
+        obj.addProperty(
+            "App::PropertyLink",
+            "slave_gear",
+            "gear",
+            translate("GearConnector", "slave gear"),
+            1,
+        )
         obj.addProperty(
             "App::PropertyAngle",
             "angle1",
             "gear",
-            "angle at which second gear is placed",
+            translate("GearConnector", "angle at which second gear is placed"),
             0,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angle2",
             "gear",
-            "angle at which second gear is placed",
+            translate("GearConnector", "angle at which second gear is placed"),
             1,
         )
         obj.version = __version__

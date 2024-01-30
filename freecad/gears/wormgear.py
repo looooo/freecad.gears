@@ -21,6 +21,7 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -33,28 +34,60 @@ class WormGear(BaseGear):
 
     def __init__(self, obj):
         super(WormGear, self).__init__(obj)
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
-        obj.addProperty("App::PropertyLength", "module", "base", "module")
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-        obj.addProperty("App::PropertyLength", "diameter", "base", "diameter")
-        obj.addProperty("App::PropertyAngle", "beta", "computed", "beta ", 1)
         obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle"
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("WormGear", "number of teeth"),
         )
         obj.addProperty(
-            "App::PropertyBool", "reverse_pitch", "base", "reverse rotation of helix"
+            "App::PropertyLength",
+            "module",
+            "base",
+            translate("WormGear", "module"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("WormGear", "height"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "diameter",
+            "base",
+            translate("WormGear", "diameter"),
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "beta",
+            "computed",
+            translate("WormGear", "beta"),
+            1,
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "pressure_angle",
+            "involute",
+            translate("WormGear", "pressure angle"),
+        )
+        obj.addProperty(
+            "App::PropertyBool",
+            "reverse_pitch",
+            "base",
+            translate("WormGear", "reverse rotation of helix"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            "head * module = additional length of head",
+            translate("WormGear", "head * module = additional length of head"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            "clearance * module = additional length of root",
+            translate("WormGear", "clearance * module = additional length of root"),
         )
         obj.teeth = 3
         obj.module = "1. mm"

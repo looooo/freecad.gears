@@ -20,6 +20,7 @@ from freecad import app
 from freecad import part
 
 import numpy as np
+from .translateutils import translate
 from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
@@ -38,18 +39,35 @@ class CycloidGear(BaseGear):
     def __init__(self, obj):
         super(CycloidGear, self).__init__(obj)
         self.cycloid_tooth = CycloidTooth()
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
-        obj.addProperty("App::PropertyLength", "module", "base", "module")
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("CycloidGear", "number of teeth"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "module",
+            "base",
+            translate("CycloidGear", "module"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("CycloidGear", "height"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            "number of points for spline",
+            translate("CycloidGear", "number of points for spline"),
         )
         obj.addProperty(
-            "App::PropertyPythonObject", "gear", "base", "the python object"
+            "App::PropertyPythonObject",
+            "gear",
+            "base",
+            translate("CycloidGear", "the python object"),
         )
 
         self.add_helical_properties(obj)
@@ -76,36 +94,62 @@ class CycloidGear(BaseGear):
         obj.Proxy = self
 
     def add_helical_properties(self, obj):
-        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
-        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta")
+        obj.addProperty(
+            "App::PropertyBool",
+            "double_helix",
+            "helical",
+            translate("CycloidGear", "double helix"),
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "beta",
+            "helical",
+            translate("CycloidGear", "beta"),
+        )
 
     def add_fillet_properties(self, obj):
         obj.addProperty(
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            "a fillet for the tooth-head, radius = head_fillet x module",
+            translate(
+                "CycloidGear",
+                "a fillet for the tooth-head, radius = head_fillet x module",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            "a fillet for the tooth-root, radius = root_fillet x module",
+            translate(
+                "CycloidGear",
+                "a fillet for the tooth-root, radius = root_fillet x module",
+            ),
         )
 
     def add_tolerance_properties(self, obj):
-        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty(
+            "App::PropertyFloat",
+            "clearance",
+            "tolerance",
+            translate("CycloidGear", "clearance"),
+        )
         obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            translate(
+                "CycloidGear",
+                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            "head_value * modul_value = additional length of head",
+            translate(
+                "CycloidGear", "head_value * module_value = additional length of head"
+            ),
         )
 
     def add_cycloid_properties(self, obj):
@@ -113,17 +157,22 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "inner_diameter",
             "cycloid",
-            "inner_diameter divided by module (hypocycloid)",
+            translate("CycloidGear", "inner_diameter divided by module (hypocycloid)"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "outer_diameter",
             "cycloid",
-            "outer_diameter divided by module (epicycloid)",
+            translate("CycloidGear", "outer_diameter divided by module (epicycloid)"),
         )
 
     def add_computed_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.addProperty(
+            "App::PropertyLength",
+            "dw",
+            "computed",
+            translate("CycloidGear", "The pitch diameter."),
+        )
         obj.setExpression(
             "dw", "teeth * module"
         )  # calculate via expression to ease usage for placement
@@ -134,7 +183,10 @@ class CycloidGear(BaseGear):
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            "The angle by which this gear can turn without moving the mating gear.",
+            translate(
+                "CycloidGear",
+                "The angle by which this gear can turn without moving the mating gear.",
+            ),
         )
         obj.setExpression(
             "angular_backlash", "backlash / dw * 360° / pi"
@@ -190,4 +242,6 @@ class CycloidGear(BaseGear):
             twist_angle = (
                 fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
             )
-            return helical_extrusion(base, fp.height.Value, twist_angle, fp.double_helix)
+            return helical_extrusion(
+                base, fp.height.Value, twist_angle, fp.double_helix
+            )

@@ -21,6 +21,7 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -43,24 +44,51 @@ class InternalInvoluteGear(BaseGear):
     def __init__(self, obj):
         super(InternalInvoluteGear, self).__init__(obj)
         self.involute_tooth = InvoluteTooth()
-        obj.addProperty("App::PropertyBool", "simple", "precision", "simple")
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
+        obj.addProperty(
+            "App::PropertyBool",
+            "simple",
+            "precision",
+            translate("InternalInvoluteGear", "simple"),
+        )
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("InternalInvoluteGear", "number of teeth"),
+        )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            "normal module if properties_from_tool=True, \
-                                                                else it's the transverse module.",
+            translate(
+                "InternalInvoluteGear",
+                "normal module if properties_from_tool=True, else it's the transverse module.",
+            ),
         )
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-        obj.addProperty("App::PropertyLength", "thickness", "base", "thickness")
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("InternalInvoluteGear", "height"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "thickness",
+            "base",
+            translate("InternalInvoluteGear", "thickness"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            "number of points for spline",
+            translate("InternalInvoluteGear", "number of points for spline"),
         )
-        obj.addProperty("App::PropertyPythonObject", "gear", "base", "test")
+        obj.addProperty(
+            "App::PropertyPythonObject",
+            "gear",
+            "base",
+            translate("InternalInvoluteGear", "test"),
+        )
 
         self.add_involute_properties(obj)
         self.add_tolerance_properties(obj)
@@ -91,16 +119,36 @@ class InternalInvoluteGear(BaseGear):
         obj.Proxy = self
 
     def add_limiting_diameter_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "da", "computed", "inside diameter", 1)
-        obj.addProperty("App::PropertyLength", "df", "computed", "root diameter", 1)
+        obj.addProperty(
+            "App::PropertyLength",
+            "da",
+            "computed",
+            translate("InternalInvoluteGear", "inside diameter"),
+            1,
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "df",
+            "computed",
+            translate("InternalInvoluteGear", "root diameter"),
+            1,
+        )
 
     def add_computed_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "dw", "computed", "The pitch diameter.")
+        obj.addProperty(
+            "App::PropertyLength",
+            "dw",
+            "computed",
+            translate("InternalInvoluteGear", "The pitch diameter."),
+        )
         obj.addProperty(
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            "The angle by which this gear can turn without moving the mating gear.",
+            translate(
+                "InternalInvoluteGear",
+                "The angle by which this gear can turn without moving the mating gear.",
+            ),
         )
         obj.setExpression(
             "angular_backlash", "backlash / dw * 360° / pi"
@@ -109,10 +157,18 @@ class InternalInvoluteGear(BaseGear):
             "angular_backlash", 1
         )  # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty(
-            "App::PropertyLength", "transverse_pitch", "computed", "transverse_pitch", 1
+            "App::PropertyLength",
+            "transverse_pitch",
+            "computed",
+            translate("InternalInvoluteGear", "transverse_pitch"),
+            1,
         )
         obj.addProperty(
-            "App::PropertyLength", "outside_diameter", "computed", "Outside diameter", 1
+            "App::PropertyLength",
+            "outside_diameter",
+            "computed",
+            translate("InternalInvoluteGear", "Outside diameter"),
+            1,
         )
 
     def add_fillet_properties(self, obj):
@@ -120,13 +176,19 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            "a fillet for the tooth-head, radius = head_fillet x module",
+            translate(
+                "InternalInvoluteGear",
+                "a fillet for the tooth-head, radius = head_fillet x module",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            "a fillet for the tooth-root, radius = root_fillet x module",
+            translate(
+                "InternalInvoluteGear",
+                "a fillet for the tooth-root, radius = root_fillet x module",
+            ),
         )
 
     def add_tolerance_properties(self, obj):
@@ -134,34 +196,68 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            translate(
+                "InternalInvoluteGear",
+                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            ),
         )
         obj.addProperty(
-            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction"
+            "App::PropertyBool",
+            "reversed_backlash",
+            "tolerance",
+            translate("InternalInvoluteGear", "backlash direction"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            "head_value * modul_value = additional length of head",
+            translate(
+                "InternalInvoluteGear",
+                "head_value * module_value = additional length of head",
+            ),
         )
-        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty(
+            "App::PropertyFloat",
+            "clearance",
+            "tolerance",
+            translate("InternalInvoluteGear", "clearance"),
+        )
 
     def add_involute_properties(self, obj):
-        obj.addProperty("App::PropertyFloat", "shift", "involute", "shift")
         obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle"
+            "App::PropertyFloat",
+            "shift",
+            "involute",
+            translate("InternalInvoluteGear", "shift"),
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "pressure_angle",
+            "involute",
+            translate("InternalInvoluteGear", "pressure angle"),
         )
 
     def add_helical_properties(self, obj):
-        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta ")
-        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
+        obj.addProperty(
+            "App::PropertyAngle",
+            "beta",
+            "helical",
+            translate("InternalInvoluteGear", "beta"),
+        )
+        obj.addProperty(
+            "App::PropertyBool",
+            "double_helix",
+            "helical",
+            translate("InternalInvoluteGear", "double helix"),
+        )
         obj.addProperty(
             "App::PropertyBool",
             "properties_from_tool",
             "helical",
-            "if beta is given and properties_from_tool is enabled, \
-            gear parameters are internally recomputed for the rotated gear",
+            translate(
+                "InternalInvoluteGear",
+                "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+            ),
         )
 
     def generate_gear_shape(self, fp):
