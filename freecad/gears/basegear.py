@@ -23,6 +23,7 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center
 
@@ -43,10 +44,11 @@ def fcvec(x):
         return app.Vector(x[0], x[1], x[2])
 
 
-class ViewProviderGear():
+class ViewProviderGear:
     """
     The base Viewprovider for the gears
     """
+
     def __init__(self, obj, icon_fn=None):
         # Set this object to the proxy object of the actual view provider
         obj.Proxy = self
@@ -92,10 +94,14 @@ class ViewProviderGear():
                 self.icon_fn = state["icon_fn"]
 
 
-class BaseGear():
+class BaseGear:
     def __init__(self, obj):
         obj.addProperty(
-            "App::PropertyString", "version", "version", "freecad.gears-version", 1
+            "App::PropertyString",
+            "version",
+            "version",
+            translate("BaseGear", "freecad.gears-version"),
+            1,
         )
         obj.version = __version__
         self.make_attachable(obj)
@@ -163,7 +169,7 @@ def part_arc_from_points_and_center(point_1, point_2, center):
         center (list, np.array with 2 values): the 2d center of the arc
 
     Returns:
-        freecad.part.Arc: a arc with 
+        freecad.part.Arc: a arc with
     """
     p_1, p_12, p_2 = arc_from_points_and_center(point_1, point_2, center)
     return part.Arc(fcvec(p_1), fcvec(p_12), fcvec(p_2))
@@ -281,7 +287,7 @@ def fillet_between_edges(edge_1, edge_2, radius, reversed=False):
     p4 = edge_2.valueAt(edge_2.LastParameter)
     t1 = p2 - p1
     t2 = p4 - p3
-    n = t1.cross(t2) * (- reversed * 2 + 1)
+    n = t1.cross(t2) * (-reversed * 2 + 1)
     pln = part.Plane(edge_1.valueAt(edge_1.FirstParameter), n)
     fillet2d_api.init(edge_1, edge_2, pln)
     if fillet2d_api.perform(radius) > 0:

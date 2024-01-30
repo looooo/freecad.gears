@@ -22,6 +22,7 @@ import scipy as sp
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
@@ -32,27 +33,40 @@ class LanternGear(BaseGear):
     def __init__(self, obj):
         super(LanternGear, self).__init__(obj)
         obj.addProperty(
-            "App::PropertyInteger", "teeth", "gear_parameter", "number of teeth"
+            "App::PropertyInteger",
+            "teeth",
+            "gear_parameter",
+            translate("LanternGear", "number of teeth"),
         )
-        obj.addProperty("App::PropertyLength", "module", "base", "module")
+        obj.addProperty(
+            "App::PropertyLength",
+            "module",
+            "base",
+            translate("LanternGear", "module"),
+        )
         obj.addProperty(
             "App::PropertyLength",
             "bolt_radius",
             "base",
-            "the bolt radius of the rack/chain",
+            translate("LanternGear", "the bolt radius of the rack/chain"),
         )
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("LanternGear", "height"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "num_profiles",
             "accuracy",
-            "number of profiles used for loft",
+            translate("LanternGear", "number of profiles used for loft"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            "head * module = additional length of head",
+            translate("LanternGear", "head * module = additional length of head"),
         )
 
         obj.teeth = 15

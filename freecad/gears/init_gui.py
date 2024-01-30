@@ -107,6 +107,10 @@ class GearWorkbench(gui.Workbench):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
+        # Add translations path
+        gui.addLanguagePath(os.path.join(os.path.dirname(__file__), "translations"))
+        gui.updateLocale()
+
         from .commands import (
             CreateCycloidGear,
             CreateInvoluteGear,

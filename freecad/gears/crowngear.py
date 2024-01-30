@@ -22,30 +22,55 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from .basegear import BaseGear, fcvec
 
 
 class CrownGear(BaseGear):
     """
-        A crown gear (also known as a face gear or a contrate gear) is a gear 
-        which has teeth that project at right angles to the face of the wheel. 
-        In particular, a crown gear is a type of bevel gear where the pitch cone 
-        angle is 90 degrees. https://en.wikipedia.org/wiki/Crown_gear
+    A crown gear (also known as a face gear or a contrate gear) is a gear
+    which has teeth that project at right angles to the face of the wheel.
+    In particular, a crown gear is a type of bevel gear where the pitch cone
+    angle is 90 degrees. https://en.wikipedia.org/wiki/Crown_gear
     """
+
     def __init__(self, obj):
         super(CrownGear, self).__init__(obj)
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("CrownGear", "number of teeth"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "other_teeth",
             "base",
-            "number of teeth of other gear",
+            translate("CrownGear", "number of teeth of other gear"),
         )
-        obj.addProperty("App::PropertyLength", "module", "base", "module")
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
-        obj.addProperty("App::PropertyLength", "thickness", "base", "thickness")
         obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle"
+            "App::PropertyLength",
+            "module",
+            "base",
+            translate("CrownGear", "module"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("CrownGear", "height"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "thickness",
+            "base",
+            translate("CrownGear", "thickness"),
+        )
+        obj.addProperty(
+            "App::PropertyAngle",
+            "pressure_angle",
+            "involute",
+            translate("CrownGear", "pressure angle"),
         )
         self.add_accuracy_properties(obj)
         obj.teeth = 15
@@ -69,13 +94,13 @@ class CrownGear(BaseGear):
             "App::PropertyInteger",
             "num_profiles",
             "accuracy",
-            "number of profiles used for loft",
+            translate("CrownGear", "number of profiles used for loft"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "preview_mode",
             "accuracy",
-            "if true no boolean operation is done",
+            translate("CrownGear", "if true no boolean operation is done"),
         )
 
     def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):

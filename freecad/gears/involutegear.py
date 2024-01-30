@@ -21,6 +21,8 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
+
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
@@ -42,7 +44,10 @@ class InvoluteGear(BaseGear):
         self.involute_tooth = InvoluteTooth()
 
         obj.addProperty(
-            "App::PropertyPythonObject", "gear", "base", "python gear object"
+            "App::PropertyPythonObject",
+            "gear",
+            "base",
+            translate("InvoluteGear", "python gear object"),
         )
 
         self.add_gear_properties(obj)
@@ -75,33 +80,64 @@ class InvoluteGear(BaseGear):
         self.compute_traverse_properties(obj)
 
     def add_gear_properties(self, obj):
-        obj.addProperty("App::PropertyInteger", "teeth", "base", "number of teeth")
+        obj.addProperty(
+            "App::PropertyInteger",
+            "teeth",
+            "base",
+            translate("InvoluteGear", "number of teeth"),
+        )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            "normal module if properties_from_tool=True, \
-                                                                else it's the transverse module.",
+            translate(
+                "InvoluteGear",
+                "normal module if properties_from_tool=True, else it's the transverse module.",
+            ),
         )
-        obj.addProperty("App::PropertyLength", "height", "base", "height")
         obj.addProperty(
-            "App::PropertyAngle", "pressure_angle", "involute", "pressure angle"
+            "App::PropertyLength",
+            "height",
+            "base",
+            translate("InvoluteGear", "height"),
         )
-        obj.addProperty("App::PropertyFloat", "shift", "involute", "shift")
+        obj.addProperty(
+            "App::PropertyAngle",
+            "pressure_angle",
+            "involute",
+            translate("InvoluteGear", "pressure angle"),
+        )
+        obj.addProperty(
+            "App::PropertyFloat",
+            "shift",
+            "involute",
+            translate("InvoluteGear", "shift"),
+        )
 
     def add_fillet_properties(self, obj):
-        obj.addProperty("App::PropertyBool", "undercut", "fillets", "undercut")
+        obj.addProperty(
+            "App::PropertyBool",
+            "undercut",
+            "fillets",
+            translate("InvoluteGear", "undercut"),
+        )
         obj.addProperty(
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            "a fillet for the tooth-head, radius = head_fillet x module",
+            translate(
+                "InvoluteGear",
+                "a fillet for the tooth-head, radius = head_fillet x module",
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            "a fillet for the tooth-root, radius = root_fillet x module",
+            translate(
+                "InvoluteGear",
+                "a fillet for the tooth-root, radius = root_fillet x module",
+            ),
         )
 
     def add_helical_properties(self, obj):
@@ -109,24 +145,55 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool",
             "properties_from_tool",
             "helical",
-            "if beta is given and properties_from_tool is enabled, \
-                         gear parameters are internally recomputed for the rotated gear",
+            translate(
+                "InvoluteGear",
+                "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+            ),
         )
-        obj.addProperty("App::PropertyAngle", "beta", "helical", "beta ")
-        obj.addProperty("App::PropertyBool", "double_helix", "helical", "double helix")
+        obj.addProperty(
+            "App::PropertyAngle",
+            "beta",
+            "helical",
+            translate("InvoluteGear", "beta"),
+        )
+        obj.addProperty(
+            "App::PropertyBool",
+            "double_helix",
+            "helical",
+            translate("InvoluteGear", "double helix"),
+        )
 
     def add_computed_properties(self, obj):
-        obj.addProperty("App::PropertyLength", "da", "computed", "outside diameter", 1)
-        obj.addProperty("App::PropertyLength", "df", "computed", "root diameter", 1)
+        obj.addProperty(
+            "App::PropertyLength",
+            "da",
+            "computed",
+            translate("InvoluteGear", "outside diameter"),
+            1,
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "df",
+            "computed",
+            translate("InvoluteGear", "root diameter"),
+            1,
+        )
         self.add_traverse_module_property(obj)
         obj.addProperty(
-            "App::PropertyLength", "dw", "computed", "The pitch diameter.", 1
+            "App::PropertyLength",
+            "dw",
+            "computed",
+            translate("InvoluteGear", "The pitch diameter."),
+            1,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            "The angle by which this gear can turn without moving the mating gear.",
+            translate(
+                "InvoluteGear",
+                "The angle by which this gear can turn without moving the mating gear.",
+            ),
         )
         obj.setExpression(
             "angular_backlash", "backlash / dw * 360° / pi"
@@ -135,7 +202,11 @@ class InvoluteGear(BaseGear):
             "angular_backlash", 1
         )  # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty(
-            "App::PropertyLength", "transverse_pitch", "computed", "transverse_pitch", 1
+            "App::PropertyLength",
+            "transverse_pitch",
+            "computed",
+            translate("InvoluteGear", "transverse_pitch"),
+            1,
         )
 
     def add_tolerance_properties(self, obj):
@@ -143,26 +214,44 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            translate(
+                "InvoluteGear",
+                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+            ),
         )
         obj.addProperty(
-            "App::PropertyBool", "reversed_backlash", "tolerance", "backlash direction"
+            "App::PropertyBool",
+            "reversed_backlash",
+            "tolerance",
+            translate("InvoluteGear", "backlash direction"),
         )
-        obj.addProperty("App::PropertyFloat", "clearance", "tolerance", "clearance")
+        obj.addProperty(
+            "App::PropertyFloat",
+            "clearance",
+            "tolerance",
+            translate("InvoluteGear", "clearance"),
+        )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            "head_value * modul_value = additional length of head",
+            translate(
+                "InvoluteGear", "head_value * module_value = additional length of head"
+            ),
         )
 
     def add_accuracy_properties(self, obj):
-        obj.addProperty("App::PropertyBool", "simple", "accuracy", "simple")
+        obj.addProperty(
+            "App::PropertyBool",
+            "simple",
+            "accuracy",
+            translate("InvoluteGear", "simple"),
+        )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            "number of points for spline",
+            translate("InvoluteGear", "number of points for spline"),
         )
 
     def add_traverse_module_property(self, obj):
@@ -170,7 +259,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "traverse_module",
             "computed",
-            "traverse module of the generated gear",
+            translate("InvoluteGear", "traverse module of the generated gear"),
             1,
         )
 

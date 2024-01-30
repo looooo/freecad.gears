@@ -23,6 +23,7 @@ import numpy as np
 from freecad import app
 from freecad import part
 
+from .translateutils import translate
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
@@ -42,66 +43,92 @@ class HypoCycloidGear(BaseGear):
             "App::PropertyFloat",
             "pin_circle_radius",
             "gear_parameter",
-            "Pin ball circle radius(overrides Tooth Pitch",
+            translate(
+                "HypoCycloidGear", "Pin ball circle radius (overrides Tooth Pitch)"
+            ),
         )
         obj.addProperty(
-            "App::PropertyFloat", "roller_diameter", "gear_parameter", "Roller Diameter"
+            "App::PropertyFloat",
+            "roller_diameter",
+            "gear_parameter",
+            translate("HypoCycloidGear", "Roller Diameter"),
         )
         obj.addProperty(
-            "App::PropertyFloat", "eccentricity", "gear_parameter", "Eccentricity"
+            "App::PropertyFloat",
+            "eccentricity",
+            "gear_parameter",
+            translate("HypoCycloidGear", "Eccentricity"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle_lim",
             "gear_parameter",
-            "Pressure angle limit",
+            translate("HypoCycloidGear", "Pressure angle limit"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "pressure_angle_offset",
             "gear_parameter",
-            "Offset in pressure angle",
+            translate("HypoCycloidGear", "Offset in pressure angle"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "teeth_number",
             "gear_parameter",
-            "Number of teeth in Cam",
+            translate("HypoCycloidGear", "Number of teeth in Cam"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "segment_count",
             "gear_parameter",
-            "Number of points used for spline interpolation",
+            translate(
+                "HypoCycloidGear", "Number of points used for spline interpolation"
+            ),
         )
         obj.addProperty(
             "App::PropertyLength",
             "hole_radius",
             "gear_parameter",
-            "Center hole's radius",
+            translate("HypoCycloidGear", "Center hole's radius"),
         )
 
         obj.addProperty(
-            "App::PropertyBool", "show_pins", "Pins", "Create pins in place"
+            "App::PropertyBool",
+            "show_pins",
+            "Pins",
+            translate("HypoCycloidGear", "Create pins in place"),
         )
-        obj.addProperty("App::PropertyLength", "pin_height", "Pins", "height")
+        obj.addProperty(
+            "App::PropertyLength",
+            "pin_height",
+            "Pins",
+            translate("HypoCycloidGear", "height"),
+        )
         obj.addProperty(
             "App::PropertyBool",
             "center_pins",
             "Pins",
-            "Center pin Z axis to generated disks",
+            translate("HypoCycloidGear", "Center pin Z axis to generated disks"),
         )
 
         obj.addProperty(
-            "App::PropertyBool", "show_disk0", "Disks", "Show main cam disk"
+            "App::PropertyBool",
+            "show_disk0",
+            "Disks",
+            translate("HypoCycloidGear", "Show main cam disk"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "show_disk1",
             "Disks",
-            "Show another reversed cam disk on top",
+            translate("HypoCycloidGear", "Show another reversed cam disk on top"),
         )
-        obj.addProperty("App::PropertyLength", "disk_height", "Disks", "height")
+        obj.addProperty(
+            "App::PropertyLength",
+            "disk_height",
+            "Disks",
+            translate("HypoCycloidGear", "height"),
+        )
 
         obj.pin_circle_radius = 66
         obj.roller_diameter = 3
