@@ -256,14 +256,14 @@ class HypoCycloidGear(BaseGear):
             cam = cam.cut(centerCircle)
 
         to_be_fused = []
-        if fp.show_disk0 == True:
+        if fp.show_disk0:
             if fp.disk_height.Value == 0:
                 to_be_fused.append(cam)
             else:
                 to_be_fused.append(cam.extrude(app.Vector(0, 0, fp.disk_height.Value)))
 
         # secondary cam disk
-        if fp.show_disk1 == True:
+        if fp.show_disk1:
             app.Console.PrintMessage("Generating secondary cam disk\r\n")
             second_cam = cam.copy()
             mat = app.Matrix()
@@ -281,7 +281,7 @@ class HypoCycloidGear(BaseGear):
                 )
 
         # pins
-        if fp.show_pins == True:
+        if fp.show_pins:
             app.Console.PrintMessage("Generating pins\r\n")
             pins = []
             for i in range(0, n + 1):
@@ -292,10 +292,10 @@ class HypoCycloidGear(BaseGear):
             pins = part.Face(pins)
 
             z_offset = -fp.pin_height.Value / 2
-            if fp.center_pins == True:
-                if fp.show_disk0 == True and fp.show_disk1 == False:
+            if fp.center_pins:
+                if fp.show_disk0 and not fp.show_disk1:
                     z_offset += fp.disk_height.Value / 2
-                elif fp.show_disk0 == False and fp.show_disk1 == True:
+                elif not fp.show_disk0 and fp.show_disk1:
                     z_offset += -fp.disk_height.Value / 2
             # extrude
             if z_offset != 0:
