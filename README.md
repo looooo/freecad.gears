@@ -12,7 +12,8 @@ __python > 3 (for python2 use branch py2)__
 * Shifting
 * Helical
 * Double Helical
-* Undercut  
+* Undercut
+* Fillets
 
 ![involute-gear](examples/involute-double-helical-gear.png)
 
@@ -23,6 +24,7 @@ __python > 3 (for python2 use branch py2)__
 ### Cylindric Cycloid
 * Helical
 * Double Helical
+* Fillets
 
 ![cycloid-gear](examples/cycloid-gear.png)
 
