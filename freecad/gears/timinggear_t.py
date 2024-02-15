@@ -60,7 +60,7 @@ class TimingGearT(BaseGear):
             "backlash",
             "tolerance",
             translate(
-                "TimingGearT"
+                "TimingGearT",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
