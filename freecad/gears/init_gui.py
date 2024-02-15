@@ -84,19 +84,19 @@ class GearWorkbench(gui.Workbench):
     ToolTip = "Gear Workbench"
     Icon = os.path.join(__dirname__, "icons", "gearworkbench.svg")
     commands = [
-        "CreateInvoluteGear",
-        "CreateInternalInvoluteGear",
-        "CreateInvoluteRack",
-        "CreateCycloidGear",
-        "CreateCycloidRack",
-        "CreateBevelGear",
-        "CreateCrownGear",
-        "CreateWormGear",
-        "CreateTimingGearT",
-        "CreateTimingGear",
-        "CreateLanternGear",
-        "CreateHypoCycloidGear",
-        "CreateGearConnector",
+        "FCGear_InvoluteGear",
+        "FCGear_InternalInvoluteGear",
+        "FCGear_InvoluteRack",
+        "FCGear_CycloidGear",
+        "FCGear_CycloidRack",
+        "FCGear_BevelGear",
+        "FCGear_CrownGear",
+        "FCGear_WormGear",
+        "FCGear_TimingGearT",
+        "FCGear_TimingGear",
+        "FCGear_LanternGear",
+        "FCGear_HypoCycloidGear",
+        "FCGear_GearConnector",
     ]
 
     def GetClassName(self):
@@ -125,19 +125,19 @@ class GearWorkbench(gui.Workbench):
 
         self.appendToolbar("Gear", self.commands)
         self.appendMenu("Gear", self.commands)
-        gui.addCommand("CreateInvoluteGear", CreateInvoluteGear())
-        gui.addCommand("CreateInternalInvoluteGear", CreateInternalInvoluteGear())
-        gui.addCommand("CreateCycloidGear", CreateCycloidGear())
-        gui.addCommand("CreateCycloidRack", CreateCycloidRack())
-        gui.addCommand("CreateBevelGear", CreateBevelGear())
-        gui.addCommand("CreateInvoluteRack", CreateInvoluteRack())
-        gui.addCommand("CreateCrownGear", CreateCrownGear())
-        gui.addCommand("CreateWormGear", CreateWormGear())
-        gui.addCommand("CreateTimingGearT", CreateTimingGearT())
-        gui.addCommand("CreateTimingGear", CreateTimingGear())
-        gui.addCommand("CreateLanternGear", CreateLanternGear())
-        gui.addCommand("CreateHypoCycloidGear", CreateHypoCycloidGear())
-        gui.addCommand("CreateGearConnector", CreateGearConnector())
+        gui.addCommand("FCGear_InvoluteGear", CreateInvoluteGear())
+        gui.addCommand("FCGear_InternalInvoluteGear", CreateInternalInvoluteGear())
+        gui.addCommand("FCGear_CycloidGear", CreateCycloidGear())
+        gui.addCommand("FCGear_CycloidRack", CreateCycloidRack())
+        gui.addCommand("FCGear_BevelGear", CreateBevelGear())
+        gui.addCommand("FCGear_InvoluteRack", CreateInvoluteRack())
+        gui.addCommand("FCGear_CrownGear", CreateCrownGear())
+        gui.addCommand("FCGear_WormGear", CreateWormGear())
+        gui.addCommand("FCGear_TimingGearT", CreateTimingGearT())
+        gui.addCommand("FCGear_TimingGear", CreateTimingGear())
+        gui.addCommand("FCGear_LanternGear", CreateLanternGear())
+        gui.addCommand("FCGear_HypoCycloidGear", CreateHypoCycloidGear())
+        gui.addCommand("FCGear_GearConnector", CreateGearConnector())
 
     def Activated(self):
         pass
