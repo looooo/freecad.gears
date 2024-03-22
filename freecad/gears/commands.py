@@ -201,17 +201,22 @@ class CreateGearConnector(BaseCommand):
     ToolTip = translate("Commands", "Combine two gears")
 
     def Activated(self):
-        gear1 = gui.Selection.getSelection()[0]
-        assert isinstance(gear1.Proxy, BaseGear)
+        try:
+            selection = gui.Selection.getSelection()
 
-        gear2 = gui.Selection.getSelection()[1]
-        assert isinstance(gear2.Proxy, BaseGear)
+            if len(selection) != 2:
+                raise ValueError("Please select two gear objects.")
 
-        # check if selected objects are beams
+            for obj in selection:
+                if not isinstance(obj.Proxy, BaseGear):
+                    raise TypeError("Selected object is not a gear.")
 
-        obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
-        GearConnector(obj, gear1, gear2)
-        ViewProviderGearConnector(obj.ViewObject)
+            obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
+            GearConnector(obj, selection[0], selection[1])
+            ViewProviderGearConnector(obj.ViewObject)
 
-        app.ActiveDocument.recompute()
-        return obj
+            app.ActiveDocument.recompute()
+            return obj
+        except Exception as e:
+            app.Console.PrintError(f"Error: {str(e)}\n")
+            return None
