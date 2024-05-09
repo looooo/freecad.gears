@@ -19,6 +19,7 @@
 
 import numpy as np
 import scipy as sp
+from scipy import optimize
 
 from freecad import app
 from freecad import part
