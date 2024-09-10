@@ -36,13 +36,9 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
     app.Console.PrintLog("Checking FreeCAD version\n")
     ver = app.Version()
     major_ver = int(ver[0])
-    minor_vers = ver[1].split(".")
-    minor_ver = int(minor_vers[0])
-    if minor_vers[1:] and minor_vers[1]:
-        patch_ver = int(minor_vers[1])
-    else:
-        patch_ver = 0
-    gitver = ver[2].split()
+    minor_ver = int(ver[1])
+    patch_ver = int(ver[2])
+    gitver = ver[3].split()
     if gitver:
         gitver = gitver[0]
     if gitver and gitver != "Unknown":
