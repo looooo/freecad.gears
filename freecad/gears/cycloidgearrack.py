@@ -24,9 +24,10 @@ from freecad import part
 
 import numpy as np
 
-from .translateutils import translate
 from pygears._functions import reflection
 from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class CycloidGearRack(BaseGear):
@@ -38,27 +39,27 @@ class CycloidGearRack(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("CycloidGearRack", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("CycloidGearRack", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "thickness",
             "base",
-            translate("CycloidGearRack", "thickness"),
+            QT_TRANSLATE_NOOP("App::Property", "thickness"),
         )
         obj.addProperty("App::PropertyLength", "module", "involute", "module")
         obj.addProperty(
             "App::PropertyBool",
             "simplified",
             "precision",
-            translate(
-                "CycloidGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if enabled the rack is drawn with a constant number of teeth to avoid topologic renaming.",
             ),
         )
@@ -66,13 +67,13 @@ class CycloidGearRack(BaseGear):
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            translate("CycloidGearRack", "number of points for spline"),
+            QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
             "App::PropertyPythonObject",
             "rack",
             "base",
-            translate("CycloidGearRack", "test"),
+            QT_TRANSLATE_NOOP("App::Property", "test"),
         )
 
         self.add_helical_properties(obj)
@@ -100,13 +101,13 @@ class CycloidGearRack(BaseGear):
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("CycloidGearRack", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "double_helix",
             "helical",
-            translate("CycloidGearRack", "double helix"),
+            QT_TRANSLATE_NOOP("App::Property", "double helix"),
         )
 
     def add_computed_properties(self, obj):
@@ -114,16 +115,16 @@ class CycloidGearRack(BaseGear):
             "App::PropertyLength",
             "transverse_pitch",
             "computed",
-            translate("CycloidGearRack", "pitch in the transverse plane"),
+            QT_TRANSLATE_NOOP("App::Property", "pitch in the transverse plane"),
             1,
         )
         obj.addProperty(
             "App::PropertyBool",
             "add_endings",
             "base",
-            translate(
-                "CycloidGearRack",
-                "if enabled the total length of the rack is num_teeth x pitch, otherwise the rack starts with a tooth-flank",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
+                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -132,14 +133,16 @@ class CycloidGearRack(BaseGear):
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate("CycloidGearRack", "head * module = additional length of head"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head * module = additional length of head"
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate(
-                "CycloidGearRack", "clearance * module = additional length of root"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "clearance * module = additional length of root"
             ),
         )
 
@@ -148,16 +151,16 @@ class CycloidGearRack(BaseGear):
             "App::PropertyFloat",
             "inner_diameter",
             "cycloid",
-            translate(
-                "CycloidGearRack", "inner_diameter divided by module (hypocycloid)"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "inner_diameter divided by module (hypocycloid)"
             ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "outer_diameter",
             "cycloid",
-            translate(
-                "CycloidGearRack", "outer_diameter divided by module (epicycloid)"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "outer_diameter divided by module (epicycloid)"
             ),
         )
 
@@ -166,8 +169,8 @@ class CycloidGearRack(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "CycloidGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -175,8 +178,8 @@ class CycloidGearRack(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "CycloidGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )

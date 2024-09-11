@@ -24,10 +24,11 @@ from scipy import optimize
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears._functions import rotation, reflection
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_fillet
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class TimingGearT(BaseGear):
@@ -36,32 +37,34 @@ class TimingGearT(BaseGear):
             "App::PropertyLength",
             "pitch",
             "base",
-            translate("TimingGearT", "pitch of gear"),
+            QT_TRANSLATE_NOOP("App::Property", "pitch of gear"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("TimingGearT", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "tooth_height",
             "base",
-            translate("TimingGearT", "radial height of tooth"),
+            QT_TRANSLATE_NOOP("App::Property", "radial height of tooth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "u",
             "base",
-            translate("TimingGearT", "radial distance from tooth-head to pitch circle"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "radial distance from tooth-head to pitch circle"
+            ),
         )
         obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            translate(
-                "TimingGearT",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
@@ -69,8 +72,8 @@ class TimingGearT(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "TimingGearT",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -78,8 +81,8 @@ class TimingGearT(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "TimingGearT",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )
@@ -87,13 +90,13 @@ class TimingGearT(BaseGear):
             "App::PropertyAngle",
             "alpha",
             "base",
-            translate("TimingGearT", "angle of tooth flanks"),
+            QT_TRANSLATE_NOOP("App::Property", "angle of tooth flanks"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("TimingGearT", "extrusion height"),
+            QT_TRANSLATE_NOOP("App::Property", "extrusion height"),
         )
         obj.pitch = "5. mm"
         obj.num_teeth = 15

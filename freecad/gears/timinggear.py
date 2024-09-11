@@ -21,9 +21,10 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears._functions import reflection
 from .basegear import BaseGear, part_arc_from_points_and_center
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class TimingGear(BaseGear):
@@ -108,40 +109,40 @@ class TimingGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("TimingGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyEnumeration",
             "type",
             "base",
-            translate("TimingGear", "type of timing-gear"),
+            QT_TRANSLATE_NOOP("App::Property", "type of timing-gear"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("TimingGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "pitch",
             "computed",
-            translate("TimingGear", "pitch of gear"),
+            QT_TRANSLATE_NOOP("App::Property", "pitch of gear"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "h",
             "computed",
-            translate("TimingGear", "radial height of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "radial height of teeth"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "u",
             "computed",
-            translate(
-                "TimingGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "radial difference between pitch diameter and head of gear",
             ),
             1,
@@ -150,28 +151,28 @@ class TimingGear(BaseGear):
             "App::PropertyLength",
             "r0",
             "computed",
-            translate("TimingGear", "radius of first arc"),
+            QT_TRANSLATE_NOOP("App::Property", "radius of first arc"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "r1",
             "computed",
-            translate("TimingGear", "radius of second arc"),
+            QT_TRANSLATE_NOOP("App::Property", "radius of second arc"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "rs",
             "computed",
-            translate("TimingGear", "radius of third arc"),
+            QT_TRANSLATE_NOOP("App::Property", "radius of third arc"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "offset",
             "computed",
-            translate("TimingGear", "x-offset of second arc-midpoint"),
+            QT_TRANSLATE_NOOP("App::Property", "x-offset of second arc-midpoint"),
             1,
         )
         obj.num_teeth = 15

@@ -22,11 +22,12 @@ import scipy as sp
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class LanternGear(BaseGear):
@@ -36,37 +37,39 @@ class LanternGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "gear_parameter",
-            translate("LanternGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("LanternGear", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "bolt_radius",
             "base",
-            translate("LanternGear", "the bolt radius of the rack/chain"),
+            QT_TRANSLATE_NOOP("App::Property", "the bolt radius of the rack/chain"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("LanternGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "num_profiles",
             "accuracy",
-            translate("LanternGear", "number of profiles used for loft"),
+            QT_TRANSLATE_NOOP("App::Property", "number of profiles used for loft"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate("LanternGear", "head * module = additional length of head"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head * module = additional length of head"
+            ),
         )
 
         obj.num_teeth = 15

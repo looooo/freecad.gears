@@ -21,11 +21,12 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
 from .basegear import BaseGear, helical_extrusion, fcvec
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class WormGear(BaseGear):
@@ -37,56 +38,60 @@ class WormGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("WormGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("WormGear", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("WormGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "diameter",
             "base",
-            translate("WormGear", "diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "diameter"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "beta",
             "computed",
-            translate("WormGear", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
             1,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute",
-            translate("WormGear", "pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure angle"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "reverse_pitch",
             "base",
-            translate("WormGear", "reverse rotation of helix"),
+            QT_TRANSLATE_NOOP("App::Property", "reverse rotation of helix"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate("WormGear", "head * module = additional length of head"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head * module = additional length of head"
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate("WormGear", "clearance * module = additional length of root"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "clearance * module = additional length of root"
+            ),
         )
         obj.num_teeth = 3
         obj.module = "1. mm"

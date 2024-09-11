@@ -20,7 +20,6 @@ from freecad import app
 from freecad import part
 
 import numpy as np
-from .translateutils import translate
 from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
@@ -31,6 +30,8 @@ from .basegear import (
     helical_extrusion,
     rotate_tooth,
 )
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class CycloidGear(BaseGear):
@@ -43,31 +44,31 @@ class CycloidGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("CycloidGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("CycloidGear", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("CycloidGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            translate("CycloidGear", "number of points for spline"),
+            QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
             "App::PropertyPythonObject",
             "gear",
             "base",
-            translate("CycloidGear", "the python object"),
+            QT_TRANSLATE_NOOP("App::Property", "the python object"),
         )
 
         self.add_helical_properties(obj)
@@ -98,13 +99,13 @@ class CycloidGear(BaseGear):
             "App::PropertyBool",
             "double_helix",
             "helical",
-            translate("CycloidGear", "double helix"),
+            QT_TRANSLATE_NOOP("App::Property", "double helix"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("CycloidGear", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
         )
 
     def add_fillet_properties(self, obj):
@@ -112,8 +113,8 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "CycloidGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -121,8 +122,8 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "CycloidGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )
@@ -132,14 +133,14 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate("CycloidGear", "clearance"),
+            QT_TRANSLATE_NOOP("App::Property", "clearance"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            translate(
-                "CycloidGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
@@ -147,8 +148,8 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate(
-                "CycloidGear", "head_value * module_value = additional length of head"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head_value * module_value = additional length of head"
             ),
         )
 
@@ -157,13 +158,17 @@ class CycloidGear(BaseGear):
             "App::PropertyFloat",
             "inner_diameter",
             "cycloid",
-            translate("CycloidGear", "inner_diameter divided by module (hypocycloid)"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "inner_diameter divided by module (hypocycloid)"
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "outer_diameter",
             "cycloid",
-            translate("CycloidGear", "outer_diameter divided by module (epicycloid)"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "outer_diameter divided by module (epicycloid)"
+            ),
         )
 
     def add_computed_properties(self, obj):
@@ -171,7 +176,7 @@ class CycloidGear(BaseGear):
             "App::PropertyLength",
             "dw",
             "computed",
-            translate("CycloidGear", "The pitch diameter."),
+            QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
         obj.setExpression(
             "dw", "num_teeth * module"
@@ -183,8 +188,8 @@ class CycloidGear(BaseGear):
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            translate(
-                "CycloidGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
         )

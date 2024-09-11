@@ -21,9 +21,10 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears.involute_tooth import InvoluteRack
 from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class InvoluteGearRack(BaseGear):
@@ -36,32 +37,32 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("InvoluteGearRack", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("InvoluteGearRack", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("InvoluteGearRack", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "thickness",
             "base",
-            translate("InvoluteGearRack", "thickness"),
+            QT_TRANSLATE_NOOP("App::Property", "thickness"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "simplified",
             "precision",
-            translate(
-                "InvoluteGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if enabled the rack is drawn with a constant number of teeth to avoid topologic renaming.",
             ),
         )
@@ -69,7 +70,7 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyPythonObject",
             "rack",
             "base",
-            translate("InvoluteGearRack", "test"),
+            QT_TRANSLATE_NOOP("App::Property", "test"),
         )
 
         self.add_helical_properties(obj)
@@ -97,8 +98,8 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyBool",
             "properties_from_tool",
             "helical",
-            translate(
-                "InvoluteGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )
@@ -106,13 +107,13 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("InvoluteGearRack", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "double_helix",
             "helical",
-            translate("InvoluteGearRack", "double helix"),
+            QT_TRANSLATE_NOOP("App::Property", "double helix"),
         )
 
     def add_computed_properties(self, obj):
@@ -120,16 +121,16 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyLength",
             "transverse_pitch",
             "computed",
-            translate("InvoluteGearRack", "pitch in the transverse plane"),
+            QT_TRANSLATE_NOOP("App::Property", "pitch in the transverse plane"),
             1,
         )
         obj.addProperty(
             "App::PropertyBool",
             "add_endings",
             "base",
-            translate(
-                "InvoluteGearRack",
-                "if enabled the total length of the rack is num_teeth x pitch, otherwise the rack starts with a tooth-flank",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
+                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -138,14 +139,16 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate("InvoluteGearRack", "head * module = additional length of head"),
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head * module = additional length of head"
+            ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate(
-                "InvoluteGearRack", "clearance * module = additional length of root"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "clearance * module = additional length of root"
             ),
         )
 
@@ -154,7 +157,7 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyAngle",
             "pressure_angle",
             "involute",
-            translate("InvoluteGearRack", "pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure angle"),
         )
 
     def add_fillet_properties(self, obj):
@@ -162,8 +165,8 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "InvoluteGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -171,8 +174,8 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "InvoluteGearRack",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )

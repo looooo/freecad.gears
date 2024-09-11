@@ -21,10 +21,10 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
-
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 from .basegear import (
     BaseGear,
@@ -46,7 +46,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyPythonObject",
             "gear",
             "base",
-            translate("InvoluteGear", "python gear object"),
+            QT_TRANSLATE_NOOP("App::Property", "python gear object"),
         )
 
         self.add_gear_properties(obj)
@@ -83,14 +83,14 @@ class InvoluteGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("InvoluteGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "normal module if properties_from_tool=True, else it's the transverse module.",
             ),
         )
@@ -98,19 +98,19 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "height",
             "base",
-            translate("InvoluteGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute",
-            translate("InvoluteGear", "pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure angle"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "shift",
             "involute",
-            translate("InvoluteGear", "shift"),
+            QT_TRANSLATE_NOOP("App::Property", "shift"),
         )
 
     def add_fillet_properties(self, obj):
@@ -118,14 +118,14 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool",
             "undercut",
             "fillets",
-            translate("InvoluteGear", "undercut"),
+            QT_TRANSLATE_NOOP("App::Property", "undercut"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -133,8 +133,8 @@ class InvoluteGear(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )
@@ -144,8 +144,8 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool",
             "properties_from_tool",
             "helical",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )
@@ -153,13 +153,13 @@ class InvoluteGear(BaseGear):
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("InvoluteGear", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "double_helix",
             "helical",
-            translate("InvoluteGear", "double helix"),
+            QT_TRANSLATE_NOOP("App::Property", "double helix"),
         )
 
     def add_computed_properties(self, obj):
@@ -167,14 +167,14 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "da",
             "computed",
-            translate("InvoluteGear", "outside diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "outside diameter"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "df",
             "computed",
-            translate("InvoluteGear", "root diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "root diameter"),
             1,
         )
         self.add_traverse_module_property(obj)
@@ -182,15 +182,15 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "dw",
             "computed",
-            translate("InvoluteGear", "The pitch diameter."),
+            QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
             1,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
         )
@@ -204,7 +204,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "transverse_pitch",
             "computed",
-            translate("InvoluteGear", "transverse_pitch"),
+            QT_TRANSLATE_NOOP("App::Property", "transverse_pitch"),
             1,
         )
 
@@ -213,8 +213,8 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            translate(
-                "InvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
@@ -222,20 +222,20 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool",
             "reversed_backlash",
             "tolerance",
-            translate("InvoluteGear", "backlash direction"),
+            QT_TRANSLATE_NOOP("App::Property", "backlash direction"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate("InvoluteGear", "clearance"),
+            QT_TRANSLATE_NOOP("App::Property", "clearance"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate(
-                "InvoluteGear", "head_value * module_value = additional length of head"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "head_value * module_value = additional length of head"
             ),
         )
 
@@ -244,13 +244,13 @@ class InvoluteGear(BaseGear):
             "App::PropertyBool",
             "simple",
             "accuracy",
-            translate("InvoluteGear", "simple"),
+            QT_TRANSLATE_NOOP("App::Property", "simple"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            translate("InvoluteGear", "number of points for spline"),
+            QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
 
     def add_traverse_module_property(self, obj):
@@ -258,7 +258,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyLength",
             "traverse_module",
             "computed",
-            translate("InvoluteGear", "traverse module of the generated gear"),
+            QT_TRANSLATE_NOOP("App::Property", "traverse module of the generated gear"),
             1,
         )
 

@@ -23,9 +23,10 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 def fcvec(x):
@@ -100,7 +101,7 @@ class BaseGear:
             "App::PropertyString",
             "version",
             "version",
-            translate("BaseGear", "freecad.gears-version"),
+            QT_TRANSLATE_NOOP("App::Property", "freecad.gears-version"),
             1,
         )
         obj.version = __version__
