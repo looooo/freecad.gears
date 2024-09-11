@@ -21,9 +21,11 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
+
 
 from .basegear import (
     BaseGear,
@@ -48,20 +50,20 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyBool",
             "simple",
             "precision",
-            translate("InternalInvoluteGear", "simple"),
+            QT_TRANSLATE_NOOP("App::Property", "simple"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("InternalInvoluteGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "normal module if properties_from_tool=True, else it's the transverse module.",
             ),
         )
@@ -69,25 +71,25 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "height",
             "base",
-            translate("InternalInvoluteGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "thickness",
             "base",
-            translate("InternalInvoluteGear", "thickness"),
+            QT_TRANSLATE_NOOP("App::Property", "thickness"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "accuracy",
-            translate("InternalInvoluteGear", "number of points for spline"),
+            QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
             "App::PropertyPythonObject",
             "gear",
             "base",
-            translate("InternalInvoluteGear", "test"),
+            QT_TRANSLATE_NOOP("App::Property", "test"),
         )
 
         self.add_involute_properties(obj)
@@ -123,14 +125,14 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "da",
             "computed",
-            translate("InternalInvoluteGear", "inside diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "inside diameter"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "df",
             "computed",
-            translate("InternalInvoluteGear", "root diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "root diameter"),
             1,
         )
 
@@ -139,14 +141,14 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "dw",
             "computed",
-            translate("InternalInvoluteGear", "The pitch diameter."),
+            QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
         )
@@ -160,14 +162,14 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "transverse_pitch",
             "computed",
-            translate("InternalInvoluteGear", "transverse_pitch"),
+            QT_TRANSLATE_NOOP("App::Property", "transverse_pitch"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
             "outside_diameter",
             "computed",
-            translate("InternalInvoluteGear", "Outside diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "Outside diameter"),
             1,
         )
 
@@ -176,8 +178,8 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyFloat",
             "head_fillet",
             "fillets",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
         )
@@ -185,8 +187,8 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyFloat",
             "root_fillet",
             "fillets",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
         )
@@ -196,8 +198,8 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
@@ -205,14 +207,14 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyBool",
             "reversed_backlash",
             "tolerance",
-            translate("InternalInvoluteGear", "backlash direction"),
+            QT_TRANSLATE_NOOP("App::Property", "backlash direction"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "head",
             "tolerance",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "head_value * module_value = additional length of head",
             ),
         )
@@ -220,7 +222,7 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate("InternalInvoluteGear", "clearance"),
+            QT_TRANSLATE_NOOP("App::Property", "clearance"),
         )
 
     def add_involute_properties(self, obj):
@@ -228,13 +230,13 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyFloat",
             "shift",
             "involute",
-            translate("InternalInvoluteGear", "shift"),
+            QT_TRANSLATE_NOOP("App::Property", "shift"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute",
-            translate("InternalInvoluteGear", "pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure angle"),
         )
 
     def add_helical_properties(self, obj):
@@ -242,20 +244,20 @@ class InternalInvoluteGear(BaseGear):
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("InternalInvoluteGear", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "beta"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "double_helix",
             "helical",
-            translate("InternalInvoluteGear", "double helix"),
+            QT_TRANSLATE_NOOP("App::Property", "double helix"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "properties_from_tool",
             "helical",
-            translate(
-                "InternalInvoluteGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )

@@ -20,11 +20,13 @@ from freecad import app
 from freecad import part
 
 import numpy as np
-from .translateutils import translate
+
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D
 
 from .basegear import BaseGear, fcvec, make_bspline_wire
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class BevelGear(BaseGear):
@@ -40,50 +42,50 @@ class BevelGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("BevelGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("BevelGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pitch_angle",
             "involute",
-            translate("BevelGear", "pitch_angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pitch_angle"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute_parameter",
-            translate("BevelGear", "pressure_angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure_angle"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("BevelGear", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "clearance",
             "tolerance",
-            translate("BevelGear", "clearance"),
+            QT_TRANSLATE_NOOP("App::Property", "clearance"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "numpoints",
             "precision",
-            translate("BevelGear", "number of points for spline"),
+            QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "reset_origin",
             "base",
-            translate(
-                "BevelGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "if value is true the gears outer face will match the z=0 plane",
             ),
         )
@@ -91,8 +93,8 @@ class BevelGear(BaseGear):
             "App::PropertyLength",
             "backlash",
             "tolerance",
-            translate(
-                "BevelGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The arc length on the pitch circle by which the tooth thicknes is reduced.",
             ),
         )
@@ -100,19 +102,19 @@ class BevelGear(BaseGear):
             "App::PropertyPythonObject",
             "gear",
             "base",
-            translate("BevelGear", "test"),
+            QT_TRANSLATE_NOOP("App::Property", "test"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "beta",
             "helical",
-            translate("BevelGear", "angle used for spiral bevel-gears"),
+            QT_TRANSLATE_NOOP("App::Property", "angle used for spiral bevel-gears"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "dw",
             "computed",
-            translate("BevelGear", "The pitch diameter."),
+            QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
         obj.setExpression(
             "dw", "num_teeth * module"
@@ -124,8 +126,8 @@ class BevelGear(BaseGear):
             "App::PropertyAngle",
             "angular_backlash",
             "computed",
-            translate(
-                "BevelGear",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
         )

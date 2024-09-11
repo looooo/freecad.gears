@@ -23,6 +23,9 @@ from freecad import gui
 
 __dirname__ = os.path.dirname(__file__)
 
+# Add translations path
+gui.addLanguagePath(os.path.join(__dirname__, "translations"))
+gui.updateLocale()
 
 if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
     # only works with 0.21.2 and above
@@ -33,7 +36,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
     FC_COMMIT_REQUIRED = 33772
 
     # Check FreeCAD version
-    app.Console.PrintLog("Checking FreeCAD version\n")
+    app.Console.PrintLog(app.Qt.translate("Log", "Checking FreeCAD version\n"))
     ver = app.Version()
     major_ver = int(ver[0])
     minor_ver = int(ver[1])
@@ -64,7 +67,10 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
         )
     ):
         app.Console.PrintWarning(
-            "FreeCAD version (currently {}.{}.{} ({})) must be at least {}.{}.{} ({}) in order to work with Python 3.11 and above\n".format(
+            app.Qt.translate(
+                "Log",
+                "FreeCAD version (currently {}.{}.{} ({})) must be at least {}.{}.{} ({}) in order to work with Python 3.11 and above\n",
+            ).format(
                 int(ver[0]),
                 minor_ver,
                 patch_ver,
@@ -80,8 +86,8 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
 class GearWorkbench(gui.Workbench):
     """A freecad workbench aiming at gear design"""
 
-    MenuText = "Gear"
-    ToolTip = "Gear Workbench"
+    MenuText = app.Qt.translate("Workbench", "Gear")
+    ToolTip = app.Qt.translate("Workbench", "Gear Workbench")
     Icon = os.path.join(__dirname__, "icons", "gearworkbench.svg")
     commands = [
         "FCGear_InvoluteGear",
@@ -103,10 +109,7 @@ class GearWorkbench(gui.Workbench):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
-        # Add translations path
-        gui.addLanguagePath(os.path.join(os.path.dirname(__file__), "translations"))
-        gui.updateLocale()
-
+        QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
         from .commands import (
             CreateCycloidGear,
             CreateInvoluteGear,
@@ -123,8 +126,8 @@ class GearWorkbench(gui.Workbench):
             CreateGearConnector,
         )
 
-        self.appendToolbar("Gear", self.commands)
-        self.appendMenu("Gear", self.commands)
+        self.appendToolbar(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)
+        self.appendMenu(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)
         gui.addCommand("FCGear_InvoluteGear", CreateInvoluteGear())
         gui.addCommand("FCGear_InternalInvoluteGear", CreateInternalInvoluteGear())
         gui.addCommand("FCGear_CycloidGear", CreateCycloidGear())

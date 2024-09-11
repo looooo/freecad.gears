@@ -22,8 +22,9 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from .basegear import BaseGear, fcvec
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class CrownGear(BaseGear):
@@ -40,37 +41,37 @@ class CrownGear(BaseGear):
             "App::PropertyInteger",
             "num_teeth",
             "base",
-            translate("CrownGear", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "other_teeth",
             "base",
-            translate("CrownGear", "number of teeth of other gear"),
+            QT_TRANSLATE_NOOP("App::Property", "number of teeth of other gear"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "module",
             "base",
-            translate("CrownGear", "module"),
+            QT_TRANSLATE_NOOP("App::Property", "module"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "height",
             "base",
-            translate("CrownGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "thickness",
             "base",
-            translate("CrownGear", "thickness"),
+            QT_TRANSLATE_NOOP("App::Property", "thickness"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle",
             "involute",
-            translate("CrownGear", "pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "pressure angle"),
         )
         self.add_accuracy_properties(obj)
         obj.num_teeth = 15
@@ -85,8 +86,11 @@ class CrownGear(BaseGear):
         obj.Proxy = self
 
         app.Console.PrintMessage(
-            "Gear module: Crown gear created, preview_mode = true for improved performance. "
-            "Set preview_mode property to false when ready to cut teeth."
+            app.Qt.translate(
+                "Log",
+                "Gear module: Crown gear created, preview_mode = true for improved performance. "
+                "Set preview_mode property to false when ready to cut teeth.",
+            )
         )
 
     def add_accuracy_properties(self, obj):
@@ -94,13 +98,13 @@ class CrownGear(BaseGear):
             "App::PropertyInteger",
             "num_profiles",
             "accuracy",
-            translate("CrownGear", "number of profiles used for loft"),
+            QT_TRANSLATE_NOOP("App::Property", "number of profiles used for loft"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "preview_mode",
             "accuracy",
-            translate("CrownGear", "if true no boolean operation is done"),
+            QT_TRANSLATE_NOOP("App::Property", "if true no boolean operation is done"),
         )
 
     def profile(self, m, r, r0, t_c, t_i, alpha_w, y0, y1, y2):

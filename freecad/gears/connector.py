@@ -25,12 +25,13 @@ from freecad import app
 from pygears import __version__
 from pygears.computation import compute_shifted_gears
 
-from .translateutils import translate
 from .involutegear import InvoluteGear
 from .internalinvolutegear import InternalInvoluteGear
 from .involutegearrack import InvoluteGearRack
 from .cycloidgear import CycloidGear
 from .cycloidgearrack import CycloidGearRack
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class ViewProviderGearConnector(object):
@@ -68,35 +69,35 @@ class GearConnector(object):
             "App::PropertyString",
             "version",
             "version",
-            translate("GearConnector", "freecad.gears-version"),
+            QT_TRANSLATE_NOOP("App::Property", "freecad.gears-version"),
             1,
         )
         obj.addProperty(
             "App::PropertyLink",
             "master_gear",
             "gear",
-            translate("GearConnector", "master gear"),
+            QT_TRANSLATE_NOOP("App::Property", "master gear"),
             1,
         )
         obj.addProperty(
             "App::PropertyLink",
             "slave_gear",
             "gear",
-            translate("GearConnector", "slave gear"),
+            QT_TRANSLATE_NOOP("App::Property", "slave gear"),
             1,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angle1",
             "gear",
-            translate("GearConnector", "angle at which second gear is placed"),
+            QT_TRANSLATE_NOOP("App::Property", "angle at which second gear is placed"),
             0,
         )
         obj.addProperty(
             "App::PropertyAngle",
             "angle2",
             "gear",
-            translate("GearConnector", "angle at which second gear is placed"),
+            QT_TRANSLATE_NOOP("App::Property", "angle at which second gear is placed"),
             1,
         )
         obj.version = __version__

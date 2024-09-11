@@ -23,15 +23,15 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from .translateutils import translate
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
 from .basegear import BaseGear, make_bspline_wire
 
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
+
 
 class HypoCycloidGear(BaseGear):
-
     """parameters:
     pressure_angle:  pressureangle,   10-30°
     pitch_angle:  cone angle,      0 < pitch_angle < pi/4
@@ -43,91 +43,91 @@ class HypoCycloidGear(BaseGear):
             "App::PropertyFloat",
             "pin_circle_radius",
             "gear_parameter",
-            translate(
-                "HypoCycloidGear", "Pin ball circle radius (overrides Tooth Pitch)"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "Pin ball circle radius (overrides Tooth Pitch)"
             ),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "roller_diameter",
             "gear_parameter",
-            translate("HypoCycloidGear", "Roller Diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "Roller Diameter"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "eccentricity",
             "gear_parameter",
-            translate("HypoCycloidGear", "Eccentricity"),
+            QT_TRANSLATE_NOOP("App::Property", "Eccentricity"),
         )
         obj.addProperty(
             "App::PropertyAngle",
             "pressure_angle_lim",
             "gear_parameter",
-            translate("HypoCycloidGear", "Pressure angle limit"),
+            QT_TRANSLATE_NOOP("App::Property", "Pressure angle limit"),
         )
         obj.addProperty(
             "App::PropertyFloat",
             "pressure_angle_offset",
             "gear_parameter",
-            translate("HypoCycloidGear", "Offset in pressure angle"),
+            QT_TRANSLATE_NOOP("App::Property", "Offset in pressure angle"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "teeth_number",
             "gear_parameter",
-            translate("HypoCycloidGear", "Number of teeth in Cam"),
+            QT_TRANSLATE_NOOP("App::Property", "Number of teeth in Cam"),
         )
         obj.addProperty(
             "App::PropertyInteger",
             "segment_count",
             "gear_parameter",
-            translate(
-                "HypoCycloidGear", "Number of points used for spline interpolation"
+            QT_TRANSLATE_NOOP(
+                "App::Property", "Number of points used for spline interpolation"
             ),
         )
         obj.addProperty(
             "App::PropertyLength",
             "hole_radius",
             "gear_parameter",
-            translate("HypoCycloidGear", "Center hole's radius"),
+            QT_TRANSLATE_NOOP("App::Property", "Center hole's radius"),
         )
 
         obj.addProperty(
             "App::PropertyBool",
             "show_pins",
             "Pins",
-            translate("HypoCycloidGear", "Create pins in place"),
+            QT_TRANSLATE_NOOP("App::Property", "Create pins in place"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "pin_height",
             "Pins",
-            translate("HypoCycloidGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "center_pins",
             "Pins",
-            translate("HypoCycloidGear", "Center pin Z axis to generated disks"),
+            QT_TRANSLATE_NOOP("App::Property", "Center pin Z axis to generated disks"),
         )
 
         obj.addProperty(
             "App::PropertyBool",
             "show_disk0",
             "Disks",
-            translate("HypoCycloidGear", "Show main cam disk"),
+            QT_TRANSLATE_NOOP("App::Property", "Show main cam disk"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "show_disk1",
             "Disks",
-            translate("HypoCycloidGear", "Show another reversed cam disk on top"),
+            QT_TRANSLATE_NOOP("App::Property", "Show another reversed cam disk on top"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "disk_height",
             "Disks",
-            translate("HypoCycloidGear", "height"),
+            QT_TRANSLATE_NOOP("App::Property", "height"),
         )
 
         obj.pin_circle_radius = 66
@@ -224,7 +224,7 @@ class HypoCycloidGear(BaseGear):
         # part.Wire(part.makeCircle(minRadius, app.Vector(-e, 0, 0)))
         # part.Wire(part.makeCircle(maxRadius, app.Vector(-e, 0, 0)))
 
-        app.Console.PrintMessage("Generating cam disk\r\n")
+        app.Console.PrintMessage(app.Qt.translate("Log", "Generating cam disk\n"))
         # generate the cam profile - note: shifted in -x by eccentricicy amount
         i = 0
         x = self.calc_x(p, d, e, n, q * i / float(n))
@@ -264,7 +264,9 @@ class HypoCycloidGear(BaseGear):
 
         # secondary cam disk
         if fp.show_disk1:
-            app.Console.PrintMessage("Generating secondary cam disk\r\n")
+            app.Console.PrintMessage(
+                app.Qt.translate("Log", "Generating secondary cam disk\n")
+            )
             second_cam = cam.copy()
             mat = app.Matrix()
             mat.rotateZ(np.pi)
@@ -282,7 +284,7 @@ class HypoCycloidGear(BaseGear):
 
         # pins
         if fp.show_pins:
-            app.Console.PrintMessage("Generating pins\r\n")
+            app.Console.PrintMessage(app.Qt.translate("Log", "Generating pins\n"))
             pins = []
             for i in range(0, n + 1):
                 x = p * n * math.cos(2 * math.pi / (n + 1) * i)
