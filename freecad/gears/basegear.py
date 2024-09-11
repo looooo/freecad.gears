@@ -112,7 +112,7 @@ class BaseGear:
         aka able to attach parameterically to other objects
         cf. https://wiki.freecadweb.org/Scripted_objects_with_attachment
         """
-        if int(app.Version()[1]) >= 19:
+        if int(app.Version()[0]) == 0 and int(app.Version()[1]) >= 19 or int(app.Version()[0]) == 1:
             obj.addExtension("Part::AttachExtensionPython")
         else:
             obj.addExtension("Part::AttachExtensionPython", obj)
