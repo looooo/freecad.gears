@@ -30,14 +30,13 @@ from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
 
 
 class CycloidGearRack(BaseGear):
-
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
         super(CycloidGearRack, self).__init__(obj)
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("CycloidGearRack", "number of teeth"),
         )
@@ -81,7 +80,7 @@ class CycloidGearRack(BaseGear):
         self.add_tolerance_properties(obj)
         self.add_cycloid_properties(obj)
         self.add_fillet_properties(obj)
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.inner_diameter = 7.5
         obj.outer_diameter = 7.5
@@ -124,7 +123,7 @@ class CycloidGearRack(BaseGear):
             "base",
             translate(
                 "CycloidGearRack",
-                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
+                "if enabled the total length of the rack is num_teeth x pitch, otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -224,7 +223,7 @@ class CycloidGearRack(BaseGear):
         tooth = part.Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
 
-        for i in range(obj.teeth - 1):
+        for i in range(obj.num_teeth - 1):
             tooth = tooth.copy()
             tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
@@ -234,7 +233,7 @@ class CycloidGearRack(BaseGear):
         if obj.add_endings:
             teeth = [part.Wire(tooth_edges[0])] + teeth
             last_edge = tooth_edges[-1]
-            last_edge.translate(app.Vector(0, np.pi * m * (obj.teeth - 1), 0))
+            last_edge.translate(app.Vector(0, np.pi * m * (obj.num_teeth - 1), 0))
             teeth = teeth + [part.Wire(last_edge)]
 
         p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])

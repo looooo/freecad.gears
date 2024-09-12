@@ -124,6 +124,23 @@ class BaseGear:
         if not hasattr(fp, "positionBySupport"):
             self.make_attachable(fp)
         fp.positionBySupport()
+
+        # Backward compatibility for old files
+        if hasattr(fp, "teeth"):
+            fp.addProperty(
+                "App::PropertyInteger",
+                "num_teeth",
+                "base",
+                "number of teeth",
+            )
+            app.Console.PrintLog(
+                app.Qt.translate(
+                    "Log", "Migrating 'teeth' property to 'num_teeth' on {} part\n"
+                ).format(fp.Name)
+            )
+            fp.num_teeth = fp.teeth  # Copy old value to new property
+            fp.removeProperty("teeth")  # Remove the old property
+
         gear_shape = self.generate_gear_shape(fp)
         if hasattr(fp, "BaseFeature") and fp.BaseFeature != None:
             # we're inside a PartDesign Body, thus need to fuse with the base feature

@@ -36,7 +36,6 @@ from .basegear import (
 
 
 class InvoluteGear(BaseGear):
-
     """FreeCAD gear"""
 
     def __init__(self, obj):
@@ -60,7 +59,7 @@ class InvoluteGear(BaseGear):
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
@@ -82,7 +81,7 @@ class InvoluteGear(BaseGear):
     def add_gear_properties(self, obj):
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("InvoluteGear", "number of teeth"),
         )
@@ -280,7 +279,6 @@ class InvoluteGear(BaseGear):
     def generate_gear_shape(self, obj):
         obj.gear.double_helix = obj.double_helix
         obj.gear.m_n = obj.module.Value
-        obj.gear.z = obj.teeth
         obj.gear.undercut = obj.undercut
         obj.gear.shift = obj.shift
         obj.gear.pressure_angle = obj.pressure_angle.Value * np.pi / 180.0
@@ -337,7 +335,7 @@ class InvoluteGear(BaseGear):
             edges = [e for e in edges if e is not None]
 
             tooth = part.Wire(edges)
-            profile = rotate_tooth(tooth, obj.teeth)
+            profile = rotate_tooth(tooth, obj.num_teeth)
 
             if obj.height.Value == 0:
                 return profile

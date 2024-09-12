@@ -40,7 +40,7 @@ class TimingGearT(BaseGear):
         )
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("TimingGearT", "number of teeth"),
         )
@@ -96,7 +96,7 @@ class TimingGearT(BaseGear):
             translate("TimingGearT", "extrusion height"),
         )
         obj.pitch = "5. mm"
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.tooth_height = "1.2 mm"
         obj.u = "0.6 mm"
         obj.alpha = "40. deg"
@@ -109,7 +109,7 @@ class TimingGearT(BaseGear):
 
     def generate_gear_shape(self, obj):
         pitch = obj.pitch.Value
-        teeth = obj.teeth
+        teeth = obj.num_teeth
         u = obj.u.Value
         tooth_height = obj.tooth_height.Value
         alpha = obj.alpha.Value / 180.0 * np.pi  # we need radiant

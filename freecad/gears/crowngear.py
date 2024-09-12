@@ -38,7 +38,7 @@ class CrownGear(BaseGear):
         super(CrownGear, self).__init__(obj)
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("CrownGear", "number of teeth"),
         )
@@ -73,7 +73,7 @@ class CrownGear(BaseGear):
             translate("CrownGear", "pressure angle"),
         )
         self.add_accuracy_properties(obj)
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.other_teeth = 15
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
@@ -135,7 +135,7 @@ class CrownGear(BaseGear):
         return pts
 
     def generate_gear_shape(self, fp):
-        inner_diameter = fp.module.Value * fp.teeth
+        inner_diameter = fp.module.Value * fp.num_teeth
         outer_diameter = inner_diameter + fp.height.Value * 2
         inner_circle = part.Wire(part.makeCircle(inner_diameter / 2.0))
         outer_circle = part.Wire(part.makeCircle(outer_diameter / 2.0))
@@ -148,7 +148,7 @@ class CrownGear(BaseGear):
         # cutting obj
         alpha_w = np.deg2rad(fp.pressure_angle.Value)
         m = fp.module.Value
-        t = fp.teeth
+        t = fp.num_teeth
         t_c = t
         t_i = fp.other_teeth
         rm = inner_diameter / 2

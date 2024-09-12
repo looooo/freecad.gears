@@ -29,14 +29,13 @@ from .basegear import BaseGear, helical_extrusion, fcvec
 
 
 class WormGear(BaseGear):
-
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
         super(WormGear, self).__init__(obj)
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("WormGear", "number of teeth"),
         )
@@ -89,7 +88,7 @@ class WormGear(BaseGear):
             "tolerance",
             translate("WormGear", "clearance * module = additional length of root"),
         )
-        obj.teeth = 3
+        obj.num_teeth = 3
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
@@ -104,7 +103,7 @@ class WormGear(BaseGear):
     def generate_gear_shape(self, fp):
         m = fp.module.Value
         d = fp.diameter.Value
-        t = fp.teeth
+        t = fp.num_teeth
         h = fp.height
 
         clearance = fp.clearance

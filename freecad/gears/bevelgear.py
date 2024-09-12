@@ -28,7 +28,6 @@ from .basegear import BaseGear, fcvec, make_bspline_wire
 
 
 class BevelGear(BaseGear):
-
     """parameters:
     pressure_angle:  pressureangle,   10-30°
     pitch_angle:  cone angle,      0 < pitch_angle < pi/4
@@ -39,7 +38,7 @@ class BevelGear(BaseGear):
         self.bevel_tooth = BevelTooth()
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("BevelGear", "number of teeth"),
         )
@@ -116,7 +115,7 @@ class BevelGear(BaseGear):
             translate("BevelGear", "The pitch diameter."),
         )
         obj.setExpression(
-            "dw", "teeth * module"
+            "dw", "num_teeth * module"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "dw", 1
@@ -136,9 +135,10 @@ class BevelGear(BaseGear):
         obj.setEditorMode(
             "angular_backlash", 1
         )  # set read-only after setting the expression, else it won't be visible. bug?
+
         obj.gear = self.bevel_tooth
         obj.module = "1. mm"
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.pressure_angle = "20. deg"
         obj.pitch_angle = "45. deg"
         obj.height = "5. mm"
@@ -151,28 +151,30 @@ class BevelGear(BaseGear):
         obj.Proxy = self
 
     def generate_gear_shape(self, fp):
-        fp.gear.z = fp.teeth
         fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.0
         fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
-        max_height = fp.gear.module * fp.teeth / 2 / np.tan(fp.gear.pitch_angle)
+        max_height = fp.gear.module * fp.num_teeth / 2 / np.tan(fp.gear.pitch_angle)
         if fp.height >= max_height:
             app.Console.PrintWarning(
                 "height must be smaller than {}".format(max_height)
             )
         fp.gear.backlash = fp.backlash.Value
         scale = (
-            fp.module.Value * fp.gear.z / 2 / np.tan(fp.pitch_angle.Value * np.pi / 180)
+            fp.module.Value
+            * fp.num_teeth
+            / 2
+            / np.tan(fp.pitch_angle.Value * np.pi / 180)
         )
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
         pts = list(fp.gear.points(num=fp.numpoints))
-        rot = rotation3D(-2 * np.pi / fp.teeth)
+        rot = rotation3D(-2 * np.pi / fp.num_teeth)
         # if fp.beta.Value != 0:
         #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
         rotated_pts = pts
-        for i in range(fp.gear.z - 1):
+        for i in range(fp.num_teeth - 1):
             rotated_pts = list(map(rot, rotated_pts))
             pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
@@ -211,20 +213,20 @@ class BevelGear(BaseGear):
             mat.move(fcvec([0, 0, scale_1]))
             shape = shape.transformGeometry(mat)
         return shape
-        # return self.create_teeth(pts, pos1, fp.teeth)
+        # return self.create_teeth(pts, pos1, fp.num_teeth)
 
     def create_tooth(self):
         w = []
         scal1 = (
             self.obj.m.Value
-            * self.obj.gear.z
+            * self.obj.num_teeth
             / 2
             / np.tan(self.obj.pitch_angle.Value * np.pi / 180)
             - self.obj.height.Value / 2
         )
         scal2 = (
             self.obj.m.Value
-            * self.obj.gear.z
+            * self.obj.num_teeth
             / 2
             / np.tan(self.obj.pitch_angle.Value * np.pi / 180)
             + self.obj.height.Value / 2
