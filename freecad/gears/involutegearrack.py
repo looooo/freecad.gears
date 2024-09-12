@@ -27,7 +27,6 @@ from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
 
 
 class InvoluteGearRack(BaseGear):
-
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
@@ -35,7 +34,7 @@ class InvoluteGearRack(BaseGear):
         self.involute_rack = InvoluteRack()
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("InvoluteGearRack", "number of teeth"),
         )
@@ -79,7 +78,7 @@ class InvoluteGearRack(BaseGear):
         self.add_involute_properties(obj)
         self.add_fillet_properties(obj)
         obj.rack = self.involute_rack
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
@@ -130,7 +129,7 @@ class InvoluteGearRack(BaseGear):
             "base",
             translate(
                 "InvoluteGearRack",
-                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
+                "if enabled the total length of the rack is num_teeth x pitch, otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -180,7 +179,7 @@ class InvoluteGearRack(BaseGear):
 
     def generate_gear_shape(self, obj):
         obj.rack.m = obj.module.Value
-        obj.rack.z = obj.teeth
+        obj.rack.z = obj.num_teeth
         obj.rack.pressure_angle = obj.pressure_angle.Value * np.pi / 180.0
         obj.rack.thickness = obj.thickness.Value
         obj.rack.beta = obj.beta.Value * np.pi / 180.0
@@ -242,7 +241,7 @@ class InvoluteGearRack(BaseGear):
         tooth = part.Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
 
-        for i in range(obj.teeth - 1):
+        for i in range(obj.num_teeth - 1):
             tooth = tooth.copy()
             tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
@@ -252,7 +251,7 @@ class InvoluteGearRack(BaseGear):
         if obj.add_endings:
             teeth = [part.Wire(tooth_edges[0])] + teeth
             last_edge = tooth_edges[-1]
-            last_edge.translate(app.Vector(0, np.pi * m * (obj.teeth - 1), 0))
+            last_edge.translate(app.Vector(0, np.pi * m * (obj.num_teeth - 1), 0))
             teeth = teeth + [part.Wire(last_edge)]
 
         p_start = np.array(teeth[0].Edges[0].firstVertex().Point[:-1])

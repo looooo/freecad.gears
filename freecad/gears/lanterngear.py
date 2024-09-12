@@ -34,7 +34,7 @@ class LanternGear(BaseGear):
         super(LanternGear, self).__init__(obj)
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "gear_parameter",
             translate("LanternGear", "number of teeth"),
         )
@@ -69,7 +69,7 @@ class LanternGear(BaseGear):
             translate("LanternGear", "head * module = additional length of head"),
         )
 
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.bolt_radius = "1 mm"
 
@@ -81,7 +81,7 @@ class LanternGear(BaseGear):
 
     def generate_gear_shape(self, fp):
         m = fp.module.Value
-        teeth = fp.teeth
+        teeth = fp.num_teeth
         r_r = fp.bolt_radius.Value
         r_0 = m * teeth / 2
         r_max = r_0 + r_r + fp.head * m

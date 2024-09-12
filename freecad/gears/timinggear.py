@@ -106,7 +106,7 @@ class TimingGear(BaseGear):
         super(TimingGear, self).__init__(obj)
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("TimingGear", "number of teeth"),
         )
@@ -174,7 +174,7 @@ class TimingGear(BaseGear):
             translate("TimingGear", "x-offset of second arc-midpoint"),
             1,
         )
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.type = ["gt2", "gt3", "gt5", "gt8", "htd3", "htd5", "htd8"]
         obj.height = "5. mm"
 
@@ -198,9 +198,9 @@ class TimingGear(BaseGear):
 
         arcs = []
         if offset == 0.0:
-            phi5 = np.pi / fp.teeth
+            phi5 = np.pi / fp.num_teeth
             ref = reflection(-phi5 - np.pi / 2.0)
-            rp = pitch * fp.teeth / np.pi / 2.0 - u
+            rp = pitch * fp.num_teeth / np.pi / 2.0 - u
 
             m_34 = np.array([-(r_12 + r_34), rp - h + r_12])
             x2 = np.array([-r_12, m_34[1]])
@@ -227,7 +227,7 @@ class TimingGear(BaseGear):
 
         else:
             phi_12 = np.arctan(np.sqrt(1.0 / (((r_12 - r_23) / offset) ** 2 - 1)))
-            rp = pitch * fp.teeth / np.pi / 2.0
+            rp = pitch * fp.num_teeth / np.pi / 2.0
             r4 = r5 = rp - u
 
             m_12 = np.array([0.0, r5 - h + r_12])
@@ -282,7 +282,7 @@ class TimingGear(BaseGear):
                 )
             )
 
-            phi5 = np.pi / fp.teeth
+            phi5 = np.pi / fp.num_teeth
 
             m_34 = (r5 - r_34) * np.array([-np.sin(phi4), np.cos(phi4)])
 
@@ -312,8 +312,8 @@ class TimingGear(BaseGear):
         wire = part.Wire(arcs)
         wires = [wire]
         rot = app.Matrix()
-        rot.rotateZ(np.pi * 2 / fp.teeth)
-        for _ in range(fp.teeth - 1):
+        rot.rotateZ(np.pi * 2 / fp.num_teeth)
+        for _ in range(fp.num_teeth - 1):
             wire = wire.transformGeometry(rot)
             wires.append(wire)
 

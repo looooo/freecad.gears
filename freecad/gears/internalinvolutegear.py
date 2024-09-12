@@ -52,7 +52,7 @@ class InternalInvoluteGear(BaseGear):
         )
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("InternalInvoluteGear", "number of teeth"),
         )
@@ -99,7 +99,7 @@ class InternalInvoluteGear(BaseGear):
 
         obj.gear = self.involute_tooth
         obj.simple = False
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
@@ -263,7 +263,6 @@ class InternalInvoluteGear(BaseGear):
     def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
-        fp.gear.z = fp.teeth
         fp.gear.undercut = False  # no undercut for internal gears
         fp.gear.shift = fp.shift
         fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.0
@@ -327,7 +326,7 @@ class InternalInvoluteGear(BaseGear):
             edges = [e for e in edges if e is not None]
 
             tooth = part.Wire(edges)
-            profile = rotate_tooth(tooth, fp.teeth)
+            profile = rotate_tooth(tooth, fp.num_teeth)
             if fp.height.Value == 0:
                 return part.makeCompound([outer_circle, profile])
             base = part.Face([outer_circle, profile])

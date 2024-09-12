@@ -41,7 +41,7 @@ class CycloidGear(BaseGear):
         self.cycloid_tooth = CycloidTooth()
         obj.addProperty(
             "App::PropertyInteger",
-            "teeth",
+            "num_teeth",
             "base",
             translate("CycloidGear", "number of teeth"),
         )
@@ -76,11 +76,11 @@ class CycloidGear(BaseGear):
         self.add_cycloid_properties(obj)
         self.add_computed_properties(obj)
         obj.gear = self.cycloid_tooth
-        obj.teeth = 15
+        obj.num_teeth = 15
         obj.module = "1. mm"
         obj.setExpression(
-            "inner_diameter", "teeth / 2"
-        )  # teeth/2 makes the hypocycloid a straight line to the center
+            "inner_diameter", "num_teeth / 2"
+        )  # num_teeth/2 makes the hypocycloid a straight line to the center
         obj.outer_diameter = 7.5  # we don't know the mating gear, so we just set the default to mesh with our default
         obj.beta = "0. deg"
         obj.height = "5. mm"
@@ -174,7 +174,7 @@ class CycloidGear(BaseGear):
             translate("CycloidGear", "The pitch diameter."),
         )
         obj.setExpression(
-            "dw", "teeth * module"
+            "dw", "num_teeth * module"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "dw", 1
@@ -197,8 +197,7 @@ class CycloidGear(BaseGear):
 
     def generate_gear_shape(self, fp):
         fp.gear.m = fp.module.Value
-        fp.gear.z = fp.teeth
-        fp.dw = fp.module * fp.teeth
+        fp.dw = fp.module * fp.num_teeth
         fp.gear.z1 = fp.inner_diameter
         fp.gear.z2 = fp.outer_diameter
         fp.gear.clearance = fp.clearance
@@ -232,7 +231,7 @@ class CycloidGear(BaseGear):
 
         tooth = part.Wire(edges)
 
-        profile = rotate_tooth(tooth, fp.teeth)
+        profile = rotate_tooth(tooth, fp.num_teeth)
         if fp.height.Value == 0:
             return profile
         base = part.Face(profile)

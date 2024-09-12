@@ -1,6 +1,6 @@
-#TODO:
+# TODO
 
 ## refactoring
 
-- [ ] fp.gear.z -> fp.gear.num_teeth
-- [ ] fp.teeth  -> fp.gear.num_teeth
+- [X] fp.gear.z -> fp.gear.num_teeth
+- [X] fp.teeth  -> fp.gear.num_teeth
