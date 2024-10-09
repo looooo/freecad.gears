@@ -287,6 +287,7 @@ class InvoluteGear(BaseGear):
         obj.gear.backlash = obj.backlash.Value * (-obj.reversed_backlash + 0.5) * 2.0
         obj.gear.head = obj.head
         obj.gear.properties_from_tool = obj.properties_from_tool
+        obj.gear.num_teeth = obj.num_teeth
 
         obj.gear._update()
         self.compute_traverse_properties(obj)

@@ -201,10 +201,11 @@ class CycloidGear(BaseGear):
         )  # set read-only after setting the expression, else it won't be visible. bug?
 
     def generate_gear_shape(self, fp):
+        fp.gear.num_teeth = fp.num_teeth
         fp.gear.m = fp.module.Value
         fp.dw = fp.module * fp.num_teeth
-        fp.gear.z1 = fp.inner_diameter
-        fp.gear.z2 = fp.outer_diameter
+        fp.gear.num_teeth_1 = fp.inner_diameter
+        fp.gear.num_teeth_2 = fp.outer_diameter
         fp.gear.clearance = fp.clearance
         fp.gear.head = fp.head
         fp.gear.backlash = fp.backlash.Value

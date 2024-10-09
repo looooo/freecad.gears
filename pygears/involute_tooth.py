@@ -43,7 +43,7 @@ class InvoluteTooth:
     def __init__(
         self,
         m=5,
-        z=15,
+        num_teeth=15,
         pressure_angle=20 * pi / 180.0,
         clearance=0.12,
         shift=0.5,
@@ -56,7 +56,7 @@ class InvoluteTooth:
         self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
-        self.z = z
+        self.num_teeth = num_teeth
         self.undercut = undercut
         self.shift = shift
         self.clearance = clearance
@@ -76,12 +76,12 @@ class InvoluteTooth:
         self.pitch = self.m * pi
         self.c = self.clearance * self.m_n
         self.midpoint = [0.0, 0.0]
-        self.d = self.z * self.m
-        self.dw = self.m * self.z
+        self.d = self.num_teeth * self.m
+        self.dw = self.m * self.num_teeth
         self.da = self.dw + 2.0 * self.m_n + 2.0 * (self.shift + self.head) * self.m_n
         self.df = self.dw - 2.0 * self.m_n - 2 * self.c + 2.0 * self.shift * self.m_n
         self.dg = self.d * cos(self.pressure_angle_t)
-        self.phipart = 2 * pi / self.z
+        self.phipart = 2 * pi / self.num_teeth
 
         self.undercut_end = sqrt(-(self.df**2) + self.da**2) / self.da
         self.undercut_rot = (
@@ -109,7 +109,7 @@ class InvoluteTooth:
             self.m / (self.d) * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
         )
         self.involute_rot2 = (
-            1 / self.z * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
+            1 / self.num_teeth * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
         )
         self.involute_rot = self.involute_rot1 + self.involute_rot2
         self.angular_backlash = self.backlash / (self.d / 2)
@@ -206,7 +206,7 @@ class InvoluteRack(object):
     def __init__(
         self,
         m=5,
-        z=15,
+        num_teeth=15,
         pressure_angle=20 * pi / 180.0,
         thickness=5,
         beta=0,
@@ -219,7 +219,7 @@ class InvoluteRack(object):
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
-        self.z = z
+        self.num_teeth = num_teeth
         self.beta = beta
         self.head = head
         self.clearance = clearance
@@ -247,8 +247,8 @@ class InvoluteRack(object):
         ]
         teeth = [tooth]
         trans = translation([0.0, pitch, 0.0])
-        for i in range(self.z - 1):
-            if self.simplified and i > 3 and i < (self.z - 6):
+        for i in range(self.num_teeth - 1):
+            if self.simplified and i > 3 and i < (self.num_teeth - 6):
                 tooth = trans(tooth).tolist()
             else:
                 tooth = trans(tooth).tolist()
@@ -258,7 +258,7 @@ class InvoluteRack(object):
                     teeth[-1].pop()
                     teeth[-1][-1][0] = 0
                     teeth[-1][-1][1] -= a / 2
-                if self.simplified and (i == self.z - 6):
+                if self.simplified and (i == self.num_teeth - 6):
                     teeth[-1].pop(0)
                     teeth[-1].pop(0)
                     teeth[-1][0][0] = 0

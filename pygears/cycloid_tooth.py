@@ -21,24 +21,24 @@ from ._functions import rotation, reflection
 
 
 class CycloidTooth:
-    def __init__(self, z1=5, z2=5, z=14, m=5, clearance=0.25, backlash=0.00, head=0.0):
+    def __init__(self, num_teeth_1=5, num_teeth_2=5, num_teeth=14, m=5, clearance=0.25, backlash=0.00, head=0.0):
         self.m = m
-        self.z = z
+        self.num_teeth = num_teeth
         self.clearance = clearance
         self.backlash = backlash
-        self.z1 = z1
-        self.z2 = z2
+        self.num_teeth_1 = num_teeth_1
+        self.num_teeth_2 = num_teeth_2
         self.head = head
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
-        self.d1 = self.z1 * self.m
-        self.d2 = self.z2 * self.m
+        self.d1 = self.num_teeth_1 * self.m
+        self.d2 = self.num_teeth_2 * self.m
         self.phi = self.m * pi
-        self.d = self.z * self.m
+        self.d = self.num_teeth * self.m
         self.da = self.d + 2 * (1 + self.head) * self.m
         self.di = self.d - 2 * (1 + self.clearance) * self.m
-        self.phipart = 2 * pi / self.z
+        self.phipart = 2 * pi / self.num_teeth
         self.angular_backlash = self.backlash / (self.d / 2)
 
     def epicycloid_x(self):
@@ -120,9 +120,9 @@ class CycloidTooth:
     def _update(self):
         self.__init__(
             m=self.m,
-            z=self.z,
-            z1=self.z1,
-            z2=self.z2,
+            num_teeth=self.num_teeth,
+            num_teeth_1=self.num_teeth_1,
+            num_teeth_2=self.num_teeth_2,
             clearance=self.clearance,
             backlash=self.backlash,
             head=self.head,
