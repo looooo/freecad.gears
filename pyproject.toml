@@ -1,0 +1,26 @@
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freecad.gears"
+dynamic = ["version"]
+description = "gears for FreeCAD"
+readme = "README.md"
+license = {file = "LICENSE"}
+maintainers = [
+    {name = "looooo", email = "sppedflyer@gmail.com"},
+]
+requires-python = ">=3.8"
+dependencies = ["numpy", "scipy", "sympy"]
+
+[project.urls]
+source = "https://github.com/looooo/freecad.gears"
+
+[tool.setuptools]
+packages = ["freecad", "freecad.gears", "pygears"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "pygears.__version__"}
