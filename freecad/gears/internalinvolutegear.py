@@ -265,6 +265,7 @@ class InternalInvoluteGear(BaseGear):
     def generate_gear_shape(self, fp):
         fp.gear.double_helix = fp.double_helix
         fp.gear.m_n = fp.module.Value
+        fp.gear.num_teeth = fp.num_teeth
         fp.gear.undercut = False  # no undercut for internal gears
         fp.gear.shift = fp.shift
         fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.0
