@@ -153,6 +153,7 @@ class BevelGear(BaseGear):
         obj.Proxy = self
 
     def generate_gear_shape(self, fp):
+        fp.gear.z = fp.num_teeth
         fp.gear.module = fp.module.Value
         fp.gear.pressure_angle = (90 - fp.pressure_angle.Value) * np.pi / 180.0
         fp.gear.pitch_angle = fp.pitch_angle.Value * np.pi / 180
