@@ -19,6 +19,7 @@
       <tag>gear</tag>
       <tag>gears</tag>
     </workbench>
+    <depend>scipy</depend>
   </content>
 
 </package>
