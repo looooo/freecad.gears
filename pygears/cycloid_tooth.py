@@ -31,6 +31,18 @@ class CycloidTooth:
         self.head = head
         self._calc_gear_factors()
 
+    def dumps(self):
+        return self.__getstate__()
+
+    def loads(self, state):
+        self.__setstate__(state)
+
+    def __getstate__(self):
+        return {}
+
+    def __setstate__(self, state):
+        return None
+
     def _calc_gear_factors(self):
         self.d1 = self.num_teeth_1 * self.m
         self.d2 = self.num_teeth_2 * self.m

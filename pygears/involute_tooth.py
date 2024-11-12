@@ -65,6 +65,18 @@ class InvoluteTooth:
         self.properties_from_tool = properties_from_tool
         self._calc_gear_factors()
 
+    def dumps(self):
+        return self.__getstate__()
+
+    def loads(self, state):
+        self.__setstate__(state)
+
+    def __getstate__(self):
+        return {}
+
+    def __setstate__(self, state):
+        return None
+
     def _calc_gear_factors(self):
         if self.properties_from_tool:
             self.pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))

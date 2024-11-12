@@ -152,6 +152,18 @@ class BevelTooth(object):
         self.z_f = cos(self.pitch_angle - sin(pitch_angle) * 2 / self.z)
         self.add_foot = True
 
+    def dumps(self):
+        return self.__getstate__()
+
+    def loads(self, state):
+        self.__setstate__(state)
+
+    def __getstate__(self):
+        return {}
+
+    def __setstate__(self, state):
+        return None
+
     def involute_function_x(self):
         def func(s):
             return -(

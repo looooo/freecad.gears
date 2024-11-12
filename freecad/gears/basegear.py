@@ -76,12 +76,10 @@ class ViewProviderGear:
         return self.icon_fn
 
     def dumps(self):
-        self._check_attr()
-        return {"icon_fn": self.icon_fn}
+        return self.__getstate__()
 
     def loads(self, state):
-        if state and "icon_fn" in state:
-            self.icon_fn = state["icon_fn"]
+        self.__setstate__(state)
 
     def __getstate__(self):
         self._check_attr()
@@ -90,7 +88,6 @@ class ViewProviderGear:
     def __setstate__(self, state):
         if state and "icon_fn" in state:
             self.icon_fn = state["icon_fn"]
-
 
 class BaseGear:
     def __init__(self, obj):
@@ -159,19 +156,17 @@ class BaseGear:
         """
         raise NotImplementedError("generate_gear_shape not implemented")
 
-
-    def loads(self, state):
-        pass
+    def loads(self, state) -> None:
+        return self.__setstate__(state)
 
     def dumps(self):
-        pass
+        return self.__getstate__()
 
     def __setstate__(self, state):
-        pass
+        return None
 
     def __getstate__(self):
-        pass
-
+        return {}
 
 def part_arc_from_points_and_center(point_1, point_2, center):
     """_summary_
