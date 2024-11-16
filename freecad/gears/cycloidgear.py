@@ -41,7 +41,7 @@ class CycloidGear(BaseGear):
         super(CycloidGear, self).__init__(obj)
         self.cycloid_tooth = CycloidTooth()
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -77,7 +77,7 @@ class CycloidGear(BaseGear):
         self.add_cycloid_properties(obj)
         self.add_computed_properties(obj)
         obj.gear = self.cycloid_tooth
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.setExpression(
             "inner_diameter", "num_teeth / 2"

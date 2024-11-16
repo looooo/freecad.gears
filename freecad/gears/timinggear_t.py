@@ -40,7 +40,7 @@ class TimingGearT(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "pitch of gear"),
         )
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -99,7 +99,7 @@ class TimingGearT(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "extrusion height"),
         )
         obj.pitch = "5. mm"
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.tooth_height = "1.2 mm"
         obj.u = "0.6 mm"
         obj.alpha = "40. deg"

@@ -106,7 +106,7 @@ class TimingGear(BaseGear):
     def __init__(self, obj):
         super(TimingGear, self).__init__(obj)
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -175,7 +175,7 @@ class TimingGear(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "x-offset of second arc-midpoint"),
             1,
         )
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.type = ["gt2", "gt3", "gt5", "gt8", "htd3", "htd5", "htd8"]
         obj.height = "5. mm"
 

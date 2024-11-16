@@ -53,7 +53,7 @@ class InternalInvoluteGear(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "simple"),
         )
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -101,7 +101,7 @@ class InternalInvoluteGear(BaseGear):
 
         obj.gear = self.involute_tooth
         obj.simple = False
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"

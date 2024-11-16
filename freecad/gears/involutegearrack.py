@@ -34,7 +34,7 @@ class InvoluteGearRack(BaseGear):
         super(InvoluteGearRack, self).__init__(obj)
         self.involute_rack = InvoluteRack()
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -79,7 +79,7 @@ class InvoluteGearRack(BaseGear):
         self.add_involute_properties(obj)
         self.add_fillet_properties(obj)
         obj.rack = self.involute_rack
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
