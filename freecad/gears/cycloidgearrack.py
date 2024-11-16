@@ -166,23 +166,23 @@ class CycloidGearRack(BaseGear):
 
     def add_fillet_properties(self, obj):
         obj.addProperty(
-            "App::PropertyFloat",
+            "App::PropertyFloatConstraint",
             "head_fillet",
             "fillets",
             QT_TRANSLATE_NOOP(
                 "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
-        )
+        ).head_fillet = (0.0, 0.0, 1000.0, 0.01)
         obj.addProperty(
-            "App::PropertyFloat",
+            "App::PropertyFloatConstraint",
             "root_fillet",
             "fillets",
             QT_TRANSLATE_NOOP(
                 "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
-        )
+        ).root_fillet = (0.0, 0.0, 1000.0, 0.01)
 
     def generate_gear_shape(self, obj):
         numpoints = obj.numpoints

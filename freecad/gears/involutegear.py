@@ -121,23 +121,23 @@ class InvoluteGear(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "undercut"),
         )
         obj.addProperty(
-            "App::PropertyFloat",
+            "App::PropertyFloatConstraint",
             "head_fillet",
             "fillets",
             QT_TRANSLATE_NOOP(
                 "App::Property",
                 "a fillet for the tooth-head, radius = head_fillet x module",
             ),
-        )
+        ).head_fillet = (0.0, 0.0, 1000.0, 0.01)
         obj.addProperty(
-            "App::PropertyFloat",
+            "App::PropertyFloatConstraint",
             "root_fillet",
             "fillets",
             QT_TRANSLATE_NOOP(
                 "App::Property",
                 "a fillet for the tooth-root, radius = root_fillet x module",
             ),
-        )
+        ).root_fillet = (0.0, 0.0, 1000.0, 0.01)
 
     def add_helical_properties(self, obj):
         obj.addProperty(
