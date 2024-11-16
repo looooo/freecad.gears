@@ -7,7 +7,7 @@
    id="svg2869"
    version="1.1"
    sodipodi:docname="gearworkbench_alt.svg"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    viewBox="0 0 64 64"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -16,6 +16,8 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">FreeCAD Gear Workbench Alternative</title>
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#505050"
@@ -29,12 +31,12 @@
      showgrid="true"
      inkscape:zoom="11.313708"
      inkscape:cx="20.727068"
-     inkscape:cy="14.981825"
-     inkscape:window-width="1983"
-     inkscape:window-height="1321"
-     inkscape:window-x="2940"
-     inkscape:window-y="32"
-     inkscape:window-maximized="0"
+     inkscape:cy="14.981826"
+     inkscape:window-width="1290"
+     inkscape:window-height="999"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="layer3"
      inkscape:lockguides="true">
     <inkscape:grid
@@ -189,6 +191,7 @@
           </cc:Agent>
         </dc:rights>
         <dc:date>2024</dc:date>
+        <dc:title>FreeCAD Gear Workbench Alternative</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
