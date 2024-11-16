@@ -36,7 +36,7 @@ class CycloidGearRack(BaseGear):
     def __init__(self, obj):
         super(CycloidGearRack, self).__init__(obj)
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -81,7 +81,7 @@ class CycloidGearRack(BaseGear):
         self.add_tolerance_properties(obj)
         self.add_cycloid_properties(obj)
         self.add_fillet_properties(obj)
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.inner_diameter = 7.5
         obj.outer_diameter = 7.5

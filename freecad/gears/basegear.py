@@ -126,11 +126,11 @@ class BaseGear:
         # Backward compatibility for old files
         if hasattr(fp, "teeth"):
             fp.addProperty(
-                "App::PropertyInteger",
+                "App::PropertyIntegerConstraint",
                 "num_teeth",
                 "base",
                 "number of teeth",
-            )
+            ).num_teeth = (15, 3, 10000, 1)
             app.Console.PrintLog(
                 app.Qt.translate(
                     "Log", "Migrating 'teeth' property to 'num_teeth' on {} part\n"

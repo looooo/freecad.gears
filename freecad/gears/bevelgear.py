@@ -39,7 +39,7 @@ class BevelGear(BaseGear):
         super(BevelGear, self).__init__(obj)
         self.bevel_tooth = BevelTooth()
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -140,7 +140,7 @@ class BevelGear(BaseGear):
 
         obj.gear = self.bevel_tooth
         obj.module = "1. mm"
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.pressure_angle = "20. deg"
         obj.pitch_angle = "45. deg"
         obj.height = "5. mm"

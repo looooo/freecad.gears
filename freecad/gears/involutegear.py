@@ -59,7 +59,7 @@ class InvoluteGear(BaseGear):
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
-        obj.num_teeth = 15
+        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
@@ -80,7 +80,7 @@ class InvoluteGear(BaseGear):
 
     def add_gear_properties(self, obj):
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),

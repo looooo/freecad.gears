@@ -35,7 +35,7 @@ class WormGear(BaseGear):
     def __init__(self, obj):
         super(WormGear, self).__init__(obj)
         obj.addProperty(
-            "App::PropertyInteger",
+            "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
             QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
@@ -93,7 +93,7 @@ class WormGear(BaseGear):
                 "App::Property", "clearance * module = additional length of root"
             ),
         )
-        obj.num_teeth = 3
+        obj.num_teeth = (3, 2, 100, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
