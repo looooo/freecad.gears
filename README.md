@@ -82,7 +82,7 @@ Use the power of python to automate your gear modeling:
 import FreeCAD as App
 import freecad.gears.commands
 gear = freecad.gears.commands.CreateInvoluteGear.create()
-gear.teeth = 20
+gear.num_teeth = 20
 gear.beta = 20
 gear.height = 10
 gear.double_helix = True
