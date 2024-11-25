@@ -73,7 +73,7 @@ update_locale() {
 	if [ "$u" == "" ]; then
 		$LUPDATE ../*.py -ts "${WB}.ts" # locale-agnostic file
 	else
-		$LUPDATE ../*.py -source-language en -target-language "${locale//-/_}" \
+		$LUPDATE ../*.py -source-language en_US -target-language "${locale//-/_}" \
 			-ts "${WB}_${locale}.ts"
 	fi
 }
@@ -105,7 +105,7 @@ if [ $# -eq 1 ]; then
 	if [ "$1" == "-R" ]; then
 		find . -type f -name '*_*.ts' | while IFS= read -r file; do
 			# Release all locales
-			$LRELEASE "$file"
+			$LRELEASE -nounfinished "$file"
 			echo
 		done
 	elif [ "$1" == "-U" ]; then
@@ -119,7 +119,7 @@ elif [ $# -eq 2 ]; then
 	if is_locale_supported "$LOCALE"; then
 		if [ "$1" == "-r" ]; then
 			# Release locale (creation of *.qm file from *.ts file)
-			$LRELEASE "${WB}_${LOCALE}.ts"
+			$LRELEASE -nounfinished "${WB}_${LOCALE}.ts"
 		elif [ "$1" == "-u" ]; then
 			# Update main & locale files
 			update_locale
