@@ -55,7 +55,7 @@ class InvoluteGear(BaseGear):
         self.add_computed_properties(obj)
         self.add_tolerance_properties(obj)
         self.add_accuracy_properties(obj)
-
+        self.add_hole_properties(obj)
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
@@ -74,9 +74,47 @@ class InvoluteGear(BaseGear):
         obj.properties_from_tool = False
         obj.head_fillet = 0
         obj.root_fillet = 0
+        obj.axle_hole = False
+        obj.axle_holesize = "10.mm"
+        obj.offset_hole = False
+        obj.offset_holesize = "10.mm"
+        obj.offset_holeoffset = "10.mm"
         self.obj = obj
         obj.Proxy = self
         self.compute_traverse_properties(obj)
+
+    def add_hole_properties(self, obj):
+        """Add properties for the central hole"""
+        obj.addProperty(
+            "App::PropertyBool",
+            "axle_hole",
+            "base",
+            QT_TRANSLATE_NOOP("App::Property", "enable central hole for axle"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "axle_holesize",
+            "base",
+            QT_TRANSLATE_NOOP("App::Property", "diameter of central hole for axle"),
+        )
+        obj.addProperty(
+            "App::PropertyBool",
+            "offset_hole",
+            "base",
+            QT_TRANSLATE_NOOP("App::Property", "enable offset hole"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "offset_holesize",
+            "base",
+            QT_TRANSLATE_NOOP("App::Property", "diameter of offset hole"),
+        )
+        obj.addProperty(
+            "App::PropertyLength",
+            "offset_holeoffset",
+            "base",
+            QT_TRANSLATE_NOOP("App::Property", "offset of offset hole"),
+        )
 
     def add_gear_properties(self, obj):
         obj.addProperty(
@@ -288,6 +326,12 @@ class InvoluteGear(BaseGear):
         obj.gear.head = obj.head
         obj.gear.properties_from_tool = obj.properties_from_tool
         obj.gear.num_teeth = obj.num_teeth
+        obj.gear.axle_hole = obj.axle_hole
+        obj.gear.axle_holesize = obj.axle_holesize.Value
+
+        obj.gear.offset_hole = obj.offset_hole
+        obj.gear.offset_holesize = obj.offset_holesize.Value
+        obj.gear.offset_holeoffset= obj.offset_holeoffset.Value
 
         obj.gear._update()
         self.compute_traverse_properties(obj)
@@ -339,15 +383,40 @@ class InvoluteGear(BaseGear):
             profile = rotate_tooth(tooth, obj.num_teeth)
 
             if obj.height.Value == 0:
-                return profile
-            base = part.Face(profile)
-            if obj.beta.Value == 0:
-                return base.extrude(app.Vector(0, 0, obj.height.Value))
+                gear_shape = profile
             else:
-                twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
-                return helical_extrusion(
-                    base, obj.height.Value, twist_angle, obj.double_helix
-                )
+                base = part.Face(profile)
+                if obj.beta.Value == 0:
+                    gear_shape = base.extrude(app.Vector(0, 0, obj.height.Value))
+                else:
+                    twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
+                    gear_shape = helical_extrusion(
+                        base, obj.height.Value, twist_angle, obj.double_helix
+                    )
+
+            if obj.axle_hole and obj.axle_holesize.Value > 0:
+                axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
+                gear_shape = gear_shape.cut(axle_hole)
+
+            if obj.offset_hole and obj.offset_holesize.Value > 0:
+                hole = part.makeCylinder(obj.offset_holesize.Value/2, obj.height.Value)
+                hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.offset_holeoffset.Value/2, 0)
+                gear_shape = gear_shape.cut(hole)
+            return gear_shape
         else:
             rw = obj.gear.dw / 2
-            return part.makeCylinder(rw, obj.height.Value)
+            gear_shape = part.makeCylinder(rw, obj.height.Value)
+        
+        if obj.axle_hole and obj.axle_holesize.Value > 0:
+            axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
+            #hole.Placement.Base = app.Vector(-obj.holesize.Value/2, -obj.holesize.Value/2, 0)
+            gear_shape = gear_shape.cut(axle_hole)
+            
+        if obj.hole and obj.holesize.Value > 0:
+            hole = part.makeCylinder(obj.holesize.Value/2, obj.height.Value)
+            hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.holeoffset.Value/2, 0)
+            gear_shape = gear_shape.cut(hole)
+            
+        return gear_shape
+
+

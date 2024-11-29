@@ -52,11 +52,22 @@ class InvoluteTooth:
         backlash=0.00,
         head=0.00,
         properties_from_tool=False,
+        axle_hole=False,
+        axle_holesize=10,
+        offset_hole=False,
+        offset_holesize=10,
+        offset_holeoffset = 5,
     ):
         self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
         self.num_teeth = num_teeth
+        self.undercut = undercut
+        self.axle_hole = axle_hole
+        self.axle_holesize = axle_holesize
+        self.offset_hole = offset_hole
+        self.offset_holesize = offset_holesize
+        self.offset_holeoffset = offset_holeoffset
         self.undercut = undercut
         self.shift = shift
         self.clearance = clearance
