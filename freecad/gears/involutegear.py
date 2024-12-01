@@ -88,31 +88,31 @@ class InvoluteGear(BaseGear):
         obj.addProperty(
             "App::PropertyBool",
             "axle_hole",
-            "base",
+            "hole",
             QT_TRANSLATE_NOOP("App::Property", "enable central hole for axle"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "axle_holesize",
-            "base",
+            "hole",
             QT_TRANSLATE_NOOP("App::Property", "diameter of central hole for axle"),
         )
         obj.addProperty(
             "App::PropertyBool",
             "offset_hole",
-            "base",
+            "hole",
             QT_TRANSLATE_NOOP("App::Property", "enable offset hole"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "offset_holesize",
-            "base",
+            "hole",
             QT_TRANSLATE_NOOP("App::Property", "diameter of offset hole"),
         )
         obj.addProperty(
             "App::PropertyLength",
             "offset_holeoffset",
-            "base",
+            "hole",
             QT_TRANSLATE_NOOP("App::Property", "offset of offset hole"),
         )
 
