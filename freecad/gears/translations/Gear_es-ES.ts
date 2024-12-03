@@ -4,7 +4,7 @@
 <context>
     <name>App::Property</name>
     <message>
-        <location filename="../basegear.py" line="104"/>
+        <location filename="../basegear.py" line="101"/>
         <location filename="../connector.py" line="72"/>
         <source>freecad.gears-version</source>
         <translation>Versión de freecad.gears</translation>
@@ -475,10 +475,6 @@
         <source>reverse rotation of helix</source>
         <translation>Revertir rotación de hélice</translation>
     </message>
-    <message>
-        <source>Combine two gears</source>
-        <translation type="vanished">Combinar dos engranajes</translation>
-    </message>
 </context>
 <context>
     <name>FCGear_BevelGear</name>
@@ -698,7 +694,7 @@
 </translation>
     </message>
     <message>
-        <location filename="../basegear.py" line="140"/>
+        <location filename="../basegear.py" line="137"/>
         <source>Migrating &apos;teeth&apos; property to &apos;num_teeth&apos; on {} part
 </source>
         <translation>Migrando propiedad de &apos;teeth&apos; a &apos;num_teeth&apos; en la parte {}
