@@ -90,6 +90,10 @@ App.ActiveDocument.recompute()
 Gui.SendMsgToActiveView("ViewFit")
 ```
 
+# Development:
+if you have pixi installed just launch pixi and run this command 
+`pixi run freecad` to launch freecad with freecad.gears installed.
+
 ## References
 * Elements of Metric Gear Technology ([PDF](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf))
 
