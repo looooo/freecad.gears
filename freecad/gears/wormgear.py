@@ -93,7 +93,7 @@ class WormGear(BaseGear):
                 "App::Property", "clearance * module = additional length of root"
             ),
         )
-        obj.num_teeth = (3, 2, 100, 1)  # default, min, max, step
+        obj.num_teeth = (3, 1, 10, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
