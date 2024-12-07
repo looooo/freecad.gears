@@ -59,3 +59,7 @@ target/
 .ipynb_checkpoints/
 results/
 *.vtk
+
+# pixi environments
+.pixi
+*.egg-info
