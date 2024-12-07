@@ -9,9 +9,13 @@ version = "0.1.0"
 [pypi-dependencies]
 freecad_gears = { path = ".", editable = true }
 
+[tasks]
+lint = "pylint $(git ls-files '*.py')"
+
 [dependencies]
 numpy = ">=2.1.3,<3"
 scipy = ">=1.14.1,<2"
 sympy = ">=1.13.3,<2"
 jupyter = ">=1.1.1,<2"
 freecad = ">=1.0.0,<2"
+pylint = ">=3.3.2,<4"
