@@ -11,6 +11,7 @@ freecad_gears = { path = ".", editable = true }
 
 [tasks]
 lint = "pylint $(git ls-files '*.py')"
+test = "python tests/tests.py"
 
 [dependencies]
 numpy = ">=2.1.3,<3"
