@@ -12,3 +12,4 @@ jobs:
         pixi-version: v0.39.0
         cache: false
     - run: pixi run lint
+    - run: pixi run test
