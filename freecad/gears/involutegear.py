@@ -387,7 +387,10 @@ class InvoluteGear(BaseGear):
                     gear_shape = helical_extrusion(
                         base, obj.height.Value, twist_angle, obj.double_helix
                     )
-
+        else:
+            rw = obj.gear.dw / 2
+            gear_shape = part.makeCylinder(rw, obj.height.Value)
+        if hasattr(obj, "axle_hole"):
             if obj.axle_hole and obj.axle_holesize.Value > 0:
                 axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
                 gear_shape = gear_shape.cut(axle_hole)
@@ -396,19 +399,7 @@ class InvoluteGear(BaseGear):
                 hole = part.makeCylinder(obj.offset_holesize.Value/2, obj.height.Value)
                 hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.offset_holeoffset.Value/2, 0)
                 gear_shape = gear_shape.cut(hole)
-            return gear_shape
-        else:
-            rw = obj.gear.dw / 2
-            gear_shape = part.makeCylinder(rw, obj.height.Value)
-
-        if obj.axle_hole and obj.axle_holesize.Value > 0:
-            axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
-            #hole.Placement.Base = app.Vector(-obj.holesize.Value/2, -obj.holesize.Value/2, 0)
-            gear_shape = gear_shape.cut(axle_hole)
-
-        if obj.hole and obj.holesize.Value > 0:
-            hole = part.makeCylinder(obj.holesize.Value/2, obj.height.Value)
-            hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.holeoffset.Value/2, 0)
-            gear_shape = gear_shape.cut(hole)
 
         return gear_shape
+
+
