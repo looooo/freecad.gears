@@ -117,15 +117,15 @@ class BaseGear:
         # unveil the "Placement" property, which seems hidden by default in PartDesign
         obj.setEditorMode("Placement", 0)  # non-readonly non-hidden
 
-    def execute(self, fp):
+    def execute(self, obj):
         # checksbackwardcompatibility:
-        if not hasattr(fp, "positionBySupport"):
-            self.make_attachable(fp)
-        fp.positionBySupport()
+        if not hasattr(obj, "positionBySupport"):
+            self.make_attachable(obj)
+        obj.positionBySupport()
 
         # Backward compatibility for old files
-        if hasattr(fp, "teeth"):
-            fp.addProperty(
+        if hasattr(obj, "teeth"):
+            obj.addProperty(
                 "App::PropertyIntegerConstraint",
                 "num_teeth",
                 "base",
@@ -134,26 +134,26 @@ class BaseGear:
             app.Console.PrintLog(
                 app.Qt.translate(
                     "Log", "Migrating 'teeth' property to 'num_teeth' on {} part\n"
-                ).format(fp.Name)
+                ).format(obj.Name)
             )
-            fp.num_teeth = fp.teeth  # Copy old value to new property
-            fp.removeProperty("teeth")  # Remove the old property
+            obj.num_teeth = obj.teeth  # Copy old value to new property
+            obj.removeProperty("teeth")  # Remove the old property
 
-        gear_shape = self.generate_gear_shape(fp)
-        if hasattr(fp, "BaseFeature") and fp.BaseFeature != None:
+        gear_shape = self.generate_gear_shape(obj)
+        if hasattr(obj, "BaseFeature") and obj.BaseFeature != None:
             # we're inside a PartDesign Body, thus need to fuse with the base feature
             gear_shape.Placement = (
-                fp.Placement
+                obj.Placement
             )  # ensure the gear is placed correctly before fusing
-            result_shape = fp.BaseFeature.Shape.fuse(gear_shape)
+            result_shape = obj.BaseFeature.Shape.fuse(gear_shape)
             result_shape.transformShape(
-                fp.Placement.inverse().toMatrix(), True
-            )  # account for setting fp.Shape below moves the shape to fp.Placement, ignoring its previous placement
-            fp.Shape = result_shape
+                obj.Placement.inverse().toMatrix(), True
+            )  # account for setting obj.Shape below moves the shape to obj.Placement, ignoring its previous placement
+            obj.Shape = result_shape
         else:
-            fp.Shape = gear_shape
+            obj.Shape = gear_shape
 
-    def generate_gear_shape(self, fp):
+    def generate_gear_shape(self, obj):
         """
         This method has to return the TopoShape of the gear.
         """

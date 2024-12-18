@@ -326,12 +326,6 @@ class InvoluteGear(BaseGear):
         obj.gear.head = obj.head
         obj.gear.properties_from_tool = obj.properties_from_tool
         obj.gear.num_teeth = obj.num_teeth
-        obj.gear.axle_hole = obj.axle_hole
-        obj.gear.axle_holesize = obj.axle_holesize.Value
-
-        obj.gear.offset_hole = obj.offset_hole
-        obj.gear.offset_holesize = obj.offset_holesize.Value
-        obj.gear.offset_holeoffset= obj.offset_holeoffset.Value
 
         obj.gear._update()
         self.compute_traverse_properties(obj)
@@ -406,17 +400,15 @@ class InvoluteGear(BaseGear):
         else:
             rw = obj.gear.dw / 2
             gear_shape = part.makeCylinder(rw, obj.height.Value)
-        
+
         if obj.axle_hole and obj.axle_holesize.Value > 0:
             axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
             #hole.Placement.Base = app.Vector(-obj.holesize.Value/2, -obj.holesize.Value/2, 0)
             gear_shape = gear_shape.cut(axle_hole)
-            
+
         if obj.hole and obj.holesize.Value > 0:
             hole = part.makeCylinder(obj.holesize.Value/2, obj.height.Value)
             hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.holeoffset.Value/2, 0)
             gear_shape = gear_shape.cut(hole)
-            
+
         return gear_shape
-
-
