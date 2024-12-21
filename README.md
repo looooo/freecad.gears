@@ -6,7 +6,7 @@ FreeCAD > v0.16
 __python > 3 (for python2 use branch py2)__
 
 ### Python packages
-scipy
+scipy, numpy, sympy (optional), jupyter (optional)
 
 
 ## Supported gear-types
