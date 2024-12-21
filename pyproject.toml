@@ -23,7 +23,3 @@ include-package-data = true
 
 [tool.setuptools.dynamic]
 version = {attr = "pygears.__version__"}
-
-[tool.pixi.project]
-channels = ["conda-forge", "freecad/label/dev"]
-platforms = ["osx-arm64"]
