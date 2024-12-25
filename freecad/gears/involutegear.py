@@ -392,12 +392,13 @@ class InvoluteGear(BaseGear):
             gear_shape = part.makeCylinder(rw, obj.height.Value)
         if hasattr(obj, "axle_hole"):
             if obj.axle_hole and obj.axle_holesize.Value > 0:
-                axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value)
+                axle_hole = part.makeCylinder(obj.axle_holesize.Value/2, obj.height.Value*2)
+                axle_hole.Placement.Base = app.Vector(0, 0, -obj.height.Value/2)
                 gear_shape = gear_shape.cut(axle_hole)
 
             if obj.offset_hole and obj.offset_holesize.Value > 0:
-                hole = part.makeCylinder(obj.offset_holesize.Value/2, obj.height.Value)
-                hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0,0) #-obj.offset_holeoffset.Value/2, 0)
+                hole = part.makeCylinder(obj.offset_holesize.Value/2, obj.height.Value*2)
+                hole.Placement.Base = app.Vector(-obj.offset_holeoffset.Value, 0, -obj.height.Value/2)
                 gear_shape = gear_shape.cut(hole)
 
         return gear_shape
