@@ -18,39 +18,39 @@ scipy, numpy, sympy (optional), jupyter (optional)
 * Undercut
 * Fillets
 
-![involute-gear](examples/involute-double-helical-gear.png)
+![involute-gear](examples/images/involute-double-helical-gear.png)
 
 
 ### Involute Rack
-![involute-rack](examples/involute-rack.png)
+![involute-rack](examples/images/involute-rack.png)
 
 ### Cylindric Cycloid
 * Helical
 * Double Helical
 * Fillets
 
-![cycloid-gear](examples/cycloid-gear.png)
+![cycloid-gear](examples/images/cycloid-gear.png)
 
 ### Cycloid Rack
 
-![cycloid-rack](examples/cycloid-rack.png)
+![cycloid-rack](examples/images/cycloid-rack.png)
 
 ### Spherical Involute Bevel-Gear
 * Spiral  
 
-![bevel-gear](examples/bevel-gear.png)
+![bevel-gear](examples/images/bevel-gear.png)
 
 ### Crown-Gear
-![crown-gear](examples/crown-gear.png)
+![crown-gear](examples/images/crown-gear.png)
 
 ### Worm-Gear
-![worm-gear](examples/worm-gear.png)
+![worm-gear](examples/images/worm-gear.png)
 
 ### Timing-Gear
-![timing-gear](examples/timing-gear.png)
+![timing-gear](examples/images/timing-gear.png)
 
 ### Lantern-Gear
-![lantern-gear](examples/lantern-gear.png)
+![lantern-gear](examples/images/lantern-gear.png)
 
 ---------------------------
 
