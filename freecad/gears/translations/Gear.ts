@@ -4,7 +4,7 @@
 <context>
     <name>App::Property</name>
     <message>
-        <location filename="../basegear.py" line="104"/>
+        <location filename="../basegear.py" line="101"/>
         <location filename="../connector.py" line="72"/>
         <source>freecad.gears-version</source>
         <translation type="unfinished"></translation>
@@ -688,7 +688,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../basegear.py" line="140"/>
+        <location filename="../basegear.py" line="137"/>
         <source>Migrating &apos;teeth&apos; property to &apos;num_teeth&apos; on {} part
 </source>
         <translation type="unfinished"></translation>
