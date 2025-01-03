@@ -83,6 +83,48 @@ class InvoluteGear(BaseGear):
         obj.Proxy = self
         self.compute_traverse_properties(obj)
 
+    def onDocumentRestored(self, obj):
+        """  
+        backward compatibility functions
+        """
+        if hasattr(obj, "dw"):
+            pitch_diameter = getattr(obj, "dw")
+            obj.addProperty(
+                "App::PropertyLength",
+                "pitch_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
+                1,
+            )
+            obj.pitch_diameter = pitch_diameter
+            obj.removeProperty("dw")
+            obj.setExpression(
+                "angular_backlash", "backlash / pitch_diameter * 360° / pi"
+            )
+        # replace da with addendum_diameter
+        if hasattr(obj, "da"):
+            addendum_diameter = getattr(obj, "da")
+            obj.addProperty(
+                "App::PropertyLength",
+                "addendum_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The addendum diameter."),
+                1,
+            )
+            obj.addendum_diameter = addendum_diameter
+
+        # replace df with root_diameter
+        if hasattr(obj, "df"):
+            root_diameter = getattr(obj, "df")
+            obj.addProperty(
+                "App::PropertyLength",
+                "root_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The root diameter."),
+                1,
+            )
+            obj.root_diameter = root_diameter
+
     def add_hole_properties(self, obj):
         """Add properties for the central hole"""
         obj.addProperty(
@@ -203,22 +245,22 @@ class InvoluteGear(BaseGear):
     def add_computed_properties(self, obj):
         obj.addProperty(
             "App::PropertyLength",
-            "da",
+            "addendum_diameter",
             "computed",
-            QT_TRANSLATE_NOOP("App::Property", "outside diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "The outside diameter"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
-            "df",
+            "root_diameter",
             "computed",
-            QT_TRANSLATE_NOOP("App::Property", "root diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "The root diameter"),
             1,
         )
         self.add_traverse_module_property(obj)
         obj.addProperty(
             "App::PropertyLength",
-            "dw",
+            "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
             1,
@@ -233,7 +275,7 @@ class InvoluteGear(BaseGear):
             ),
         )
         obj.setExpression(
-            "angular_backlash", "backlash / dw * 360° / pi"
+            "angular_backlash", "backlash / pitch_diameter * 360° / pi"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "angular_backlash", 1
@@ -310,9 +352,9 @@ class InvoluteGear(BaseGear):
             obj.traverse_module = obj.module
 
         obj.transverse_pitch = "{}mm".format(obj.gear.pitch)
-        obj.da = "{}mm".format(obj.gear.da)
-        obj.df = "{}mm".format(obj.gear.df)
-        obj.dw = "{}mm".format(obj.gear.dw)
+        obj.addendum_diameter = "{}mm".format(obj.gear.da)
+        obj.root_diameter = "{}mm".format(obj.gear.df)
+        obj.pitch_diameter = "{}mm".format(obj.gear.dw)
 
     def generate_gear_shape(self, obj):
         obj.gear.double_helix = obj.double_helix

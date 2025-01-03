@@ -120,26 +120,68 @@ class InternalInvoluteGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
+    def onDocumentRestored(self, obj):
+        """  
+        backward compatibility functions
+        """
+        if hasattr(obj, "dw"):
+            pitch_diameter = getattr(obj, "dw")
+            obj.addProperty(
+                "App::PropertyLength",
+                "pitch_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
+                1,
+            )
+            obj.pitch_diameter = pitch_diameter
+            obj.removeProperty("dw")
+            obj.setExpression(
+                "angular_backlash", "backlash / pitch_diameter * 360° / pi"
+            )
+        # replace da with addendum_diameter
+        if hasattr(obj, "da"):
+            addendum_diameter = getattr(obj, "da")
+            obj.addProperty(
+                "App::PropertyLength",
+                "addendum_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The addendum diameter."),
+                1,
+            )
+            obj.addendum_diameter = addendum_diameter
+
+        # replace df with root_diameter
+        if hasattr(obj, "df"):
+            root_diameter = getattr(obj, "df")
+            obj.addProperty(
+                "App::PropertyLength",
+                "root_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The root diameter."),
+                1,
+            )
+            obj.root_diameter = root_diameter
+
     def add_limiting_diameter_properties(self, obj):
         obj.addProperty(
             "App::PropertyLength",
-            "da",
+            "addendum_diameter",
             "computed",
-            QT_TRANSLATE_NOOP("App::Property", "inside diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "The addendum diameter"),
             1,
         )
         obj.addProperty(
             "App::PropertyLength",
-            "df",
+            "root_diameter",
             "computed",
-            QT_TRANSLATE_NOOP("App::Property", "root diameter"),
+            QT_TRANSLATE_NOOP("App::Property", "The root diameter"),
             1,
         )
 
     def add_computed_properties(self, obj):
         obj.addProperty(
             "App::PropertyLength",
-            "dw",
+            "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
@@ -153,7 +195,7 @@ class InternalInvoluteGear(BaseGear):
             ),
         )
         obj.setExpression(
-            "angular_backlash", "backlash / dw * 360° / pi"
+            "angular_backlash", "backlash / pitch_diameter * 360° / pi"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "angular_backlash", 1
@@ -278,16 +320,16 @@ class InternalInvoluteGear(BaseGear):
         fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
 
-        fp.dw = "{}mm".format(fp.gear.dw)
+        fp.pitch_diameter = "{}mm".format(fp.gear.dw)
 
         # computed properties
         fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
-        fp.outside_diameter = fp.dw + 2 * fp.thickness
+        fp.outside_diameter = fp.pitch_diameter + 2 * fp.thickness
         # checksbackwardcompatibility:
-        if not "da" in fp.PropertiesList:
+        if not "addendum_diameter" in fp.PropertiesList:
             self.add_limiting_diameter_properties(fp)
-        fp.da = "{}mm".format(fp.gear.df)  # swap addednum and dedendum for "internal"
-        fp.df = "{}mm".format(fp.gear.da)  # swap addednum and dedendum for "internal"
+        fp.addendum_diameter = "{}mm".format(fp.gear.df)  # swap addendum and dedendum for "internal"
+        fp.root_diameter = "{}mm".format(fp.gear.da)  # swap addendum and dedendum for "internal"
 
         outer_circle = part.Wire(part.makeCircle(fp.outside_diameter / 2.0))
         outer_circle.reverse()
@@ -341,7 +383,7 @@ class InternalInvoluteGear(BaseGear):
                     base, fp.height.Value, twist_angle, fp.double_helix
                 )
         else:
-            inner_circle = part.Wire(part.makeCircle(fp.dw / 2.0))
+            inner_circle = part.Wire(part.makeCircle(fp.pitch_diameter / 2.0))
             inner_circle.reverse()
             base = part.Face([outer_circle, inner_circle])
             return base.extrude(app.Vector(0, 0, fp.height.Value))
