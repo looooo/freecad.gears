@@ -94,6 +94,25 @@ class CycloidGear(BaseGear):
         obj.root_fillet = 0
         obj.Proxy = self
 
+    def onDocumentRestored(self, obj):
+        """  
+        backward compatibility functions
+        """
+        if hasattr(obj, "dw"):
+            pitch_diameter = getattr(obj, "dw")
+            obj.addProperty(
+                "App::PropertyLength",
+                "pitch_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
+                1,
+            )
+            obj.pitch_diameter = pitch_diameter
+            obj.removeProperty("dw")
+            obj.setExpression(
+                "angular_backlash", "backlash / pitch_diameter * 360° / pi"
+            )
+
     def add_helical_properties(self, obj):
         obj.addProperty(
             "App::PropertyBool",
@@ -174,15 +193,15 @@ class CycloidGear(BaseGear):
     def add_computed_properties(self, obj):
         obj.addProperty(
             "App::PropertyLength",
-            "dw",
+            "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
         obj.setExpression(
-            "dw", "num_teeth * module"
+            "pitch_diameter", "num_teeth * module"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
-            "dw", 1
+            "pitch_diameter", 1
         )  # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty(
             "App::PropertyAngle",
@@ -194,7 +213,7 @@ class CycloidGear(BaseGear):
             ),
         )
         obj.setExpression(
-            "angular_backlash", "backlash / dw * 360° / pi"
+            "angular_backlash", "backlash / pitch_diameter * 360° / pi"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "angular_backlash", 1
@@ -203,7 +222,7 @@ class CycloidGear(BaseGear):
     def generate_gear_shape(self, fp):
         fp.gear.num_teeth = fp.num_teeth
         fp.gear.m = fp.module.Value
-        fp.dw = fp.module * fp.num_teeth
+        fp.pitch_diameter = fp.module * fp.num_teeth
         fp.gear.num_teeth_1 = fp.inner_diameter
         fp.gear.num_teeth_2 = fp.outer_diameter
         fp.gear.clearance = fp.clearance
