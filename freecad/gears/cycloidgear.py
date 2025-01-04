@@ -83,7 +83,7 @@ class CycloidGear(BaseGear):
             "inner_diameter", "num_teeth / 2"
         )  # num_teeth/2 makes the hypocycloid a straight line to the center
         obj.outer_diameter = 7.5  # we don't know the mating gear, so we just set the default to mesh with our default
-        obj.beta = "0. deg"
+        obj.helix_angle = "0. deg"
         obj.height = "5. mm"
         obj.clearance = 0.25
         obj.numpoints = 20
@@ -113,6 +113,18 @@ class CycloidGear(BaseGear):
                 "angular_backlash", "backlash / pitch_diameter * 360° / pi"
             )
 
+        # replace beta with helix_angle
+        if hasattr(obj, "beta"):
+            helix_angle = getattr(obj, "beta")
+            obj.addProperty(
+                "App::PropertyAngle",
+                "helix_angle",
+                "helical",
+                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+            )
+            obj.helix_angle = helix_angle
+            obj.removeProperty("beta")
+
     def add_helical_properties(self, obj):
         obj.addProperty(
             "App::PropertyBool",
@@ -122,9 +134,9 @@ class CycloidGear(BaseGear):
         )
         obj.addProperty(
             "App::PropertyAngle",
-            "beta",
+            "helix_angle",
             "helical",
-            QT_TRANSLATE_NOOP("App::Property", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "helix angle"),
         )
 
     def add_fillet_properties(self, obj):
@@ -260,11 +272,12 @@ class CycloidGear(BaseGear):
         if fp.height.Value == 0:
             return profile
         base = part.Face(profile)
-        if fp.beta.Value == 0:
+        if fp.helix_angle.Value == 0:
             return base.extrude(app.Vector(0, 0, fp.height.Value))
         else:
+            beta = fp.helix_angle.Value * np.pi / 180
             twist_angle = (
-                fp.height.Value * np.tan(fp.beta.Value * np.pi / 180) * 2 / fp.gear.d
+                fp.height.Value * np.tan(beta) * 2 / fp.gear.d
             )
             return helical_extrusion(
                 base, fp.height.Value, twist_angle, fp.double_helix

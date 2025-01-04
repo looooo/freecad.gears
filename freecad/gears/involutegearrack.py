@@ -84,7 +84,7 @@ class InvoluteGearRack(BaseGear):
         obj.pressure_angle = "20. deg"
         obj.height = "5. mm"
         obj.thickness = "5 mm"
-        obj.beta = "0. deg"
+        obj.helix_angle = "0. deg"
         obj.clearance = 0.25
         obj.head = 0.0
         obj.properties_from_tool = False
@@ -93,6 +93,22 @@ class InvoluteGearRack(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
+    def onDocumentRestored(self, obj):
+        """  
+        backward compatibility functions
+        """
+        # replace beta with helix_angle
+        if hasattr(obj, "beta"):
+            helix_angle = getattr(obj, "beta")
+            obj.addProperty(
+                "App::PropertyAngle",
+                "helix_angle",
+                "helical",
+                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+            )
+            obj.helix_angle = helix_angle
+            obj.removeProperty("beta")
+
     def add_helical_properties(self, obj):
         obj.addProperty(
             "App::PropertyBool",
@@ -100,14 +116,14 @@ class InvoluteGearRack(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )
         obj.addProperty(
             "App::PropertyAngle",
-            "beta",
+            "helix_angle",
             "helical",
-            QT_TRANSLATE_NOOP("App::Property", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "helix anglle"),
         )
         obj.addProperty(
             "App::PropertyBool",
@@ -185,7 +201,7 @@ class InvoluteGearRack(BaseGear):
         obj.rack.z = obj.num_teeth
         obj.rack.pressure_angle = obj.pressure_angle.Value * np.pi / 180.0
         obj.rack.thickness = obj.thickness.Value
-        obj.rack.beta = obj.beta.Value * np.pi / 180.0
+        obj.rack.beta = obj.helix_angle.Value * np.pi / 180.0
         obj.rack.head = obj.head
         # checksbackwardcompatibility:
         if "clearance" in obj.PropertiesList:
@@ -272,22 +288,20 @@ class InvoluteGearRack(BaseGear):
 
         if obj.height.Value == 0:
             return pol
-        elif obj.beta.Value == 0:
+        elif obj.rack.beta == 0:
             face = part.Face(part.Wire(pol))
             return face.extrude(fcvec([0.0, 0.0, obj.height.Value]))
         elif obj.double_helix:
-            beta = obj.beta.Value * np.pi / 180.0
             pol2 = part.Wire(pol)
             pol2.translate(
-                fcvec([0.0, np.tan(beta) * obj.height.Value / 2, obj.height.Value / 2])
+                fcvec([0.0, np.tan(obj.rack.beta) * obj.height.Value / 2, obj.height.Value / 2])
             )
             pol3 = part.Wire(pol)
             pol3.translate(fcvec([0.0, 0.0, obj.height.Value]))
             return part.makeLoft([pol, pol2, pol3], True, True)
         else:
-            beta = obj.beta.Value * np.pi / 180.0
             pol2 = part.Wire(pol)
             pol2.translate(
-                fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
+                fcvec([0.0, np.tan(obj.rack.beta) * obj.height.Value, obj.height.Value])
             )
             return part.makeLoft([pol, pol2], True)

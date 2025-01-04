@@ -105,7 +105,7 @@ class InternalInvoluteGear(BaseGear):
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
-        obj.beta = "0. deg"
+        obj.helix_angle = "0. deg"
         obj.height = "5. mm"
         obj.thickness = "5 mm"
         obj.clearance = 0.25
@@ -149,6 +149,7 @@ class InternalInvoluteGear(BaseGear):
                 1,
             )
             obj.addendum_diameter = addendum_diameter
+            obj.removeProperty("da")
 
         # replace df with root_diameter
         if hasattr(obj, "df"):
@@ -161,6 +162,21 @@ class InternalInvoluteGear(BaseGear):
                 1,
             )
             obj.root_diameter = root_diameter
+            obj.removeProperty("df")
+
+        # replace beta with helix_angle
+        if hasattr(obj, "beta"):
+            helix_angle = getattr(obj, "beta")
+            obj.addProperty(
+                "App::PropertyAngle",
+                "helix_angle",
+                "helical",
+                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+            )
+            obj.helix_angle = helix_angle
+            obj.removeProperty("beta")
+
+
 
     def add_limiting_diameter_properties(self, obj):
         obj.addProperty(
@@ -284,9 +300,9 @@ class InternalInvoluteGear(BaseGear):
     def add_helical_properties(self, obj):
         obj.addProperty(
             "App::PropertyAngle",
-            "beta",
+            "helix_angle",
             "helical",
-            QT_TRANSLATE_NOOP("App::Property", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "helix angle"),
         )
         obj.addProperty(
             "App::PropertyBool",
@@ -300,7 +316,7 @@ class InternalInvoluteGear(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )
 
@@ -311,7 +327,7 @@ class InternalInvoluteGear(BaseGear):
         fp.gear.undercut = False  # no undercut for internal gears
         fp.gear.shift = fp.shift
         fp.gear.pressure_angle = fp.pressure_angle.Value * np.pi / 180.0
-        fp.gear.beta = fp.beta.Value * np.pi / 180
+        fp.gear.beta = fp.helix_angle.Value * np.pi / 180
         fp.gear.clearance = fp.head  # swap head and clearance to become "internal"
         fp.gear.backlash = (
             fp.backlash.Value * (fp.reversed_backlash - 0.5) * 2.0
@@ -375,7 +391,7 @@ class InternalInvoluteGear(BaseGear):
             if fp.height.Value == 0:
                 return part.makeCompound([outer_circle, profile])
             base = part.Face([outer_circle, profile])
-            if fp.beta.Value == 0:
+            if fp.gear.beta == 0:
                 return base.extrude(app.Vector(0, 0, fp.height.Value))
             else:
                 twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d

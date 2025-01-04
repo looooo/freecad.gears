@@ -63,7 +63,7 @@ class InvoluteGear(BaseGear):
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
-        obj.beta = "0. deg"
+        obj.helix_angle = "0. deg"
         obj.height = "5. mm"
         obj.clearance = 0.25
         obj.head = 0.0
@@ -87,6 +87,7 @@ class InvoluteGear(BaseGear):
         """  
         backward compatibility functions
         """
+        # replace dw with pitch_diameter
         if hasattr(obj, "dw"):
             pitch_diameter = getattr(obj, "dw")
             obj.addProperty(
@@ -112,6 +113,7 @@ class InvoluteGear(BaseGear):
                 1,
             )
             obj.addendum_diameter = addendum_diameter
+            obj.removeProperty("da")
 
         # replace df with root_diameter
         if hasattr(obj, "df"):
@@ -124,6 +126,21 @@ class InvoluteGear(BaseGear):
                 1,
             )
             obj.root_diameter = root_diameter
+            obj.removeProperty("df")
+
+
+        # replace beta with helix_angle
+        if hasattr(obj, "beta"):
+            helix_angle = getattr(obj, "beta")
+            obj.addProperty(
+                "App::PropertyAngle",
+                "helix_angle",
+                "helical",
+                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+            )
+            obj.helix_angle = helix_angle
+            obj.removeProperty("beta")
+
 
     def add_hole_properties(self, obj):
         """Add properties for the central hole"""
@@ -226,14 +243,14 @@ class InvoluteGear(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if beta is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
             ),
         )
         obj.addProperty(
             "App::PropertyAngle",
-            "beta",
+            "helix_angle",
             "helical",
-            QT_TRANSLATE_NOOP("App::Property", "beta"),
+            QT_TRANSLATE_NOOP("App::Property", "helix angle"),
         )
         obj.addProperty(
             "App::PropertyBool",
@@ -362,7 +379,7 @@ class InvoluteGear(BaseGear):
         obj.gear.undercut = obj.undercut
         obj.gear.shift = obj.shift
         obj.gear.pressure_angle = obj.pressure_angle.Value * np.pi / 180.0
-        obj.gear.beta = obj.beta.Value * np.pi / 180
+        obj.gear.beta = obj.helix_angle.Value * np.pi / 180
         obj.gear.clearance = obj.clearance
         obj.gear.backlash = obj.backlash.Value * (-obj.reversed_backlash + 0.5) * 2.0
         obj.gear.head = obj.head
@@ -422,7 +439,7 @@ class InvoluteGear(BaseGear):
                 gear_shape = profile
             else:
                 base = part.Face(profile)
-                if obj.beta.Value == 0:
+                if obj.gear.beta == 0:
                     gear_shape = base.extrude(app.Vector(0, 0, obj.height.Value))
                 else:
                     twist_angle = obj.height.Value * np.tan(obj.gear.beta) * 2 / obj.gear.d
