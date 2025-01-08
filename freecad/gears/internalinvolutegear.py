@@ -258,7 +258,7 @@ class InternalInvoluteGear(BaseGear):
             "tolerance",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "The arc length on the pitch circle by which the tooth thicknes is reduced.",
+                "The arc length on the pitch circle by which the tooth thickness is reduced.",
             ),
         )
         obj.addProperty(

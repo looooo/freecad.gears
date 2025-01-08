@@ -123,7 +123,7 @@ class InvoluteGearRack(BaseGear):
             "App::PropertyAngle",
             "helix_angle",
             "helical",
-            QT_TRANSLATE_NOOP("App::Property", "helix anglle"),
+            QT_TRANSLATE_NOOP("App::Property", "helix angle"),
         )
         obj.addProperty(
             "App::PropertyBool",
