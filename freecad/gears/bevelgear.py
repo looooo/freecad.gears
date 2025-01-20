@@ -106,21 +106,21 @@ class BevelGear(BaseGear):
         )
         obj.addProperty(
             "App::PropertyAngle",
-            "beta",
+            "helix_angle",
             "helical",
             QT_TRANSLATE_NOOP("App::Property", "angle used for spiral bevel-gears"),
         )
         obj.addProperty(
             "App::PropertyLength",
-            "dw",
+            "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
         )
         obj.setExpression(
-            "dw", "num_teeth * module"
+            "pitch_diameter", "num_teeth * module"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
-            "dw", 1
+            "pitch_diameter", 1
         )  # set read-only after setting the expression, else it won't be visible. bug?
         obj.addProperty(
             "App::PropertyAngle",
@@ -132,7 +132,7 @@ class BevelGear(BaseGear):
             ),
         )
         obj.setExpression(
-            "angular_backlash", "backlash / dw * 360° / pi"
+            "angular_backlash", "backlash / pitch_diameter * 360° / pi"
         )  # calculate via expression to ease usage for placement
         obj.setEditorMode(
             "angular_backlash", 1
@@ -147,10 +147,41 @@ class BevelGear(BaseGear):
         obj.numpoints = 20
         obj.backlash = "0.00 mm"
         obj.clearance = 0.1
-        obj.beta = "0 deg"
+        obj.helix_angle = "0 deg"
         obj.reset_origin = True
         self.obj = obj
         obj.Proxy = self
+
+    def onDocumentRestored(self, obj):
+        """  
+        backward compatibility functions
+        """
+        if hasattr(obj, "dw"):
+            pitch_diameter = getattr(obj, "dw")
+            obj.addProperty(
+                "App::PropertyLength",
+                "pitch_diameter",
+                "computed",
+                QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
+                1,
+            )
+            obj.pitch_diameter = pitch_diameter
+            obj.removeProperty("dw")
+            obj.setExpression(
+                "angular_backlash", "backlash / pitch_diameter * 360° / pi"
+            )
+
+        # replace beta with helix_angle
+        if hasattr(obj, "beta"):
+            helix_angle = getattr(obj, "beta")
+            obj.addProperty(
+                "App::PropertyAngle",
+                "helix_angle",
+                "helical",
+                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+            )
+            obj.helix_angle = helix_angle
+            obj.removeProperty("beta")
 
     def generate_gear_shape(self, fp):
         fp.gear.z = fp.num_teeth
@@ -189,7 +220,7 @@ class BevelGear(BaseGear):
         else:  # starting with version 0.0.2
             scale_0 = scale - fp.height.Value
             scale_1 = scale
-        if fp.beta.Value == 0:
+        if fp.helix_angle.Value == 0:
             wires.append(make_bspline_wire([scale_0 * p for p in pts]))
             wires.append(make_bspline_wire([scale_1 * p for p in pts]))
         else:
@@ -198,7 +229,7 @@ class BevelGear(BaseGear):
                 # rot = rotation3D(- beta_i)
                 # points = [rot(pt) * scale_i for pt in pts]
                 angle = (
-                    fp.beta.Value
+                    fp.helix_angle.Value
                     * np.pi
                     / 180.0
                     * np.sin(np.pi / 4)
