@@ -57,9 +57,11 @@ class BaseCommand(object):
 
     def Activated(self):
         gui.doCommandGui("import freecad.gears.commands")
+        app.ActiveDocument.openTransaction("Create gear")
         gui.doCommandGui(
             "freecad.gears.commands.{}.create()".format(self.__class__.__name__)
         )
+        app.ActiveDocument.commitTransaction()
         app.ActiveDocument.recompute()
         gui.SendMsgToActiveView("ViewFit")
 
