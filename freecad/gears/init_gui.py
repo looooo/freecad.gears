@@ -44,7 +44,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
     gitver = ver[3].split()
     if gitver:
         gitver = gitver[0]
-    if gitver and gitver != "Unknown":
+    if gitver and gitver != "Unknown" and gitver.isdigit():
         gitver = int(gitver)
     else:
         # If we don't have the git version, assume it's OK.
