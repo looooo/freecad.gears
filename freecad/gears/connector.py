@@ -115,9 +115,9 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
-            dist = (dw_master + dw_slave) / 2
+            pitch_diameter_master = fp.master_gear.pitch_diameter
+            pitch_diameter_slave = fp.slave_gear.pitch_diameter
+            dist = (pitch_diameter_master + pitch_diameter_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
                 dist, alpha_w = compute_shifted_gears(
                     fp.master_gear.module,
@@ -132,8 +132,8 @@ class GearConnector(object):
             trans = app.Vector(dist)
             mat0.move(trans)
             rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = dw_master / dw_slave * fp.angle1.Value
-            angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
+            angle2 = pitch_diameter_master / pitch_diameter_slave * fp.angle1.Value
+            angle4 = pitch_diameter_master / pitch_diameter_slave * np.rad2deg(angle_master)
             rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
@@ -148,9 +148,9 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
-            dist = (dw_master - dw_slave) / 2
+            pitch_diameter_master = fp.master_gear.pitch_diameter
+            pitch_diameter_slave = fp.slave_gear.pitch_diameter
+            dist = (pitch_diameter_master - pitch_diameter_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
                 dist, alpha_w = compute_shifted_gears(
                     fp.master_gear.module,
@@ -165,8 +165,8 @@ class GearConnector(object):
             trans = app.Vector(dist)
             mat0.move(trans)
             rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = -dw_master / dw_slave * fp.angle1.Value
-            angle4 = -dw_master / dw_slave * np.rad2deg(angle_master)
+            angle2 = -pitch_diameter_master / pitch_diameter_slave * fp.angle1.Value
+            angle4 = -pitch_diameter_master / pitch_diameter_slave * np.rad2deg(angle_master)
             rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
@@ -185,15 +185,15 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw.Value
-            dw_slave = 0
-            dist = -(dw_master + dw_slave) / 2
+            pitch_diameter_master = fp.master_gear.pitch_diameter.Value
+            pitch_diameter_slave = 0
+            dist = -(pitch_diameter_master + pitch_diameter_slave) / 2
             mat0 = app.Matrix()  # unity matrix
             mat0.move(app.Vector(dist, 0, 0))
             mat1 = app.Matrix()
-            mat1.move(app.Vector(0, np.deg2rad(fp.angle1.Value) * dw_master / 2, 0))
+            mat1.move(app.Vector(0, np.deg2rad(fp.angle1.Value) * pitch_diameter_master / 2, 0))
             mat2 = app.Matrix()
-            mat2.move(app.Vector(0, -np.deg2rad(fp.angle2.Value) * dw_master / 2, 0))
+            mat2.move(app.Vector(0, -np.deg2rad(fp.angle2.Value) * pitch_diameter_master / 2, 0))
             rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
             mat3 = rot * mat2 * mat1 * mat0
             mat3.move(fp.master_gear.Placement.Base)
@@ -205,15 +205,15 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
-            dist = (dw_master + dw_slave) / 2
+            pitch_diameter_master = fp.master_gear.pitch_diameter
+            pitch_diameter_slave = fp.slave_gear.pitch_diameter
+            dist = (pitch_diameter_master + pitch_diameter_slave) / 2
             mat0 = app.Matrix()  # unity matrix
             trans = app.Vector(dist, 0, 0)
             mat0.move(trans)
             rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = dw_master / dw_slave * fp.angle1.Value
-            angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
+            angle2 = pitch_diameter_master / pitch_diameter_slave * fp.angle1.Value
+            angle4 = pitch_diameter_master / pitch_diameter_slave * np.rad2deg(angle_master)
             rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
