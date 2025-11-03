@@ -115,8 +115,8 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
+            dw_master = fp.master_gear.pitch_diameter.Value
+            dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
                 dist, alpha_w = compute_shifted_gears(
@@ -148,8 +148,8 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
+            dw_master = fp.master_gear.pitch_diameter.Value
+            dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master - dw_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
                 dist, alpha_w = compute_shifted_gears(
@@ -185,7 +185,7 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw.Value
+            dw_master = fp.master_gear.pitch_diameter.Value
             dw_slave = 0
             dist = -(dw_master + dw_slave) / 2
             mat0 = app.Matrix()  # unity matrix
@@ -205,8 +205,8 @@ class GearConnector(object):
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
-            dw_master = fp.master_gear.dw
-            dw_slave = fp.slave_gear.dw
+            dw_master = fp.master_gear.pitch_diameter.Value
+            dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
             mat0 = app.Matrix()  # unity matrix
             trans = app.Vector(dist, 0, 0)
