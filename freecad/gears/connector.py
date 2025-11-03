@@ -141,6 +141,7 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+            fp.slave_gear.purgeTouched()
 
         if isinstance(fp.master_gear.Proxy, InternalInvoluteGear) and isinstance(
             fp.slave_gear.Proxy, InvoluteGear
@@ -174,6 +175,7 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+            fp.slave_gear.purgeTouched()
 
         if (
             isinstance(fp.master_gear.Proxy, InvoluteGear)
@@ -198,6 +200,7 @@ class GearConnector(object):
             mat3 = rot * mat2 * mat1 * mat0
             mat3.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat3
+            fp.slave_gear.purgeTouched()
 
         if isinstance(fp.master_gear.Proxy, CycloidGear) and isinstance(
             fp.slave_gear.Proxy, CycloidGear
@@ -221,6 +224,7 @@ class GearConnector(object):
             mat1 = rot * mat0 * rot2 * rot3 * rot4
             mat1.move(fp.master_gear.Placement.Base)
             fp.slave_gear.Placement = mat1
+            fp.slave_gear.purgeTouched()
 
     def execute(self, fp):
         self.onChanged(fp, None)
