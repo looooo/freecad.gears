@@ -95,7 +95,7 @@ class InvoluteGear(BaseGear):
                 "pitch_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
-                1,
+                8,
             )
             obj.pitch_diameter = pitch_diameter
             obj.removeProperty("dw")
@@ -110,7 +110,7 @@ class InvoluteGear(BaseGear):
                 "addendum_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The addendum diameter."),
-                1,
+                8,
             )
             obj.addendum_diameter = addendum_diameter
             obj.removeProperty("da")
@@ -123,7 +123,7 @@ class InvoluteGear(BaseGear):
                 "root_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The root diameter."),
-                1,
+                8,
             )
             obj.root_diameter = root_diameter
             obj.removeProperty("df")
@@ -265,14 +265,14 @@ class InvoluteGear(BaseGear):
             "addendum_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The outside diameter"),
-            1,
+            8,
         )
         obj.addProperty(
             "App::PropertyLength",
             "root_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The root diameter"),
-            1,
+            8,
         )
         self.add_traverse_module_property(obj)
         obj.addProperty(
@@ -280,7 +280,7 @@ class InvoluteGear(BaseGear):
             "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
-            1,
+            8,
         )
         obj.addProperty(
             "App::PropertyAngle",
@@ -290,6 +290,7 @@ class InvoluteGear(BaseGear):
                 "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
+            8,
         )
         obj.setExpression(
             "angular_backlash", "backlash / pitch_diameter * 360° / pi"
@@ -302,7 +303,7 @@ class InvoluteGear(BaseGear):
             "transverse_pitch",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "transverse_pitch"),
-            1,
+            8,
         )
 
     def add_tolerance_properties(self, obj):
@@ -356,7 +357,7 @@ class InvoluteGear(BaseGear):
             "traverse_module",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "traverse module of the generated gear"),
-            1,
+            8,
         )
 
     def compute_traverse_properties(self, obj):

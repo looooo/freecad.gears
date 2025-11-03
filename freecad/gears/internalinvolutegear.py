@@ -131,7 +131,7 @@ class InternalInvoluteGear(BaseGear):
                 "pitch_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
-                1,
+                8,
             )
             obj.pitch_diameter = pitch_diameter
             obj.removeProperty("dw")
@@ -146,7 +146,7 @@ class InternalInvoluteGear(BaseGear):
                 "addendum_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The addendum diameter."),
-                1,
+                8,
             )
             obj.addendum_diameter = addendum_diameter
             obj.removeProperty("da")
@@ -159,7 +159,7 @@ class InternalInvoluteGear(BaseGear):
                 "root_diameter",
                 "computed",
                 QT_TRANSLATE_NOOP("App::Property", "The root diameter."),
-                1,
+                8,
             )
             obj.root_diameter = root_diameter
             obj.removeProperty("df")
@@ -200,6 +200,7 @@ class InternalInvoluteGear(BaseGear):
             "pitch_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "The pitch diameter."),
+            8,
         )
         obj.addProperty(
             "App::PropertyAngle",
@@ -209,6 +210,7 @@ class InternalInvoluteGear(BaseGear):
                 "App::Property",
                 "The angle by which this gear can turn without moving the mating gear.",
             ),
+            8,
         )
         obj.setExpression(
             "angular_backlash", "backlash / pitch_diameter * 360° / pi"
@@ -221,14 +223,14 @@ class InternalInvoluteGear(BaseGear):
             "transverse_pitch",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "transverse_pitch"),
-            1,
+            8,
         )
         obj.addProperty(
             "App::PropertyLength",
             "outside_diameter",
             "computed",
             QT_TRANSLATE_NOOP("App::Property", "Outside diameter"),
-            1,
+            8,
         )
 
     def add_fillet_properties(self, obj):
