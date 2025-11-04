@@ -190,37 +190,34 @@ class GearConnector(object):
 
             elif master_stationary and not slave_stationary:
                 # Original behavior: slave gear orbits around master
-                mat0 = app.Matrix()  # unity matrix
-                trans = app.Vector(dist)
-                mat0.move(trans)
-                rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-                angle2 = dw_master / dw_slave * fp.angle1.Value
-                angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
-                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
-                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
-                rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
-                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
-                mat1 = rot * mat0 * rot2 * rot3 * rot4
-                mat1.move(fp.master_gear.Placement.Base)
-                fp.slave_gear.Placement = mat1
+                orbit_angle = fp.angle1.Value
+                slave_rotation_angle = - (dw_master / dw_slave) * orbit_angle
+
+                # Slave gear's local rotation
+                slave_local_rot = app.Rotation(app.Vector(0, 0, 1), slave_rotation_angle)
+
+                # Orbital placement
+                orbit_rot = app.Rotation(app.Vector(0, 0, 1), orbit_angle)
+                orbit_pos = fp.master_gear.Placement.Base + orbit_rot.multVec(app.Vector(dist, 0, 0))
+
+                # Combine orbital placement with local rotation
+                fp.slave_gear.Placement = app.Placement(orbit_pos, orbit_rot * slave_local_rot)
                 fp.slave_gear.purgeTouched()
 
             elif not master_stationary and slave_stationary:
                 # Master orbits around slave (inverse behavior)
-                mat0 = app.Matrix()  # unity matrix
-                trans = app.Vector(dist)
-                mat0.move(trans)
-                rot = app.Rotation(app.Vector(0, 0, 1), -fp.angle1).toMatrix()  # negative angle for reverse orbit
-                angle2 = -dw_slave / dw_master * fp.angle1.Value  # master's rotation based on orbital motion
-                angle_slave = fp.slave_gear.Placement.Rotation.Angle * sum(
-                    fp.slave_gear.Placement.Rotation.Axis
-                )
-                angle4 = -dw_slave / dw_master * np.rad2deg(angle_slave)  # additional rotation from slave's current angle
-                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
-                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
-                mat1 = rot * mat0 * rot2 * rot4
-                mat1.move(fp.slave_gear.Placement.Base)
-                fp.master_gear.Placement = mat1
+                orbit_angle = -fp.angle1.Value
+                master_rotation_angle = - (dw_slave / dw_master) * orbit_angle
+
+                # Master gear's local rotation
+                master_local_rot = app.Rotation(app.Vector(0, 0, 1), master_rotation_angle)
+
+                # Orbital placement
+                orbit_rot = app.Rotation(app.Vector(0, 0, 1), orbit_angle)
+                orbit_pos = fp.slave_gear.Placement.Base + orbit_rot.multVec(app.Vector(dist, 0, 0))
+
+                # Combine orbital placement with local rotation
+                fp.master_gear.Placement = app.Placement(orbit_pos, orbit_rot * master_local_rot)
                 fp.master_gear.purgeTouched()
 
             # else: both not stationary - no action needed
