@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 # ***************************************************************************
-# *                                                                         *
+# * *
 # * This program is free software: you can redistribute it and/or modify    *
 # * it under the terms of the GNU General Public License as published by    *
 # * the Free Software Foundation, either version 3 of the License, or       *
 # * (at your option) any later version.                                     *
-# *                                                                         *
+# * *
 # * This program is distributed in the hope that it will be useful,         *
 # * but WITHOUT ANY WARRANTY; without even the implied warranty of          *
 # * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
 # * GNU General Public License for more details.                            *
-# *                                                                         *
+# * *
 # * You should have received a copy of the GNU General Public License       *
 # * along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
-# *                                                                         *
+# * *
 # ***************************************************************************
 
 import os
@@ -36,7 +36,9 @@ from .lanterngear import LanternGear
 from .hypocycloidgear import HypoCycloidGear
 
 
+# CRITICAL CHANGE: Import both connector types
 from .connector import GearConnector, ViewProviderGearConnector
+from .chainconnector import ChainConnector, Chain 
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -217,49 +219,35 @@ class CreateGearConnector(BaseCommand):
                     app.Qt.translate("Log", "Please select two objects (gear+gear or connector+gear).")
                 )
 
-            # Check if first selection is a GearConnector (for chaining)
-            if isinstance(selection[0].Proxy, GearConnector):
+            # Get the proxy types for the two selected objects
+            selection0_proxy = selection[0].Proxy if hasattr(selection[0], 'Proxy') else None
+            selection1_proxy = selection[1].Proxy if hasattr(selection[1], 'Proxy') else None
+            
+            # Identify the parent connector and the new slave gear
+            parent_connector = None
+            slave_gear = None
+
+            # Case 1: Connector (GC1) selected first, Gear (G3) second
+            if isinstance(selection0_proxy, GearConnector) and isinstance(selection1_proxy, BaseGear):
                 parent_connector = selection[0]
-                master_gear = parent_connector.slave_gear
                 slave_gear = selection[1]
+            
+            # Case 2: Gear (G3) selected first, Connector (GC1) second
+            elif isinstance(selection1_proxy, GearConnector) and isinstance(selection0_proxy, BaseGear):
+                parent_connector = selection[1]
+                slave_gear = selection[0]
 
-                # Validate that slave is a gear
-                if not isinstance(slave_gear.Proxy, BaseGear):
-                    raise TypeError(
-                        app.Qt.translate("Log", "Second selection must be a gear object.")
-                    )
-
-                # Create the chained connector
-                obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
-                GearConnector(obj, master_gear, slave_gear)
+            # --- CRITICAL DECISION POINT ---
+            if parent_connector is not None:
+                # Import the ChainConnector class (we already imported it at the top)
+                
+                # Chain Creation: Create the dedicated ChainConnector
+                obj = app.ActiveDocument.addObject("Part::FeaturePython", "ChainConnector")
+                ChainConnector(obj, parent_connector, slave_gear)
                 ViewProviderGearConnector(obj.ViewObject)
 
-                # Add parent_connector as a link property to create explicit dependency
-                if not hasattr(obj, 'parent_connector'):
-                    obj.addProperty(
-                        "App::PropertyLink",
-                        "parent_connector",
-                        "gear",
-                        app.Qt.translate("App::Property", "Parent connector for chained gear trains"),
-                        1,  # Read-only
-                    )
-                obj.parent_connector = parent_connector
-
-                # Auto-sync angle1 to master gear's actual rotation angle
-                # This ensures the gear train rotates in sync based on actual gear rotations
-                obj.setExpression('angle1', f'{master_gear.Name}.Placement.Rotation.Angle * 180 / pi')
-
-                # Inherit stationary state from parent (both default to True now)
-                if hasattr(parent_connector, 'slave_gear_stationary'):
-                    obj.master_gear_stationary = parent_connector.slave_gear_stationary
-                if hasattr(parent_connector, 'master_gear_stationary'):
-                    obj.slave_gear_stationary = parent_connector.slave_gear_stationary
-
-                app.Console.PrintMessage(
-                    f"Created chained GearConnector: {parent_connector.Name} -> {obj.Name}\n"
-                )
             else:
-                # Original behavior: two gears selected
+                # Standard Creation: Two gears selected (G1 and G2)
                 for obj_sel in selection:
                     if not isinstance(obj_sel.Proxy, BaseGear):
                         raise TypeError(
@@ -275,3 +263,4 @@ class CreateGearConnector(BaseCommand):
         except Exception as e:
             app.Console.PrintError(f"Error: {str(e)}\n")
             return None
+
