@@ -57,11 +57,9 @@ class BaseCommand(object):
 
     def Activated(self):
         gui.doCommandGui("import freecad.gears.commands")
-        app.ActiveDocument.openTransaction("Create gear")
         gui.doCommandGui(
             "freecad.gears.commands.{}.create()".format(self.__class__.__name__)
         )
-        app.ActiveDocument.commitTransaction()
         app.ActiveDocument.recompute()
         gui.SendMsgToActiveView("ViewFit")
 
@@ -216,23 +214,64 @@ class CreateGearConnector(BaseCommand):
 
             if len(selection) != 2:
                 raise ValueError(
-                    app.Qt.translate("Log", "Please select two gear objects.")
+                    app.Qt.translate("Log", "Please select two objects (gear+gear or connector+gear).")
                 )
 
-            for obj in selection:
-                if not isinstance(obj.Proxy, BaseGear):
+            # Check if first selection is a GearConnector (for chaining)
+            if isinstance(selection[0].Proxy, GearConnector):
+                parent_connector = selection[0]
+                master_gear = parent_connector.slave_gear
+                slave_gear = selection[1]
+
+                # Validate that slave is a gear
+                if not isinstance(slave_gear.Proxy, BaseGear):
                     raise TypeError(
-                        app.Qt.translate("Log", "Selected object is not a gear.")
+                        app.Qt.translate("Log", "Second selection must be a gear object.")
                     )
 
-            obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
-            GearConnector(obj, selection[0], selection[1])
-            ViewProviderGearConnector(obj.ViewObject)
+                # Create the chained connector
+                obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
+                GearConnector(obj, master_gear, slave_gear)
+                ViewProviderGearConnector(obj.ViewObject)
+
+                # Add parent_connector as a link property to create explicit dependency
+                if not hasattr(obj, 'parent_connector'):
+                    obj.addProperty(
+                        "App::PropertyLink",
+                        "parent_connector",
+                        "gear",
+                        app.Qt.translate("App::Property", "Parent connector for chained gear trains"),
+                        1,  # Read-only
+                    )
+                obj.parent_connector = parent_connector
+
+                # Auto-sync angle1 to master gear's actual rotation angle
+                # This ensures the gear train rotates in sync based on actual gear rotations
+                obj.setExpression('angle1', f'{master_gear.Name}.Placement.Rotation.Angle * 180 / pi')
+
+                # Inherit stationary state from parent (both default to True now)
+                if hasattr(parent_connector, 'slave_gear_stationary'):
+                    obj.master_gear_stationary = parent_connector.slave_gear_stationary
+                if hasattr(parent_connector, 'master_gear_stationary'):
+                    obj.slave_gear_stationary = parent_connector.slave_gear_stationary
+
+                app.Console.PrintMessage(
+                    f"Created chained GearConnector: {parent_connector.Name} -> {obj.Name}\n"
+                )
+            else:
+                # Original behavior: two gears selected
+                for obj_sel in selection:
+                    if not isinstance(obj_sel.Proxy, BaseGear):
+                        raise TypeError(
+                            app.Qt.translate("Log", "Selected objects must be gears.")
+                        )
+
+                obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
+                GearConnector(obj, selection[0], selection[1])
+                ViewProviderGearConnector(obj.ViewObject)
 
             app.ActiveDocument.recompute()
             return obj
         except Exception as e:
             app.Console.PrintError(f"Error: {str(e)}\n")
             return None
-
-
