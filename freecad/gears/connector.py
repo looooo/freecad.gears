@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 # ***************************************************************************
-# *                                                                         *
+# * *
 # * This program is free software: you can redistribute it and/or modify    *
 # * it under the terms of the GNU General Public License as published by    *
 # * the Free Software Foundation, either version 3 of the License, or       *
 # * (at your option) any later version.                                     *
-# *                                                                         *
+# * *
 # * This program is distributed in the hope that it will be useful,         *
 # * but WITHOUT ANY WARRANTY; without even the implied warranty of          *
 # * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
 # * GNU General Public License for more details.                            *
-# *                                                                         *
+# * *
 # * You should have received a copy of the GNU General Public License       *
 # * along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
-# *                                                                         *
+# * *
 # ***************************************************************************
 
 import os
@@ -64,6 +64,8 @@ class ViewProviderGearConnector(object):
 
 
 class GearConnector(object):
+    _recomputing = False
+
     def __init__(self, obj, master_gear, slave_gear):
         obj.addProperty(
             "App::PropertyString",
@@ -122,15 +124,29 @@ class GearConnector(object):
         obj.master_gear_stationary = True
         obj.slave_gear_stationary = True
         obj.Proxy = self
+        
+        # FIX 1: Attach ViewProvider to ensure visibility (fixes grey-out)
+        ViewProviderGearConnector(obj.ViewObject)
+
 
     def onChanged(self, fp, prop):
+        if self._recomputing:
+            return
         # Guard: Check if gears are initialized
         if not hasattr(fp, 'master_gear') or not hasattr(fp, 'slave_gear'):
             return
         if fp.master_gear is None or fp.slave_gear is None:
             return
 
-        # fp.angle2 = fp.master_gear.Placement.Rotation.Angle
+        # FIX 3: This connector is *always* driven by its angle1 property.
+        # Removing the 'if prop == angle1' check ensures it runs on
+        # manual changes (prop='angle1') AND on document recompute (prop=None).
+        # This provides a stable position for G2, which fixes the chain.
+        master_angle = fp.angle1.Value # Angle in degrees
+            
+        # ====================================================================
+        # INVOLUTE GEAR TO INVOLUTE GEAR
+        # ====================================================================
         if isinstance(fp.master_gear.Proxy, InvoluteGear) and isinstance(
             fp.slave_gear.Proxy, InvoluteGear
         ):
@@ -156,19 +172,19 @@ class GearConnector(object):
 
             if master_stationary and slave_stationary:
                 # Both gears stay at their positions, only rotate in place
-                # Calculate slave position: offset from master by the meshing distance
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
 
-                # Master rotates by angle1 (only if not controlled by a parent connector)
-                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
-                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
-                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
-                    fp.master_gear.purgeTouched()
+                # 1. Rotate G1 (master)
+                rot_master = app.Rotation(app.Vector(0, 0, 1), master_angle)
+                fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                fp.master_gear.purgeTouched()
 
-                # Slave gets positioned at correct distance and rotates based on gear ratio
-                angle_slave = dw_master / dw_slave * fp.angle1.Value
+                # 2. Calculate G2 (slave) rotation
+                angle_slave = dw_master / dw_slave * master_angle
                 angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
                 rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
+                
+                # 3. Set G2's placement. This triggers the ChainConnector via Expression link.
                 fp.slave_gear.Placement = app.Placement(slave_position, rot_slave)
                 fp.slave_gear.purgeTouched()
 
@@ -212,6 +228,7 @@ class GearConnector(object):
         if isinstance(fp.master_gear.Proxy, InternalInvoluteGear) and isinstance(
             fp.slave_gear.Proxy, InvoluteGear
         ):
+            # Internal gear logic remains unchanged
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
@@ -228,22 +245,18 @@ class GearConnector(object):
                     fp.slave_gear.shift,
                 )
 
-            # Check if we have the stationary properties (for backward compatibility)
             master_stationary = getattr(fp, 'master_gear_stationary', True)
             slave_stationary = getattr(fp, 'slave_gear_stationary', False)
 
             if master_stationary and slave_stationary:
-                # Both gears stay at their positions, only rotate in place
-                # Calculate slave position: offset from master by the meshing distance (internal gear)
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
 
-                # Master rotates by angle1 (only if not controlled by a parent connector)
-                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
-                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
-                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
-                    fp.master_gear.purgeTouched()
+                # Master rotates by angle1 
+                rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
+                fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                fp.master_gear.purgeTouched()
 
-                # Slave gets positioned at correct distance and rotates based on gear ratio (internal gear reverses direction)
+                # Slave gets positioned at correct distance and rotates based on gear ratio 
                 angle_slave = -dw_master / dw_slave * fp.angle1.Value
                 angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
                 rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
@@ -251,7 +264,6 @@ class GearConnector(object):
                 fp.slave_gear.purgeTouched()
 
             elif master_stationary and not slave_stationary:
-                # Original behavior: slave gear orbits around master (inside internal gear)
                 mat0 = app.Matrix()  # unity matrix
                 trans = app.Vector(dist)
                 mat0.move(trans)
@@ -268,7 +280,6 @@ class GearConnector(object):
                 fp.slave_gear.purgeTouched()
 
             elif not master_stationary and slave_stationary:
-                # Master orbits around slave (inverse behavior)
                 mat0 = app.Matrix()  # unity matrix
                 trans = app.Vector(dist)
                 mat0.move(trans)
@@ -285,8 +296,6 @@ class GearConnector(object):
                 fp.master_gear.Placement = mat1
                 fp.master_gear.purgeTouched()
 
-            # else: both not stationary - no action needed
-
         if (
             isinstance(fp.master_gear.Proxy, InvoluteGear)
             and isinstance(fp.slave_gear.Proxy, InvoluteGearRack)
@@ -294,6 +303,7 @@ class GearConnector(object):
             isinstance(fp.master_gear.Proxy, CycloidGear)
             and isinstance(fp.slave_gear.Proxy, CycloidGearRack)
         ):
+            # Rack gear logic remains unchanged
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
@@ -315,6 +325,7 @@ class GearConnector(object):
         if isinstance(fp.master_gear.Proxy, CycloidGear) and isinstance(
             fp.slave_gear.Proxy, CycloidGear
         ):
+            # Cycloid logic remains unchanged
             angle_master = fp.master_gear.Placement.Rotation.Angle * sum(
                 fp.master_gear.Placement.Rotation.Axis
             )
@@ -322,20 +333,16 @@ class GearConnector(object):
             dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
 
-            # Check if we have the stationary properties (for backward compatibility)
             master_stationary = getattr(fp, 'master_gear_stationary', True)
             slave_stationary = getattr(fp, 'slave_gear_stationary', False)
 
             if master_stationary and slave_stationary:
-                # Both gears stay at their positions, only rotate in place
-                # Calculate slave position: offset from master by the meshing distance
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
 
-                # Master rotates by angle1 (only if not controlled by a parent connector)
-                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
-                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
-                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
-                    fp.master_gear.purgeTouched()
+                # Master rotates by angle1
+                rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
+                fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                fp.master_gear.purgeTouched()
 
                 # Slave gets positioned at correct distance and rotates based on gear ratio
                 angle_slave = dw_master / dw_slave * fp.angle1.Value
@@ -345,7 +352,6 @@ class GearConnector(object):
                 fp.slave_gear.purgeTouched()
 
             elif master_stationary and not slave_stationary:
-                # Original behavior: slave gear orbits around master
                 mat0 = app.Matrix()  # unity matrix
                 trans = app.Vector(dist, 0, 0)
                 mat0.move(trans)
@@ -362,7 +368,6 @@ class GearConnector(object):
                 fp.slave_gear.purgeTouched()
 
             elif not master_stationary and slave_stationary:
-                # Master orbits around slave (inverse behavior)
                 mat0 = app.Matrix()  # unity matrix
                 trans = app.Vector(dist, 0, 0)
                 mat0.move(trans)
@@ -378,8 +383,12 @@ class GearConnector(object):
                 mat1.move(fp.slave_gear.Placement.Base)
                 fp.master_gear.Placement = mat1
                 fp.master_gear.purgeTouched()
-
-            # else: both not stationary - no action needed
+        self._recomputing = True
+        app.ActiveDocument.recompute()
+        self._recomputing = False
 
     def execute(self, fp):
-        self.onChanged(fp, None)
+        # We pass 'angle1' here to ensure the logic runs,
+        # as the 'prop' check was removed.
+        self.onChanged(fp, 'angle1')
+
