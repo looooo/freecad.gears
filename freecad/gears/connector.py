@@ -100,14 +100,36 @@ class GearConnector(object):
             QT_TRANSLATE_NOOP("App::Property", "angle at which second gear is placed"),
             1,
         )
+        obj.addProperty(
+            "App::PropertyBool",
+            "master_gear_stationary",
+            "gear",
+            QT_TRANSLATE_NOOP("App::Property", "master gear position is fixed (does not orbit)"),
+            0,
+        )
+        obj.addProperty(
+            "App::PropertyBool",
+            "slave_gear_stationary",
+            "gear",
+            QT_TRANSLATE_NOOP("App::Property", "slave gear position is fixed (does not orbit)"),
+            0,
+        )
         obj.version = __version__
         obj.master_gear = master_gear
         obj.slave_gear = slave_gear
         obj.angle1 = 0
         obj.angle2 = 0
+        obj.master_gear_stationary = True
+        obj.slave_gear_stationary = True
         obj.Proxy = self
 
     def onChanged(self, fp, prop):
+        # Guard: Check if gears are initialized
+        if not hasattr(fp, 'master_gear') or not hasattr(fp, 'slave_gear'):
+            return
+        if fp.master_gear is None or fp.slave_gear is None:
+            return
+
         # fp.angle2 = fp.master_gear.Placement.Rotation.Angle
         if isinstance(fp.master_gear.Proxy, InvoluteGear) and isinstance(
             fp.slave_gear.Proxy, InvoluteGear
@@ -128,20 +150,64 @@ class GearConnector(object):
                     fp.slave_gear.shift,
                 )
 
-            mat0 = app.Matrix()  # unity matrix
-            trans = app.Vector(dist)
-            mat0.move(trans)
-            rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = dw_master / dw_slave * fp.angle1.Value
-            angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
-            rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
-            angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
-            rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
-            rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
-            mat1 = rot * mat0 * rot2 * rot3 * rot4
-            mat1.move(fp.master_gear.Placement.Base)
-            fp.slave_gear.Placement = mat1
-            fp.slave_gear.purgeTouched()
+            # Check if we have the stationary properties (for backward compatibility)
+            master_stationary = getattr(fp, 'master_gear_stationary', True)
+            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+
+            if master_stationary and slave_stationary:
+                # Both gears stay at their positions, only rotate in place
+                # Calculate slave position: offset from master by the meshing distance
+                slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
+
+                # Master rotates by angle1 (only if not controlled by a parent connector)
+                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
+                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
+                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                    fp.master_gear.purgeTouched()
+
+                # Slave gets positioned at correct distance and rotates based on gear ratio
+                angle_slave = dw_master / dw_slave * fp.angle1.Value
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
+                fp.slave_gear.Placement = app.Placement(slave_position, rot_slave)
+                fp.slave_gear.purgeTouched()
+
+            elif master_stationary and not slave_stationary:
+                # Original behavior: slave gear orbits around master
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
+                angle2 = dw_master / dw_slave * fp.angle1.Value
+                angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot3 * rot4
+                mat1.move(fp.master_gear.Placement.Base)
+                fp.slave_gear.Placement = mat1
+                fp.slave_gear.purgeTouched()
+
+            elif not master_stationary and slave_stationary:
+                # Master orbits around slave (inverse behavior)
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), -fp.angle1).toMatrix()  # negative angle for reverse orbit
+                angle2 = -dw_slave / dw_master * fp.angle1.Value  # master's rotation based on orbital motion
+                angle_slave = fp.slave_gear.Placement.Rotation.Angle * sum(
+                    fp.slave_gear.Placement.Rotation.Axis
+                )
+                angle4 = -dw_slave / dw_master * np.rad2deg(angle_slave)  # additional rotation from slave's current angle
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot4
+                mat1.move(fp.slave_gear.Placement.Base)
+                fp.master_gear.Placement = mat1
+                fp.master_gear.purgeTouched()
+
+            # else: both not stationary - no action needed
 
         if isinstance(fp.master_gear.Proxy, InternalInvoluteGear) and isinstance(
             fp.slave_gear.Proxy, InvoluteGear
@@ -162,20 +228,64 @@ class GearConnector(object):
                     fp.slave_gear.shift,
                 )
 
-            mat0 = app.Matrix()  # unity matrix
-            trans = app.Vector(dist)
-            mat0.move(trans)
-            rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = -dw_master / dw_slave * fp.angle1.Value
-            angle4 = -dw_master / dw_slave * np.rad2deg(angle_master)
-            rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
-            angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
-            rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
-            rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
-            mat1 = rot * mat0 * rot2 * rot3 * rot4
-            mat1.move(fp.master_gear.Placement.Base)
-            fp.slave_gear.Placement = mat1
-            fp.slave_gear.purgeTouched()
+            # Check if we have the stationary properties (for backward compatibility)
+            master_stationary = getattr(fp, 'master_gear_stationary', True)
+            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+
+            if master_stationary and slave_stationary:
+                # Both gears stay at their positions, only rotate in place
+                # Calculate slave position: offset from master by the meshing distance (internal gear)
+                slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
+
+                # Master rotates by angle1 (only if not controlled by a parent connector)
+                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
+                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
+                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                    fp.master_gear.purgeTouched()
+
+                # Slave gets positioned at correct distance and rotates based on gear ratio (internal gear reverses direction)
+                angle_slave = -dw_master / dw_slave * fp.angle1.Value
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
+                fp.slave_gear.Placement = app.Placement(slave_position, rot_slave)
+                fp.slave_gear.purgeTouched()
+
+            elif master_stationary and not slave_stationary:
+                # Original behavior: slave gear orbits around master (inside internal gear)
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
+                angle2 = -dw_master / dw_slave * fp.angle1.Value
+                angle4 = -dw_master / dw_slave * np.rad2deg(angle_master)
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot3 * rot4
+                mat1.move(fp.master_gear.Placement.Base)
+                fp.slave_gear.Placement = mat1
+                fp.slave_gear.purgeTouched()
+
+            elif not master_stationary and slave_stationary:
+                # Master orbits around slave (inverse behavior)
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), -fp.angle1).toMatrix()
+                angle2 = -dw_slave / dw_master * fp.angle1.Value
+                angle_slave = fp.slave_gear.Placement.Rotation.Angle * sum(
+                    fp.slave_gear.Placement.Rotation.Axis
+                )
+                angle4 = -dw_slave / dw_master * np.rad2deg(angle_slave)
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot4
+                mat1.move(fp.slave_gear.Placement.Base)
+                fp.master_gear.Placement = mat1
+                fp.master_gear.purgeTouched()
+
+            # else: both not stationary - no action needed
 
         if (
             isinstance(fp.master_gear.Proxy, InvoluteGear)
@@ -211,20 +321,65 @@ class GearConnector(object):
             dw_master = fp.master_gear.pitch_diameter.Value
             dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
-            mat0 = app.Matrix()  # unity matrix
-            trans = app.Vector(dist, 0, 0)
-            mat0.move(trans)
-            rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
-            angle2 = dw_master / dw_slave * fp.angle1.Value
-            angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
-            rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
-            angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
-            rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
-            rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
-            mat1 = rot * mat0 * rot2 * rot3 * rot4
-            mat1.move(fp.master_gear.Placement.Base)
-            fp.slave_gear.Placement = mat1
-            fp.slave_gear.purgeTouched()
+
+            # Check if we have the stationary properties (for backward compatibility)
+            master_stationary = getattr(fp, 'master_gear_stationary', True)
+            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+
+            if master_stationary and slave_stationary:
+                # Both gears stay at their positions, only rotate in place
+                # Calculate slave position: offset from master by the meshing distance
+                slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
+
+                # Master rotates by angle1 (only if not controlled by a parent connector)
+                if not hasattr(fp, 'parent_connector') or fp.parent_connector is None:
+                    rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
+                    fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
+                    fp.master_gear.purgeTouched()
+
+                # Slave gets positioned at correct distance and rotates based on gear ratio
+                angle_slave = dw_master / dw_slave * fp.angle1.Value
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
+                fp.slave_gear.Placement = app.Placement(slave_position, rot_slave)
+                fp.slave_gear.purgeTouched()
+
+            elif master_stationary and not slave_stationary:
+                # Original behavior: slave gear orbits around master
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist, 0, 0)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), fp.angle1).toMatrix()
+                angle2 = dw_master / dw_slave * fp.angle1.Value
+                angle4 = dw_master / dw_slave * np.rad2deg(angle_master)
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
+                rot3 = app.Rotation(app.Vector(0, 0, 1), angle3).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot3 * rot4
+                mat1.move(fp.master_gear.Placement.Base)
+                fp.slave_gear.Placement = mat1
+                fp.slave_gear.purgeTouched()
+
+            elif not master_stationary and slave_stationary:
+                # Master orbits around slave (inverse behavior)
+                mat0 = app.Matrix()  # unity matrix
+                trans = app.Vector(dist, 0, 0)
+                mat0.move(trans)
+                rot = app.Rotation(app.Vector(0, 0, 1), -fp.angle1).toMatrix()
+                angle2 = -dw_slave / dw_master * fp.angle1.Value  # master's rotation based on orbital motion
+                angle_slave = fp.slave_gear.Placement.Rotation.Angle * sum(
+                    fp.slave_gear.Placement.Rotation.Axis
+                )
+                angle4 = -dw_slave / dw_master * np.rad2deg(angle_slave)
+                rot2 = app.Rotation(app.Vector(0, 0, 1), angle2).toMatrix()
+                rot4 = app.Rotation(app.Vector(0, 0, 1), -angle4).toMatrix()
+                mat1 = rot * mat0 * rot2 * rot4
+                mat1.move(fp.slave_gear.Placement.Base)
+                fp.master_gear.Placement = mat1
+                fp.master_gear.purgeTouched()
+
+            # else: both not stationary - no action needed
 
     def execute(self, fp):
         self.onChanged(fp, None)
