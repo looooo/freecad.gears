@@ -59,10 +59,13 @@ class InvoluteGear(BaseGear):
         obj.gear = self.involute_tooth
         obj.simple = False
         obj.undercut = False
-        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
+        # default, min, max, step (in ISO 1328-1:2013 range is: 5 ≤ z ≤ 1 000)
+        obj.num_teeth = (15, 5, 1000, 1)
+        # default, min, max, step (in ISO 1328-1:2013 range is: 0,5 mm ≤ mₙ ≤ 70 mm)
         obj.module = "1. mm"
         obj.shift = 0.0
         obj.pressure_angle = "20. deg"
+        # default, min, max, step (in ISO 1328-1:2013 range is: β ≤ 45°)
         obj.helix_angle = "0. deg"
         obj.height = "5. mm"
         obj.clearance = 0.25
@@ -136,7 +139,7 @@ class InvoluteGear(BaseGear):
                 "App::PropertyAngle",
                 "helix_angle",
                 "helical",
-                QT_TRANSLATE_NOOP("App::Property", "helix angle"),
+                QT_TRANSLATE_NOOP("App::Property", "β,helix angle"),
             )
             obj.helix_angle = helix_angle
             obj.removeProperty("beta")
@@ -180,7 +183,7 @@ class InvoluteGear(BaseGear):
             "App::PropertyIntegerConstraint",
             "num_teeth",
             "base",
-            QT_TRANSLATE_NOOP("App::Property", "number of teeth"),
+            QT_TRANSLATE_NOOP("App::Property", "z, number of teeth"),
         )
         obj.addProperty(
             "App::PropertyLength",
@@ -188,7 +191,7 @@ class InvoluteGear(BaseGear):
             "base",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "normal module if properties_from_tool=True, else it's the transverse module.",
+                "mₙ, normal module (if properties_from_tool=True, else it's the transverse module).",
             ),
         )
         obj.addProperty(
@@ -405,7 +408,7 @@ class InvoluteGear(BaseGear):
             if obj.undercut and r_root != 0.0:
                 r_root = 0.0
                 app.Console.PrintWarning(
-                    "root fillet is not allowed if undercut is computed"
+                    QT_TRANSLATE_NOOP("App::Property", "root fillet is not allowed if undercut is computed")
                 )
             if len(tooth.Edges) == 11:
                 pos_head = [1, 3, 9]
