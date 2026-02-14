@@ -1,86 +1,79 @@
-## A Gear module for FreeCAD
-[![Liberapay](http://img.shields.io/liberapay/patrons/looooo.svg?logo=liberapay)](https://liberapay.com/looooo/donate) 
+# FreeCAD Gears
+
+A gear workbench for FreeCAD: create involute, cycloid, bevel, worm, timing, lantern and crown gears with full control over parameters.
 
 ## Requirements
-FreeCAD > v0.16  
-__python > 3 (for python2 use branch py2)__
 
-### Python packages
-scipy, numpy, sympy (optional), jupyter (optional)
+- **FreeCAD** ≥ 1.0 (or ≥ 0.16 for older setups)
+- **Python** ≥ 3.8 (used by FreeCAD)
+- **Python packages:** `numpy`, `scipy`, `sympy` (optional: `jupyter`, `matplotlib`)
 
+## Supported gear types
 
-## Supported gear-types
-
-### Cylindric Involute
-* Shifting
-* Helical
-* Double Helical
-* Undercut
-* Fillets
+### Cylindric involute
+- Shifting, helical, double helical, undercut, fillets
 
 ![involute-gear](examples/images/involute-double-helical-gear.png)
 
-
-### Involute Rack
+### Involute rack
 ![involute-rack](examples/images/involute-rack.png)
 
-### Cylindric Cycloid
-* Helical
-* Double Helical
-* Fillets
+### Cylindric cycloid
+- Helical, double helical, fillets
 
 ![cycloid-gear](examples/images/cycloid-gear.png)
 
-### Cycloid Rack
-
+### Cycloid rack
 ![cycloid-rack](examples/images/cycloid-rack.png)
 
-### Spherical Involute Bevel-Gear
-* Spiral  
+### Spherical involute bevel gear
+- Spiral
 
 ![bevel-gear](examples/images/bevel-gear.png)
 
-### Crown-Gear
+### Crown gear
 ![crown-gear](examples/images/crown-gear.png)
 
-### Worm-Gear
+### Worm gear
 ![worm-gear](examples/images/worm-gear.png)
 
-### Timing-Gear
+### Timing gear
 ![timing-gear](examples/images/timing-gear.png)
 
-### Lantern-Gear
+### Lantern gear
 ![lantern-gear](examples/images/lantern-gear.png)
 
----------------------------
+---
 
 ## Installation
 
-### Addon Manager  
-Starting from v0.17 it's possible to use the built-in FreeCAD [Addon Manager](https://github.com/FreeCAD/FreeCAD-addons#1-builtin-addon-manager)
-located in the `Tools` > `Addon Manager` dropdown menu.
+### Addon Manager (recommended)
+In FreeCAD: **Tools** → **Addon Manager** → search for “Gears” (or “FCGear”) → Install.
 
 ### pip
+```bash
+pip install freecad.gears
+```
+Or from source:
+```bash
+pip install https://github.com/looooo/freecad.gears/archive/master.tar.gz
+```
+Use the same Python/pip that FreeCAD uses on your system.
 
-`pip install https://github.com/looooo/FCGear/archive/master.tar.gz`
-
-**Important note:** Most systems have multiple versions of python installed. Make sure the `pip` you're using is used by FreeCAD as well.
+---
 
 ## Usage
 
-### Create a gear manually
-* Open freecad
-* Switch to the gear workbench
-* Create new document
-* Create a gear (click on a gear symbol in the toolbar)
-* Change the gear parameters
+### In FreeCAD
+1. Open FreeCAD and switch to the **Gear** workbench.
+2. **File** → **New** (or open a document).
+3. Create a gear from the toolbar and adjust parameters in the property panel.
 
-## Scripted gears
-Use the power of python to automate your gear modeling: 
-
+### From Python
 ```python
 import FreeCAD as App
 import freecad.gears.commands
+
 gear = freecad.gears.commands.CreateInvoluteGear.create()
 gear.num_teeth = 20
 gear.beta = 20
@@ -90,21 +83,57 @@ App.ActiveDocument.recompute()
 Gui.SendMsgToActiveView("ViewFit")
 ```
 
-# Development:
-if you have pixi installed just launch pixi and run this command 
-`pixi run freecad` to launch freecad with freecad.gears installed.
+---
+
+## Development
+
+The project uses [pixi](https://pixi.sh/) for environment and task management.
+
+### Setup
+```bash
+pixi install
+```
+
+### Pixi commands
+
+
+### Tasks (Kurzreferenz)
+
+| Befehl | Beschreibung |
+|--------|--------------|
+| `pixi run freecad` | FreeCAD mit freecad.gears starten. |
+| `pixi run lint` | Pylint. |
+| `pixi run test` | Unit-Tests. |
+| `pixi run test-visual` | Visual-Tests (Display nötig). |
+| `pixi run test-visual-xvfb` | Visual-Tests unter xvfb. |
+| `pixi run test-all` | Alle Tests. |
+| `pixi run create-references` | Referenzbilder erzeugen. |
+| `pixi run create-references-xvfb` | Referenzbilder unter xvfb. |
+| `pixi run clean-test` | Test-Artefakte und Referenzen löschen. |
+
+Visual tests use [freecad.visual_tests](https://github.com/looooo/freecad.visual_tests): each project under `tests/data/*/` has a `metafile.yaml` and a `.FCStd` model; references are stored in `references/`.
+
+### CI (GitHub Actions)
+- **Pylint:** Runs on push, pull_request and `workflow_dispatch` (lint does not fail the job).
+- **Tests:** Unit tests on all OS; visual tests (xvfb) on Ubuntu only.
+- **Update reference images:** Manual workflow “Update reference images” to regenerate references on CI and push them to the repo.
+
+---
 
 ## References
-* Elements of Metric Gear Technology ([PDF](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf))
 
-### FreeCAD Forum threads
-These are forum threads where FreeCAD Gears has been discussed. If you want to give Feedback
-or report a bug please use the below threads. Please make sure that the report hasn't been reported already
-by browsing this repositories [issue queue](https://github.com/looooo/freecad.gears/issues).   
-* "CONTINUED: involute gear generator preview !" ([thread](https://forum.freecadweb.org/viewtopic.php?f=10&t=4829))  
-* "Bevel gear - module/script/tutorial" ([thread](https://forum.freecadweb.org/viewtopic.php?f=3&t=12878))  
-* "Gears in FreeCAD: FC Gear" ([thread](https://forum.freecadweb.org/viewtopic.php?f=24&t=27381))  
-* "FC Gears: Feedback thread" ([thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626))  
+- Elements of Metric Gear Technology ([PDF](http://qtcgears.com/tools/catalogs/PDF_Q420/Tech.pdf))
 
-# License
+### FreeCAD Forum
+- [Involute gear generator preview](https://forum.freecadweb.org/viewtopic.php?f=10&t=4829)
+- [Bevel gear – module/script/tutorial](https://forum.freecadweb.org/viewtopic.php?f=3&t=12878)
+- [Gears in FreeCAD: FC Gear](https://forum.freecadweb.org/viewtopic.php?f=24&t=27381)
+- [FC Gears: Feedback thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=27626)
+
+Please check the [issue tracker](https://github.com/looooo/freecad.gears/issues) before opening a new report.
+
+---
+
+## License
+
 GNU General Public License v3.0

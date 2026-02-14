@@ -28,3 +28,6 @@ version = {attr = "pygears.__version__"}
 markers = [
     "visual: visual regression tests (need display or xvfb)",
 ]
+filterwarnings = [
+    "ignore:builtin type.*__module__:DeprecationWarning",
+]

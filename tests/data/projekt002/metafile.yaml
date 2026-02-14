@@ -1,0 +1,50 @@
+version: 1
+model: "bevelgear.FCStd"
+description: "Involute gear – 4 orthographic/isometric views"
+
+default:
+  image_dir: "references"
+  image_format: "png"
+  threshold: 0.98
+  fit_all: true
+
+views:
+  - id: "gear_iso"
+    label: "Isometric view"
+    type: "3d"
+    orientation: "iso"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_iso.png"
+
+  - id: "gear_front"
+    label: "Front view"
+    type: "3d"
+    orientation: "front"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_front.png"
+
+  - id: "gear_top"
+    label: "Top view"
+    type: "3d"
+    orientation: "top"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_top.png"
+
+  - id: "gear_right"
+    label: "Right view"
+    type: "3d"
+    orientation: "right"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_right.png"

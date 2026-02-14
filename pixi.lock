@@ -4433,7 +4433,7 @@ packages:
 - pypi: ./
   name: freecad-gears
   version: 1.3.0
-  sha256: fc43346395605ed79fd151cd4120cd706c17ac3580f16a659f5be13967e0b572
+  sha256: c829046851e9cbdd6b94cbb2074a91ef0193328b89a2e174148be2980fbf8eb3
   requires_dist:
   - numpy
   - scipy
