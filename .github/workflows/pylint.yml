@@ -1,6 +1,9 @@
 name: Pylint
 
-on: [push]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:    
@@ -10,10 +13,16 @@ jobs:
         os: [macOs-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: prefix-dev/setup-pixi@v0.8.0
+    - uses: actions/checkout@v4
+    - uses: prefix-dev/setup-pixi@v0.9.4
       with:
-        pixi-version: v0.39.0
+        pixi-version: v0.44.0
         cache: false
     - run: pixi run lint
     - run: pixi run test
+    - name: Install xvfb (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get update && sudo apt-get install -y xvfb xauth
+    - name: Visual tests (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: pixi run test-visual-xvfb

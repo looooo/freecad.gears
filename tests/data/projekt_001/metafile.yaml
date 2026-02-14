@@ -1,0 +1,40 @@
+version: 1
+model: "involute_gear_test.FCStd"
+description: "Involute gear (freecad.gears) – 3D view"
+
+default:
+  image_dir: "references"
+  image_format: "png"
+  threshold: 0.98
+  fit_all: true
+
+views:
+  - id: "gear_iso"
+    label: "Isometric gear view"
+    type: "3d"
+    orientation: "iso"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_iso.png"
+
+  - id: "gear_front"
+    label: "Front orthographic view"
+    type: "3d"
+    orientation: "front"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_front.png"
+
+  - id: "gear_top"
+    label: "Top orthographic view"
+    type: "3d"
+    orientation: "top"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_top.png"

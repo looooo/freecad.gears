@@ -40,6 +40,12 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
+# Visual test artifacts (references are versioned)
+tests/data/*/artifacts/
+
+# Pytest exit status (used by xvfb wrapper)
+.pytest_exitstatus
+
 # Translations
 *.mo
 *.pot

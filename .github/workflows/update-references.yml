@@ -1,0 +1,38 @@
+# Manuell ausführen: Referenzbilder auf CI-Umgebung neu erzeugen und committen.
+# So passen die Referenzen zur CI-Umgebung (FreeCAD/Python auf ubuntu-latest).
+name: Update reference images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-references:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          pixi-version: v0.44.0
+          cache: true
+
+      - name: Install dependencies
+        run: pixi install
+
+      - name: Install xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb xauth
+
+      - name: Generate reference images (update)
+        run: pixi run create-references-xvfb
+
+      - name: Commit and push reference images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tests/data/*/references/
+          git diff --staged --quiet || git commit -m "chore: update reference images from CI [update-references workflow]"
+          git push

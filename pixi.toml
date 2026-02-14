@@ -1,4 +1,4 @@
-[project]
+[workspace]
 authors = ["looooo <sppedflyer@gmail.com>"]
 channels = ["conda-forge"]
 description = "Add a short description here"
@@ -7,17 +7,25 @@ platforms = ["osx-arm64", "linux-aarch64", "linux-64", "win-64", "osx-64"]
 version = "0.1.0"
 
 [pypi-dependencies]
+freecad-visual-tests = "*"
 freecad_gears = { path = ".", editable = true }
+pytest = "*"
 
 [tasks]
 lint = "pylint $(git ls-files '*.py')"
-test = "python tests/tests.py"
+test = "pytest tests/ -v -m 'not visual'"
+test-visual = "pytest tests/ -v -m visual -s"
+test-visual-xvfb = "xvfb-run -a pytest tests/ -v -m visual -s"
+test-all = "pytest tests/ -v -s"
+create-references = "VISUAL_TEST_REFERENCE_MODE=update pytest tests/ -v -m visual -s"
+create-references-xvfb = "xvfb-run -a pixi run create-references"
+clean-test = "rm -rf tests/data/*/artifacts tests/data/*/references"
 
 [dependencies]
-numpy = ">=2.2.0,<3"
-scipy = ">=1.14.1,<2"
-sympy = ">=1.13.3,<2"
-jupyter = ">=1.1.1,<2"
 freecad = ">=1.0.0,<2"
-pylint = ">=3.3.2,<4"
-matplotlib = ">=3.10.0,<4"
+numpy = "*"
+scipy = "*"
+sympy = "*"
+jupyter = "*"
+pylint = "*"
+matplotlib = "*"
