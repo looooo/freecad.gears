@@ -1,0 +1,14 @@
+coin_version: SIM Coin 4.0.3
+freecad_version: 1.0.0
+freecad_version_full:
+- '1'
+- '0'
+- '0'
+- 39109 (Git)
+- https://github.com/FreeCAD/FreeCAD
+- 2024/11/18 16:48:00
+- (HEAD detached at 1.0.0)
+- 2fcc5317fe3aee96ca73475986a577719fc78e20
+occt_version: 7.8.1
+pivy_version: 0.6.10
+python_version: 3.12.12
