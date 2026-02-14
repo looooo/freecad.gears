@@ -23,7 +23,7 @@ clean-test = "rm -rf tests/data/*/artifacts tests/data/*/references"
 
 [dependencies]
 freecad = ">=1.0.0,<2"
-numpy = "*"
+numpy = ">=1.26,<1.27"
 scipy = "*"
 sympy = "*"
 jupyter = "*"
