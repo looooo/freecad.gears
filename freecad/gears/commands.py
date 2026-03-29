@@ -210,6 +210,14 @@ class CreateGearConnector(BaseCommand):
     MenuText = QT_TRANSLATE_NOOP("FCGear_GearConnector", "Combine two gears")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_GearConnector", "Combine two gears")
 
+    @staticmethod
+    def _find_body(obj):
+        """Return the PartDesign::Body containing obj, or None."""
+        for parent in obj.InList:
+            if hasattr(parent, "TypeId") and parent.TypeId == "PartDesign::Body":
+                return parent
+        return None
+
     def Activated(self):
         try:
             selection = gui.Selection.getSelection()
@@ -257,6 +265,21 @@ class CreateGearConnector(BaseCommand):
                 obj = app.ActiveDocument.addObject("Part::FeaturePython", self.NAME)
                 GearConnector(obj, selection[0], selection[1])
                 ViewProviderGearConnector(obj.ViewObject)
+
+                # If the gears live inside a PartDesign Body, the connector must
+                # be added to the same body. Cross-scope PropertyLinks are not
+                # allowed and will cause a SIGSEGV on document restore.
+                body0 = self._find_body(selection[0])
+                body1 = self._find_body(selection[1])
+                if body0 != body1 and (body0 is not None or body1 is not None):
+                    app.Console.PrintWarning(
+                        "FCGear GearConnector: The selected gears are in different "
+                        "scopes. Cross-scope links are not supported and may cause "
+                        "issues. Place both gears in the same body or outside any body.\n"
+                    )
+                body = body0 or body1
+                if body:
+                    body.addObject(obj)
 
             app.ActiveDocument.recompute()
             return obj

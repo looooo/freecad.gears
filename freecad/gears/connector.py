@@ -64,8 +64,6 @@ class ViewProviderGearConnector(object):
 
 
 class GearConnector(object):
-    _recomputing = False
-
     def __init__(self, obj, master_gear, slave_gear):
         obj.addProperty(
             "App::PropertyString",
@@ -130,19 +128,20 @@ class GearConnector(object):
 
 
     def onChanged(self, fp, prop):
-        if self._recomputing:
-            return
-        # Guard: Check if gears are initialized
         if not hasattr(fp, 'master_gear') or not hasattr(fp, 'slave_gear'):
             return
         if fp.master_gear is None or fp.slave_gear is None:
             return
 
-        # FIX 3: This connector is *always* driven by its angle1 property.
-        # Removing the 'if prop == angle1' check ensures it runs on
-        # manual changes (prop='angle1') AND on document recompute (prop=None).
-        # This provides a stable position for G2, which fixes the chain.
-        master_angle = fp.angle1.Value # Angle in degrees
+        # Only recompute positions on user-driven property changes.
+        # Skipping link properties ('master_gear', 'slave_gear') avoids calling
+        # app.ActiveDocument.recompute() during document restore, which would
+        # attempt to recompute partially-loaded objects and cause a SIGSEGV in
+        # App::LocalCoordinateSystem::getAxis().
+        if prop not in ('angle1', 'master_gear_stationary', 'slave_gear_stationary'):
+            return
+
+        master_angle = fp.angle1.Value
             
         # ====================================================================
         # INVOLUTE GEAR TO INVOLUTE GEAR
@@ -380,12 +379,7 @@ class GearConnector(object):
                 mat1.move(fp.slave_gear.Placement.Base)
                 fp.master_gear.Placement = mat1
                 fp.master_gear.purgeTouched()
-        self._recomputing = True
-        app.ActiveDocument.recompute()
-        self._recomputing = False
 
     def execute(self, fp):
-        # We pass 'angle1' here to ensure the logic runs,
-        # as the 'prop' check was removed.
         self.onChanged(fp, 'angle1')
 
