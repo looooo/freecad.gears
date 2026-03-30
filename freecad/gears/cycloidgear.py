@@ -77,7 +77,7 @@ class CycloidGear(BaseGear):
         self.add_cycloid_properties(obj)
         self.add_computed_properties(obj)
         obj.gear = self.cycloid_tooth
-        obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
+        obj.num_teeth = (15, 2, 10000, 1)  # default, min, max, step
         obj.module = "1. mm"
         obj.setExpression(
             "inner_diameter", "num_teeth / 2"
