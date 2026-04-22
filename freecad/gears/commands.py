@@ -22,18 +22,19 @@ from freecad import gui
 
 from .basegear import ViewProviderGear, BaseGear
 
-from .timinggear_t import TimingGearT
-from .involutegear import InvoluteGear
-from .internalinvolutegear import InternalInvoluteGear
-from .involutegearrack import InvoluteGearRack
-from .cycloidgearrack import CycloidGearRack
-from .crowngear import CrownGear
-from .cycloidgear import CycloidGear
-from .bevelgear import BevelGear
-from .wormgear import WormGear
-from .timinggear import TimingGear
-from .lanterngear import LanternGear
-from .hypocycloidgear import HypoCycloidGear
+from .timinggear_t import TimingGearT, TimingGearTViewProvider
+from .involutegear import InvoluteGear, InvoluteGearViewProvider
+from .internalinvolutegear import InternalInvoluteGear, InternalInvoluteGearViewProvider
+from .involutegearrack import InvoluteGearRack, InvoluteGearRackViewProvider
+from .cycloidgearrack import CycloidGearRack, CycloidGearRackViewProvider
+from .crowngear import CrownGear, CrownGearViewProvider
+from .cycloidgear import CycloidGear, CycloidGearViewProvider
+from .bevelgear import BevelGear, BevelGearViewProvider
+from .wormgear import WormGear, WormGearViewProvider
+from .timinggear import TimingGear, TimingGearViewProvider
+from .lanterngear import LanternGear, LanternGearViewProvider
+from .hypocycloidgear import HypoCycloidGear, HypoCycloidGearViewProvider
+# Individual view providers prepare for task panels
 
 
 # CRITICAL CHANGE: Import both connector types
@@ -46,6 +47,7 @@ QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 class BaseCommand(object):
     NAME = ""
     GEAR_FUNCTION = None
+    GEAR_VIEW_PROVIDER = None
     ICONDIR = os.path.join(os.path.dirname(__file__), "icons")
 
     def __init__(self):
@@ -79,7 +81,7 @@ class BaseCommand(object):
                 )
             else:
                 obj = app.ActiveDocument.addObject("Part::FeaturePython", cls.NAME)
-            ViewProviderGear(obj.ViewObject, cls.Pixmap)
+            cls.GEAR_VIEW_PROVIDER(obj.ViewObject, cls.Pixmap)
             cls.GEAR_FUNCTION(obj)
 
             if body:
@@ -102,6 +104,7 @@ class BaseCommand(object):
 class CreateInvoluteGear(BaseCommand):
     NAME = "InvoluteGear"
     GEAR_FUNCTION = InvoluteGear
+    GEAR_VIEW_PROVIDER = InvoluteGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "involutegear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_InvoluteGear", "Involute Gear")
     ToolTip = QT_TRANSLATE_NOOP(
@@ -112,6 +115,7 @@ class CreateInvoluteGear(BaseCommand):
 class CreateInternalInvoluteGear(BaseCommand):
     NAME = "InternalInvoluteGear"
     GEAR_FUNCTION = InternalInvoluteGear
+    GEAR_VIEW_PROVIDER = InternalInvoluteGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "internalinvolutegear.svg")
     MenuText = QT_TRANSLATE_NOOP(
         "FCGear_InternalInvoluteGear", "Internal Involute Gear"
@@ -124,6 +128,7 @@ class CreateInternalInvoluteGear(BaseCommand):
 class CreateInvoluteRack(BaseCommand):
     NAME = "InvoluteRack"
     GEAR_FUNCTION = InvoluteGearRack
+    GEAR_VIEW_PROVIDER = InvoluteGearRackViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "involuterack.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_InvoluteRack", "Involute Rack")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_InvoluteRack", "Create an Involute rack")
@@ -132,6 +137,7 @@ class CreateInvoluteRack(BaseCommand):
 class CreateCycloidRack(BaseCommand):
     NAME = "CycloidRack"
     GEAR_FUNCTION = CycloidGearRack
+    GEAR_VIEW_PROVIDER = CycloidGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "cycloidrack.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_CycloidRack", "Cycloid Rack")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_CycloidRack", "Create an Cycloid rack")
@@ -140,6 +146,7 @@ class CreateCycloidRack(BaseCommand):
 class CreateCrownGear(BaseCommand):
     NAME = "CrownGear"
     GEAR_FUNCTION = CrownGear
+    GEAR_VIEW_PROVIDER = CrownGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "crowngear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_CrownGear", "Crown Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_CrownGear", "Create a Crown gear")
@@ -148,6 +155,7 @@ class CreateCrownGear(BaseCommand):
 class CreateCycloidGear(BaseCommand):
     NAME = "CycloidGear"
     GEAR_FUNCTION = CycloidGear
+    GEAR_VIEW_PROVIDER = CycloidGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "cycloidgear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_CycloidGear", "Cycloid Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_CycloidGear", "Create a Cycloid gear")
@@ -156,6 +164,7 @@ class CreateCycloidGear(BaseCommand):
 class CreateBevelGear(BaseCommand):
     NAME = "BevelGear"
     GEAR_FUNCTION = BevelGear
+    GEAR_VIEW_PROVIDER = BevelGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "bevelgear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_BevelGear", "Bevel Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_BevelGear", "Create a Bevel gear")
@@ -164,6 +173,7 @@ class CreateBevelGear(BaseCommand):
 class CreateHypoCycloidGear(BaseCommand):
     NAME = "HypocycloidGear"
     GEAR_FUNCTION = HypoCycloidGear
+    GEAR_VIEW_PROVIDER = HypoCycloidGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "hypocycloidgear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_HypoCycloidGear", "HypoCycloid Gear")
     ToolTip = QT_TRANSLATE_NOOP(
@@ -174,6 +184,7 @@ class CreateHypoCycloidGear(BaseCommand):
 class CreateWormGear(BaseCommand):
     NAME = "WormGear"
     GEAR_FUNCTION = WormGear
+    GEAR_VIEW_PROVIDER = WormGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "wormgear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_WormGear", "Worm Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_WormGear", "Create a Worm gear")
@@ -182,6 +193,7 @@ class CreateWormGear(BaseCommand):
 class CreateTimingGearT(BaseCommand):
     NAME = "TimingGearT"
     GEAR_FUNCTION = TimingGearT
+    GEAR_VIEW_PROVIDER = TimingGearTViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "timinggear_t.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_TimingGearT", "Timing Gear T-shape")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_TimingGearT", "Create a Timing gear T-shape")
@@ -190,6 +202,7 @@ class CreateTimingGearT(BaseCommand):
 class CreateTimingGear(BaseCommand):
     NAME = "TimingGear"
     GEAR_FUNCTION = TimingGear
+    GEAR_VIEW_PROVIDER = TimingGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "timinggear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_TimingGear", "Timing Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_TimingGear", "Create a Timing gear")
@@ -198,6 +211,7 @@ class CreateTimingGear(BaseCommand):
 class CreateLanternGear(BaseCommand):
     NAME = "LanternGear"
     GEAR_FUNCTION = LanternGear
+    GEAR_VIEW_PROVIDER = LanternGearViewProvider
     Pixmap = os.path.join(BaseCommand.ICONDIR, "lanterngear.svg")
     MenuText = QT_TRANSLATE_NOOP("FCGear_LanternGear", "Lantern Gear")
     ToolTip = QT_TRANSLATE_NOOP("FCGear_LanternGear", "Create a Lantern gear")
