@@ -18,6 +18,7 @@
 
 
 import numpy as np
+import os
 import scipy as sp
 from scipy import optimize
 
@@ -26,7 +27,13 @@ from freecad import part
 
 from pygears._functions import rotation, reflection
 
-from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_fillet
+from .basegear import (
+    BaseGear,
+    fcvec,
+    part_arc_from_points_and_center,
+    insert_fillet,
+    ViewProviderGear
+)
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -189,3 +196,25 @@ class TimingGearT(BaseGear):
         else:
             face = part.Face(part.Wire(wires))
             return face.extrude(app.Vector(0.0, 0.0, height))
+
+if app.GuiUp:
+
+    class TimingGearTViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "timinggear_t.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "timinggear_t.svg"),
+                )
