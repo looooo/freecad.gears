@@ -18,6 +18,7 @@
 
 
 import numpy as np
+import os
 
 from freecad import app
 from freecad import part
@@ -174,3 +175,25 @@ class CrownGear(BaseGear):
             loft = loft.transformGeometry(rot)
             cut_shapes.append(loft)
         return solid.cut(cut_shapes)
+
+if app.GuiUp:
+
+    class CrownGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "crowngear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "crowngear.svg"),
+                )
