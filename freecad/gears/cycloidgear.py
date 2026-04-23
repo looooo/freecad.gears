@@ -16,10 +16,13 @@
 # *                                                                         *
 # ***************************************************************************
 
+import numpy as np
+import os
+
 from freecad import app
+from freecad import gui
 from freecad import part
 
-import numpy as np
 from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
@@ -29,6 +32,9 @@ from .basegear import (
     insert_fillet,
     helical_extrusion,
     rotate_tooth,
+    updateTaskTitleIcon,
+    GearsBaseTaskPanel,
+    ViewProviderGear,
 )
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
@@ -93,6 +99,10 @@ class CycloidGear(BaseGear):
         obj.head_fillet = 0
         obj.root_fillet = 0
         obj.Proxy = self
+
+        panel = CycloidGearTaskPanel(obj)
+        updateTaskTitleIcon(panel)
+        gui.Control.showDialog(panel)
 
     def onDocumentRestored(self, obj):
         """  
@@ -282,3 +292,91 @@ class CycloidGear(BaseGear):
             return helical_extrusion(
                 base, fp.height.Value, twist_angle, fp.double_helix
             )
+
+if app.GuiUp:
+
+    class CycloidGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "cycloidgear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "cycloidgear.svg"),
+                )
+
+        def getTaskPanel(self, obj):
+            return CycloidGearTaskPanel(obj)
+
+    class CycloidGearTaskPanel(GearsBaseTaskPanel):
+        """Control panel for Cycloid Gears"""
+
+        def __init__(self, obj):
+
+            self.obj = obj
+
+            #obj.gear = self.cycloid_tooth
+            self.num_teeth = obj.num_teeth
+            self.module = obj.module
+            self.helix_angle = obj.helix_angle
+            self.height = obj.height
+            self.double_helix = obj.double_helix
+
+            self.pitch_diameter = obj.pitch_diameter.Value
+            self.auto_recompute = False
+
+            self.translateTaskPanel()
+
+            #- Add a QGroupBox container with a QGridLayout to group widgets
+            self.group_box_0, self.grid_0 = self.groupBoxWithGrid()
+            self.group_box_0.setWindowTitle(QT_TRANSLATE_NOOP(
+                "Gear_TaskPanel",
+                "Cycloid Gear Parameters"
+            ))
+            #- Add sub-boxes
+            self.group_box_1, self.grid_1 = self.groupBoxWithGrid(
+                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Size")
+            )
+            self.group_box_1.setStyleSheet("background-color:#dec")
+            self.grid_0.addWidget(self.group_box_1, 0, 0)
+
+            self.group_box_2, self.grid_2 = self.groupBoxWithGrid(
+                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Helix Angle")
+            )
+            self.group_box_2.setStyleSheet("background-color:#def")
+            self.grid_0.addWidget(self.group_box_2, 1, 0)
+
+            self.group_box_3, self.grid_3 = self.groupBoxWithGrid(
+                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Gear Width")
+            )
+            self.group_box_3.setStyleSheet("background-color:#fed")
+            self.grid_0.addWidget(self.group_box_3, 2, 0)
+
+            self.group_box_4, self.grid_4 = self.groupBoxWithGrid(
+                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Update")
+            )
+            self.group_box_4.setStyleSheet("background-color:#ddd")
+            self.grid_0.addWidget(self.group_box_4, 10, 0)
+
+            #- Add some widgets to the grids
+            self.addSizeWidgetsInvolute(self.grid_1)
+
+            self.addHelixAngleWidgets(self.grid_2)
+
+            self.addTransverseHightWidgets(self.grid_3)
+
+            self.addUpdateWidgets(self.grid_4)
+
+            self.form = self.group_box_0
+            return
+
