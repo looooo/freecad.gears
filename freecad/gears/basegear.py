@@ -37,8 +37,6 @@ from PySide.QtWidgets import (
     QCheckBox,
     QDoubleSpinBox,
     QPushButton,
-    QRadioButton,
-    QButtonGroup,
     QLineEdit
 )
 
@@ -121,6 +119,36 @@ class ViewProviderGear:
     def getIcon(self):
         self._check_attr()
         return self.icon_fn
+
+    def setupContextMenu(self, viewObject, menu):
+        action = menu.addAction(app.Qt.translate(
+            "QObject", "Edit %1").replace("%1", viewObject.Object.Label))
+        action.triggered.connect(lambda: self.startDefaultEditMode(viewObject))
+        return False
+
+    def startDefaultEditMode(self, viewObject):
+        viewObject.Document.setEdit(viewObject.Object, 0)
+
+    def setEdit(self, vobj, mode):
+        if mode != 0:
+            return None
+        if not hasattr(self, "getTaskPanel"):
+            print("not found: getTaskPanel")
+            return False
+        panel = self.getTaskPanel(vobj.Object)
+        updateTaskTitleIcon(panel)
+        if isPartDesign(vobj.Object): #self.Object):
+            vobj.Object.ViewObject.Visibility = True
+        app.ActiveDocument.openTransaction(vobj.Object.Name) #self.Object.Name)
+        gui.Control.showDialog(panel)
+        return True
+
+    def unsetEdit(self, _vobj, _mode):
+        gui.Control.closeDialog()
+        if hasattr(_vobj.Object, "baseObject"):
+            _vobj.Object.baseObject[0].ViewObject.Visibility = False
+        _vobj.Object.ViewObject.Visibility = True
+        return False
 
     def dumps(self):
         self._check_attr()
@@ -420,6 +448,10 @@ class GearsBaseTaskPanel(object):
             "Gear_TaskPanel",
             "Thickness"
         )
+        self.header_other_teeth = QT_TRANSLATE_NOOP(
+            "Gear_TaskPanel",
+            "Number of Teeth"
+        )
         self.tool_tip_module = QT_TRANSLATE_NOOP(
             "Gear_TaskPanel",
             "Sets the module for the gear's teeth"
@@ -455,6 +487,10 @@ class GearsBaseTaskPanel(object):
         self.tool_tip_apply = QT_TRANSLATE_NOOP(
             "Gear_TaskPanel",
             "Applies changes and updates the shape"
+        )
+        self.tool_tip_preview = QT_TRANSLATE_NOOP(
+            "Gear_TaskPanel",
+            "Toggles between normal and preview mode"
         )
         self.multyply_mm = QT_TRANSLATE_NOOP("Gear_TaskPanel", "mm *")
         self.multyply_mm_pi = QT_TRANSLATE_NOOP("Gear_TaskPanel", "mm * Pi =")
@@ -495,6 +531,14 @@ class GearsBaseTaskPanel(object):
         self.option_auto_update = QT_TRANSLATE_NOOP(
             "Gear_TaskPanel",
             "Automatic Update"
+        )
+        self.option_enabled = QT_TRANSLATE_NOOP(
+            "Gear_TaskPanel",
+            "Enabled"
+        )
+        self.option_disabled = QT_TRANSLATE_NOOP(
+            "Gear_TaskPanel",
+            "Disabled"
         )
         
     #---------------------------------------------------------------------------
@@ -704,6 +748,15 @@ class GearsBaseTaskPanel(object):
         self.button_apply.clicked.connect(self.onButtonApplyBevel)
         grid.addWidget(self.button_apply, 1, 1)
 
+    def addUpdateCrownWidgets(self, grid):
+        '''Provides an update button'''
+
+        self.button_apply = QPushButton(self.apply)
+        self.button_apply.setToolTip(self.tool_tip_apply)
+        self.button_apply.setEnabled(False)
+        self.button_apply.clicked.connect(self.onButtonApplyCrown)
+        grid.addWidget(self.button_apply, 1, 1)
+
 
     def addTransverseHightWidgets(self, grid):
         '''Sets the transverse height'''
@@ -735,6 +788,32 @@ class GearsBaseTaskPanel(object):
         )
         grid.addWidget(self.ds_box_thickness, 1, 1)
 
+    def addOtherGearWidgets(self, grid):
+        '''
+        The number of teeth of the other gear influences the shape of
+        this crown gear's teeth
+        '''
+        self.label_other_teeth = QLabel(self.header_other_teeth)
+        grid.addWidget(self.label_other_teeth, 1, 0)
+
+        self.ds_box_other_teeth = QDoubleSpinBox()
+        self.ds_box_other_teeth.setMaximum(10000)
+        self.ds_box_other_teeth.setValue(self.other_teeth)
+        self.ds_box_other_teeth.valueChanged.connect(
+            self.onDoubleSpinBoxOtherTeethChanged
+        )
+        grid.addWidget(self.ds_box_other_teeth, 1, 1)
+
+    def addPreviewModeWidgets(self, grid):
+        '''
+        Toggles between normal and preview mode
+        '''
+        self.button_preview = QPushButton(self.option_enabled)
+        self.button_preview.setToolTip(self.tool_tip_preview)
+        self.button_preview.setEnabled(True)
+        self.button_preview.clicked.connect(self.onButtonPreview)
+        grid.addWidget(self.button_preview, 1, 0)
+
     #---------------------------------------------------------------------------
     # Logic blocks controlling the interaction of widgets
     #---------------------------------------------------------------------------
@@ -760,6 +839,11 @@ class GearsBaseTaskPanel(object):
         self.num_teeth = value
         self.pitch_diameter = self.module * self.num_teeth
         self.label_pitch_diameter.setText(str(self.pitch_diameter))
+        self.button_apply.setEnabled(True)
+
+    def onDoubleSpinBoxOtherTeethChanged(self, value):
+        '''Updates the number of teeth of a meshing gear'''
+        self.other_teeth = value
         self.button_apply.setEnabled(True)
 
     # Helix:
@@ -898,6 +982,22 @@ class GearsBaseTaskPanel(object):
         self.ds_box_thickness.setValue(self.thickness)
         self.button_apply.setEnabled(True)
 
+    # Preview:
+    def onButtonPreview(self, value):
+        '''
+        Toggles between enabled and disabled
+        '''
+        if self.button_preview.text() == self.option_enabled:
+            self.button_preview.setText(self.option_disabled)
+            self.preview_mode = False
+        else:
+            self.button_preview.setText(self.option_enabled)
+            self.preview_mode = True
+        self.button_apply.setEnabled(True)
+
+        if self.auto_recompute:
+            self.onButtonApplyBevel()
+
     # Update:
     def onButtonUpdate(self, value):
         '''Toggles the automatic update'''
@@ -951,17 +1051,30 @@ class GearsBaseTaskPanel(object):
         app.ActiveDocument.recompute()
         self.button_apply.setEnabled(False)
 
+    def onButtonApplyCrown(self, value = None):
+        '''
+        Updates the object parameters with the task panel settings
+        and runs a recompute
+        '''
+        self.obj.num_teeth = int(self.num_teeth)
+        self.obj.module = self.module
+        self.obj.other_teeth = int(self.other_teeth)
+        self.obj.height = self.height
+        self.obj.thickness = self.thickness
+        self.obj.preview_mode = self.preview_mode
+
+        app.ActiveDocument.recompute()
+        self.button_apply.setEnabled(False)
+
 
     def accept(self):
         '''
         This is triggered by the panel's OK button.
         '''
         gui.Control.closeDialog()
-        print("Accepted. ")
 
     def reject(self):
         '''
         This is triggered by the panel's Cancel button.
         '''
         gui.Control.closeDialog()
-        print("Canceled, there is nothing left to do!")
