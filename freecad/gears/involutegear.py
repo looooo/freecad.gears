@@ -88,10 +88,6 @@ class InvoluteGear(BaseGear):
         obj.Proxy = self
         self.compute_traverse_properties(obj)
 
-        panel = InvoluteGearTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
     def onDocumentRestored(self, obj):
         """  
         backward compatibility functions
