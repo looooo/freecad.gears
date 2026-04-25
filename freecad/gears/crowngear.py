@@ -101,10 +101,6 @@ class CrownGear(BaseGear):
             )
         )
 
-        panel = CrownGearTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
 
     def add_accuracy_properties(self, obj):
         obj.addProperty(
