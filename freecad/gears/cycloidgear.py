@@ -98,11 +98,8 @@ class CycloidGear(BaseGear):
         obj.head = 0
         obj.head_fillet = 0
         obj.root_fillet = 0
+        self.obj = obj
         obj.Proxy = self
-
-        panel = CycloidGearTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
 
     def onDocumentRestored(self, obj):
         """  
