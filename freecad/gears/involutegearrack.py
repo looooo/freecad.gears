@@ -103,10 +103,6 @@ class InvoluteGearRack(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-        panel = InvoluteGearRackTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
     def onDocumentRestored(self, obj):
         """  
         backward compatibility functions
