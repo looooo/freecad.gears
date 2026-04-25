@@ -161,10 +161,6 @@ class BevelGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-        panel = BevelGearTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
     def generate_gear_shape(self, fp):
         fp.gear.z = fp.num_teeth
         fp.gear.module = fp.module.Value
