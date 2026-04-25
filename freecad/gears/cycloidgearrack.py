@@ -105,10 +105,6 @@ class CycloidGearRack(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-        panel = CycloidGearRackTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
     def onDocumentRestored(self, obj):
         """  
         backward compatibility functions
