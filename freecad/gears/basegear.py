@@ -1072,9 +1072,13 @@ class GearsBaseTaskPanel(object):
         This is triggered by the panel's OK button.
         '''
         gui.Control.closeDialog()
+        app.ActiveDocument.recompute()
+        gui.ActiveDocument.resetEdit()
 
     def reject(self):
         '''
         This is triggered by the panel's Cancel button.
         '''
         gui.Control.closeDialog()
+        app.ActiveDocument.recompute()
+        gui.ActiveDocument.resetEdit()
