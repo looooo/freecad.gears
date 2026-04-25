@@ -125,10 +125,6 @@ class InternalInvoluteGear(BaseGear):
         self.obj = obj
         obj.Proxy = self
 
-        panel = InternalInvoluteGearTaskPanel(obj)
-        updateTaskTitleIcon(panel)
-        gui.Control.showDialog(panel)
-
     def onDocumentRestored(self, obj):
         """  
         backward compatibility functions
