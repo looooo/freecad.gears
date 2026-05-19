@@ -28,7 +28,6 @@ from .basegear import (
     BaseGear,
     fcvec,
     updateTaskTitleIcon,
-    GearsBaseTaskPanel,
     ViewProviderGear,
 )
 
@@ -186,6 +185,8 @@ class CrownGear(BaseGear):
 
 if app.GuiUp:
 
+    from .taskpanels import CrownGearTaskPanel
+
     class CrownGearViewProvider(ViewProviderGear):
 
         def __init__(self, obj, icon_fn=None):
@@ -208,82 +209,3 @@ if app.GuiUp:
 
         def getTaskPanel(self, obj):
             return CrownGearTaskPanel(obj)
-
-    class CrownGearTaskPanel(GearsBaseTaskPanel):
-        """Control panel for Crown Gears"""
-
-        def __init__(self, obj):
-
-            self.obj = obj
-
-            self.num_teeth = obj.num_teeth
-            self.module = obj.module
-            self.other_teeth = obj.other_teeth
-            obj.pressure_angle = "20. deg"
-            self.height = obj.height
-            self.thickness = obj.thickness
-            obj.num_profiles = 4
-            self.preview_mode = obj.preview_mode
-
-            self.auto_recompute = False
-
-            self.translateTaskPanel()
-
-            #- Add a QGroupBox container with a QGridLayout to group widgets
-            self.group_box_0, self.grid_0 = self.groupBoxWithGrid()
-            self.group_box_0.setWindowTitle(QT_TRANSLATE_NOOP(
-                "Gear_TaskPanel",
-                "Crown Gear Parameters"
-            ))
-            #- Add sub-boxes
-            self.group_box_1, self.grid_1 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Size")
-            )
-            self.group_box_1.setStyleSheet("background-color:#dec")
-            self.grid_0.addWidget(self.group_box_1, 0, 0, 1, -1)
-
-            self.group_box_2, self.grid_2 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Other Gear")
-            )
-            self.group_box_2.setStyleSheet("background-color:#def")
-            self.grid_0.addWidget(self.group_box_2, 1, 0, 1, 1)
-
-            self.group_box_3, self.grid_3 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Preview Mode")
-            )
-            self.group_box_3.setStyleSheet("background-color:#def")
-            self.grid_0.addWidget(self.group_box_3, 1, 2)
-
-            self.group_box_4, self.grid_4 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Gear Width")
-            )
-            self.group_box_4.setStyleSheet("background-color:#fed")
-            self.grid_0.addWidget(self.group_box_4, 2, 0, 1, -1)
-
-            self.group_box_5, self.grid_5 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Thickness")
-            )
-            self.group_box_5.setStyleSheet("background-color:#ffe")
-            self.grid_0.addWidget(self.group_box_5, 3, 0, 1, -1)
-
-            self.group_box_6, self.grid_6 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Update")
-            )
-            self.group_box_6.setStyleSheet("background-color:#ddd")
-            self.grid_0.addWidget(self.group_box_6, 10, 0, 1, -1)
-
-            #- Add some widgets to the grids
-            self.addSizeWidgetsBevel(self.grid_1)
-
-            self.addOtherGearWidgets(self.grid_2)
-
-            self.addPreviewModeWidgets(self.grid_3)
-
-            self.addTransverseHightWidgets(self.grid_4)
-
-            self.addThicknessWidgets(self.grid_5)
-
-            self.addUpdateCrownWidgets(self.grid_6)
-
-            self.form = self.group_box_0
-            return
