@@ -36,7 +36,6 @@ from .basegear import (
     helical_extrusion,
     rotate_tooth,
     updateTaskTitleIcon,
-    GearsBaseTaskPanel,
     ViewProviderGear,
 )
 
@@ -413,6 +412,8 @@ class InternalInvoluteGear(BaseGear):
 
 if app.GuiUp:
 
+    from .taskpanels import InternalInvoluteGearTaskPanel
+
     class InternalInvoluteGearViewProvider(ViewProviderGear):
 
         def __init__(self, obj, icon_fn=None):
@@ -435,74 +436,3 @@ if app.GuiUp:
                 
         def getTaskPanel(self, obj):
             return InternalInvoluteGearTaskPanel(obj)
-
-    class InternalInvoluteGearTaskPanel(GearsBaseTaskPanel):
-        """Control panel for Involute Gears"""
-
-        def __init__(self, obj):
-
-            self.obj = obj
-
-            self.num_teeth = obj.num_teeth
-            self.module = obj.module
-            self.helix_angle = obj.helix_angle
-            self.height = obj.height
-            self.thickness = obj.thickness
-            self.double_helix = obj.double_helix
-
-            self.pitch_diameter = obj.pitch_diameter.Value
-            self.auto_recompute = False
-
-            self.translateTaskPanel()
-
-            #- Add a QGroupBox container with a QGridLayout to group widgets
-            self.group_box_0, self.grid_0 = self.groupBoxWithGrid()
-            self.group_box_0.setWindowTitle(QT_TRANSLATE_NOOP(
-                "Gear_TaskPanel",
-                "Internal Involute Gear Parameters"
-            ))
-            #- Add sub-boxes
-            self.group_box_1, self.grid_1 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Size")
-            )
-            self.group_box_1.setStyleSheet("background-color:#dec")
-            self.grid_0.addWidget(self.group_box_1, 0, 0)
-
-            self.group_box_2, self.grid_2 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Helix Angle")
-            )
-            self.group_box_2.setStyleSheet("background-color:#def")
-            self.grid_0.addWidget(self.group_box_2, 1, 0)
-
-            self.group_box_3, self.grid_3 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Gear Width")
-            )
-            self.group_box_3.setStyleSheet("background-color:#fed")
-            self.grid_0.addWidget(self.group_box_3, 2, 0)
-
-            self.group_box_4, self.grid_4 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Thickness")
-            )
-            self.group_box_4.setStyleSheet("background-color:#ddd")
-            self.grid_0.addWidget(self.group_box_4, 3, 0)
-
-            self.group_box_5, self.grid_5 = self.groupBoxWithGrid(
-                QT_TRANSLATE_NOOP("Gear_TaskPanel", "Update")
-            )
-            self.group_box_5.setStyleSheet("background-color:#ddd")
-            self.grid_0.addWidget(self.group_box_5, 10, 0)
-
-            #- Add some widgets to the grids
-            self.addSizeWidgetsInvolute(self.grid_1)
-
-            self.addHelixAngleWidgets(self.grid_2)
-
-            self.addTransverseHightWidgets(self.grid_3)
-
-            self.addThicknessWidgets(self.grid_4)
-
-            self.addUpdateWidgets(self.grid_5)
-
-            self.form = self.group_box_0
-            return
-
