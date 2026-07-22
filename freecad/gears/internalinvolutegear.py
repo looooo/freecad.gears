@@ -350,8 +350,8 @@ class InternalInvoluteGear(BaseGear):
         fp.root_diameter = "{}mm".format(fp.gear.da)  # swap addendum and dedendum for "internal"
 
         outer_circle = part.Wire(part.makeCircle(fp.outside_diameter / 2.0))
-        outer_circle.reverse()
         if not fp.simple:
+            outer_circle.reverse()
             # head-fillet:
             pts = fp.gear.points(num=fp.numpoints)
             rot = rotation(fp.gear.phipart)
