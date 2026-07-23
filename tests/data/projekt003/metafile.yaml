@@ -1,0 +1,20 @@
+version: 1
+model: "drug-safe.FCStd"
+description: "example from failing gear-connector example"
+
+default:
+  image_dir: "references"
+  image_format: "png"
+  threshold: 0.98
+  fit_all: true
+
+views:
+  - id: "iso_drug_save"
+    label: "Isometric view"
+    type: "3d"
+    orientation: "iso"
+    display:
+      mode: "shaded"
+      size: [1600, 1200]
+    output:
+      filename: "gear_iso.png"
