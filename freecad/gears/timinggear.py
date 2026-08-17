@@ -84,11 +84,11 @@ class TimingGear(BaseGear):
         "htd5": {
             "pitch": 5.0,
             "u": 0.5715,
-            "h": 2.06,
+            "h": 2.16,  # real pulley valley depth, not the specified belt teeth height (2.06)
             "H": 3.80,
-            "r0": 1.49,
-            "r1": 1.49,
-            "rs": 0.43,
+            "r0": 1.6,  # pulley from SolidEdge measured, 1.56 would be probably enough
+            "r1": 1.6,  # unused with offset = 0.0
+            "rs": 0.48,  # SolidEdge pulley: rs = 0.45, manufacturer data (0.48/0.50)
             "offset": 0.0,
         },
         "htd8": {
@@ -202,10 +202,34 @@ class TimingGear(BaseGear):
             phi5 = np.pi / fp.num_teeth
             ref = reflection(-phi5 - np.pi / 2.0)
             rp = pitch * fp.num_teeth / np.pi / 2.0 - u
+            root_y = rp - h
 
-            m_34 = np.array([-(r_12 + r_34), rp - h + r_12])
-            x2 = np.array([-r_12, m_34[1]])
-            x4 = np.array([m_34[0], m_34[1] + r_34])
+            # center of the root/valley arc (radius r_12): sits on the
+            # y-axis, r_12 above the deepest point of the valley (0, root_y)
+            c0 = np.array([0.0, root_y + r_12])
+
+            # m_34 (center of the fillet arc, radius r_34) must satisfy two
+            # tangency conditions simultaneously:
+            #   - tangent to the root arc:   |m_34 - c0| = r_12 + r_34
+            #   - tangent to the tip circle: |m_34 - 0| = rp - r_34
+            # this is the intersection of two circles, solved the same way
+            # phi4 is solved for in the offset != 0 branch below.
+            R1 = r_12 + r_34
+            R2 = rp - r_34
+            d = np.linalg.norm(c0)
+            a = (d**2 + R1**2 - R2**2) / (2 * d)  # distance from c0 towards origin
+            b = np.sqrt(max(R1**2 - a**2, 0.0))
+            to_origin = -c0 / d
+            perp = np.array([-to_origin[1], to_origin[0]])
+            m_34 = c0 + a * to_origin - b * perp
+
+            # exact tangent point between the root arc and the fillet,
+            # replaces the old fixed assumption x2 = [-r_12, c0[1]]
+            x2 = c0 + r_12 * (m_34 - c0) / np.linalg.norm(m_34 - c0)
+            # exact tangent point on the tip circle (radius rp), replaces
+            # the old approximation "m_34 + [0, r_34]" which did not
+            # actually lie on that circle
+            x4 = rp * m_34 / np.linalg.norm(m_34)
             x6 = ref(x4)
 
             mir = np.array([-1.0, 1.0])
@@ -217,7 +241,7 @@ class TimingGear(BaseGear):
             arcs.append(
                 part.Arc(
                     app.Vector(*xn2, 0.0),
-                    app.Vector(0, rp - h, 0.0),
+                    app.Vector(0, root_y, 0.0),
                     app.Vector(*x2, 0.0),
                 ).toShape()
             )
