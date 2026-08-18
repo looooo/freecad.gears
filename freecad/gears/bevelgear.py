@@ -90,6 +90,15 @@ class BevelGear(BaseGear):
             ),
         )
         obj.addProperty(
+            "App::PropertyBool",
+            "trim_perpendicular",
+            "base",
+            QT_TRANSLATE_NOOP(
+                "App::Property",
+                "if value is true the gear's teeth will be cut so that their ends are perpendicular to the cone that defines the gear",
+            ),
+        )
+        obj.addProperty(
             "App::PropertyLength",
             "backlash",
             "tolerance",
@@ -215,6 +224,36 @@ class BevelGear(BaseGear):
             mat.A33 = -1
             mat.move(fcvec([0, 0, scale_1]))
             shape = shape.transformGeometry(mat)
+
+        if fp.trim_perpendicular:
+            top_z = fp.height.Value
+            unscaled_base_radius = (fp.gear.r_f / fp.gear.z_f)
+            bottom_base_radius = unscaled_base_radius * scale_1
+            top_base_radius = unscaled_base_radius * scale_0
+
+            # calculate radius for conical mask shape such that its face is perpendicular to the gear's cone
+            calculated_radius = bottom_base_radius + (top_z**2/(bottom_base_radius - top_base_radius))      
+            mask = part.makeLoft([part.makeCircle(bottom_base_radius), part.makeCircle(calculated_radius, app.Vector(0, 0, top_z))], True)
+            shape = mask.common(shape)
+
+            addendum_angle = np.sin(fp.gear.pitch_angle) * 2 / fp.gear.z
+            tip_angle = fp.gear.pitch_angle + addendum_angle
+            top_tip_radius = np.tan(tip_angle) * scale_0
+
+            # project top_tip_radius onto the cone defined by bottom_base_radius at z=0 and top_base_radius at z=top_z (fp.height.Value)
+            tip_vector_x =  top_tip_radius  - bottom_base_radius   # z=top_z
+            cone_vector_x = top_base_radius - bottom_base_radius # z=top_z
+
+            cone_vector_mag = np.sqrt(cone_vector_x ** 2 + top_z ** 2)
+
+            t = ((tip_vector_x * cone_vector_x + top_z ** 2) / cone_vector_mag)
+            
+            projected_r = bottom_base_radius + t * (cone_vector_x/cone_vector_mag) # add back the bottom base radius
+            projected_z = t * (top_z/cone_vector_mag)
+
+            cutter = part.makeLoft([part.makeCircle(projected_r, app.Vector(0, 0, projected_z)), part.makeCircle(top_tip_radius, app.Vector(0, 0, top_z))], True)
+            shape = shape.cut(cutter)
+
         return shape
         # return self.create_teeth(pts, pos1, fp.num_teeth)
 
