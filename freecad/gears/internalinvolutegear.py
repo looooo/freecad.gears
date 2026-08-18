@@ -124,6 +124,9 @@ class InternalInvoluteGear(BaseGear):
         """  
         backward compatibility functions
         """
+        from .migration import migrate_shift
+
+        migrate_shift(obj)
         if hasattr(obj, "dw"):
             pitch_diameter = getattr(obj, "dw")
             obj.addProperty(

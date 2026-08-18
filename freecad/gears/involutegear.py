@@ -87,6 +87,9 @@ class InvoluteGear(BaseGear):
         """  
         backward compatibility functions
         """
+        from .migration import migrate_shift
+
+        migrate_shift(obj)
         # replace dw with pitch_diameter
         if hasattr(obj, "dw"):
             pitch_diameter = getattr(obj, "dw")
