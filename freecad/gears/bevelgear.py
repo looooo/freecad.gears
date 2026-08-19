@@ -232,8 +232,15 @@ class BevelGear(BaseGear):
             top_base_radius = unscaled_base_radius * scale_0
 
             # calculate radius for conical mask shape such that its face is perpendicular to the gear's cone
-            calculated_radius = bottom_base_radius + (top_z**2/(bottom_base_radius - top_base_radius))      
-            mask = part.makeLoft([part.makeCircle(bottom_base_radius), part.makeCircle(calculated_radius, app.Vector(0, 0, top_z))], True)
+            calculated_radius = bottom_base_radius + (top_z ** 2 / (bottom_base_radius - top_base_radius))
+            
+            mask = part.makeLoft(
+                [
+                    part.makeCircle(bottom_base_radius),
+                    part.makeCircle(calculated_radius, app.Vector(0, 0, top_z))
+                ],
+                True,
+            )
             shape = mask.common(shape)
 
             addendum_angle = np.sin(fp.gear.pitch_angle) * 2 / fp.gear.z
@@ -241,17 +248,23 @@ class BevelGear(BaseGear):
             top_tip_radius = np.tan(tip_angle) * scale_0
 
             # project top_tip_radius onto the cone defined by bottom_base_radius at z=0 and top_base_radius at z=top_z (fp.height.Value)
-            tip_vector_x =  top_tip_radius  - bottom_base_radius   # z=top_z
+            tip_vector_x = top_tip_radius - bottom_base_radius # z=top_z
             cone_vector_x = top_base_radius - bottom_base_radius # z=top_z
 
             cone_vector_mag = np.sqrt(cone_vector_x ** 2 + top_z ** 2)
 
-            t = ((tip_vector_x * cone_vector_x + top_z ** 2) / cone_vector_mag)
+            t = (tip_vector_x * cone_vector_x + top_z ** 2) / cone_vector_mag
             
-            projected_r = bottom_base_radius + t * (cone_vector_x/cone_vector_mag) # add back the bottom base radius
+            projected_r = bottom_base_radius + t * (cone_vector_x / cone_vector_mag) # add back the bottom base radius
             projected_z = t * (top_z/cone_vector_mag)
 
-            cutter = part.makeLoft([part.makeCircle(projected_r, app.Vector(0, 0, projected_z)), part.makeCircle(top_tip_radius, app.Vector(0, 0, top_z))], True)
+            cutter = part.makeLoft(
+                [
+                    part.makeCircle(projected_r, app.Vector(0, 0, projected_z)),
+                    part.makeCircle(top_tip_radius, app.Vector(0, 0, top_z))
+                ],
+                True,
+            )
             shape = shape.cut(cutter)
 
         return shape
