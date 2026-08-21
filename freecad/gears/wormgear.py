@@ -109,7 +109,7 @@ class WormGear(BaseGear):
         m = fp.module.Value
         d = fp.diameter.Value
         t = fp.num_teeth
-        h = fp.height
+        h = fp.height.Value
 
         clearance = fp.clearance
         head = fp.head
