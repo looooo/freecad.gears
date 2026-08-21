@@ -1,11 +1,8 @@
-import pytest
-
 from freecad import app
 from freecad import part
 from freecad.gears.basegear import helical_extrusion
 
 
-@pytest.mark.xfail(reason="OCC returns wrong face normals/positions for helical extrusion")
 def test_helical_extrusion():
     """check if helical extrusion is working correctly"""
     normal = app.Vector(0, 0, 1)
@@ -21,7 +18,6 @@ def test_helical_extrusion():
     # face 0 is the cylinder
     # face 1 is pointing in positive z direction
     # face 2 is pointing in negative z direction
-    # Strict checks: known to fail with current OCC (Open CASCADE) – wrong face normals/positions
     assert (solid.Faces[1].normalAt(0, 0) - normal).Length == 0.0
     assert (solid.Faces[2].normalAt(0, 0) + normal).Length == 0.0
     assert solid.Faces[1].valueAt(0, 0)[2] == height

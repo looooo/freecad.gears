@@ -242,24 +242,23 @@ def helical_extrusion(face, height, angle, double_helix=False):
         spine = part.makeHelix(pitch, height, radius, cone_angle, direction)
 
     def make_pipe(path, profile):
-        """
-        returns (shell, last_wire)
-        """
         mkPS = part.BRepOffsetAPI.MakePipeShell(path)
-        mkPS.setFrenetMode(
-            True
-        )  # otherwise, the profile's normal would follow the path
+        # Fixed Z binormal: sections stay in XY while the helix still twists.
+        # Frenet tilts LastShape because OCCT's helix 3d-curve is only C1.
+        mkPS.setBiNormalMode(app.Vector(0, 0, 1))
         mkPS.add(profile, False, False)
         mkPS.build()
-        return (mkPS.shape(), mkPS.lastShape())
+        return mkPS.shape()
 
     shell_faces = []
-    top_wires = []
     for wire in face.Wires:
-        pipe_shell, top_wire = make_pipe(spine, wire)
-        shell_faces.extend(pipe_shell.Faces)
-        top_wires.append(top_wire)
-    top_face = part.Face(top_wires)
+        shell_faces.extend(make_pipe(spine, wire).Faces)
+    # Use the transformed original face as the cap. LastShape from PipeShell is a
+    # BSpline-fitted plane whose Axis is only approximately +Z (ulp-level noise).
+    top_face = face.copy()
+    half = 0.5 if double_helix else 1.0
+    top_face.rotate(app.Vector(0, 0, 0), app.Vector(0, 0, 1), np.degrees(angle) * half)
+    top_face.translate(app.Vector(0, 0, height * half))
     shell_faces.append(top_face)
     if double_helix:
         origin = app.Vector(0, 0, height / 2.0)
