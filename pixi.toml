@@ -4,7 +4,6 @@ channels = ["conda-forge"]
 description = "Add a short description here"
 name = "freecad.gears"
 platforms = ["osx-arm64", "linux-aarch64", "linux-64", "win-64", "osx-64"]
-version = "0.1.0"
 
 [pypi-dependencies]
 freecad-visual-tests = "*"
