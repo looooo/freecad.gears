@@ -16,18 +16,20 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Pure geometric helpers for 2D/3D point transformations and curve trimming."""
+
 from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
 from numpy.linalg import solve, norm
 
 
 def reflection(angle):
-    """A 2d reflection- / mirror- transformation 
+    """A 2D reflection across a line through the origin.
 
     Args:
-        angle (float): the angle of the line which mirrors the points.
+        angle (float): Angle of the mirror line [rad].
 
     Returns:
-        function(points): the function can be used to transform an array of points (2d)
+        function(points): Callable that reflects an array of 2D points.
     """
     mat = array([[cos(2 * angle), -sin(2 * angle)], [-sin(2 * angle), -cos(2 * angle)]])
 
@@ -40,14 +42,13 @@ def reflection(angle):
 
 
 def reflection3D(angle):
-    """A 3d reflection- / mirror- transformation 
+    """A 3D reflection across a plane containing the z-axis.
 
     Args:
-        angle (float): the angle of the line which mirrors the points. The transformation
-        happens in xy-plane.
+        angle (float): Angle of the mirror line in the xy-plane [rad].
 
     Returns:
-        function(points): the function can be used to transform an array of points (3d)
+        function(points): Callable that reflects an array of 3D points.
     """
     mat = array(
         [
@@ -64,14 +65,15 @@ def reflection3D(angle):
 
 
 def rotation(angle, center=None):
-    """A 2d rotation - transformation 
+    """A 2D rotation transformation.
 
     Args:
-        angle (float): the angle of the rotation.
-        center (2d array): 
+        angle (float): Rotation angle [rad].
+        center (sequence, optional): Center of rotation ``[x, y]``. Defaults
+            to the origin.
 
     Returns:
-        function(points): the function can be used to transform an array of points (3d)
+        function(points): Callable that rotates an array of 2D points.
     """
     center = center or [0.0, 0.0]
     mat = array([[cos(angle), sin(angle)], [-sin(angle), cos(angle)]])
@@ -86,14 +88,13 @@ def rotation(angle, center=None):
 
 
 def rotation3D(angle):
-    """A 3d rotation - transformation 
+    """A 3D rotation about the z-axis.
 
     Args:
-        angle (float): the angle of the line which mirrors the points. The transformation
-        happens in xy-plane.
+        angle (float): Rotation angle [rad] in the xy-plane.
 
     Returns:
-        function(points): the function can be used to transform an array of points (3d)
+        function(points): Callable that rotates an array of 3D points.
     """
     mat = array(
         [[cos(angle), sin(angle), 0.0], [-sin(angle), cos(angle), 0.0], [0.0, 0.0, 1.0]]
@@ -106,14 +107,13 @@ def rotation3D(angle):
 
 
 def translation(vector):
-    """A 2d translation - transformation 
+    """A 2D translation transformation.
 
     Args:
-        angle (float): the angle of the line which mirrors the points. The transformation
-        happens in xy-plane.
+        vector (sequence): Translation offset ``[dx, dy]``.
 
     Returns:
-        function(points): the function can be used to transform an array of points (3d)
+        function(points): Callable that translates an array of 2D points.
     """
     def _trans(point):
         return [point[0] + vector[0], point[1] + vector[1]]
@@ -125,16 +125,15 @@ def translation(vector):
 
 
 def trim(p1, p2, p3, p4):
-    """ a trim function, needs to be documented
+    """Find the intersection point of two 2D line segments.
 
     Args:
-        p1 (array or list of length 2): _description_
-        p2 (array or list of length 2): _description_
-        p3 (array or list of length 2): _description_
-        p4 (array or list of length 2): _description_
+        p1, p2: Endpoints of the first segment.
+        p3, p4: Endpoints of the second segment.
 
     Returns:
-        _type_: _description_
+        numpy.ndarray: Intersection point, an endpoint, or ``False`` if the
+            segments do not intersect within their bounds.
     """
     a1 = array(p1)
     a2 = array(p2)
@@ -170,15 +169,15 @@ def trim(p1, p2, p3, p4):
 
 
 def trimfunc(l1, l2):
-    """seems like a trimm function, but I don't have any clue what it does,
-       sry ;)
+    """Trim two polylines at their first intersection.
 
     Args:
-        l1 (_type_): _description_
-        l2 (_type_): _description_
+        l1 (sequence): First polyline as a sequence of 2D points.
+        l2 (sequence): Second polyline as a sequence of 2D points.
 
     Returns:
-        _type_: _description_
+        list or bool: ``[trimmed_l1, trimmed_l2]`` with both polylines ending
+        at the intersection, or ``False`` if no intersection is found.
     """
     ik = 0
     i0 = array(l1[0])
@@ -205,27 +204,31 @@ def trimfunc(l1, l2):
 
 
 def diff_norm(vector_1, vector_2):
-    """_summary_
+    """Return the Euclidean distance between two 2D points.
 
     Args:
-        vector_1 (np.array or list): the first vector
-        vector_2 (np.array or list): the second vector
+        vector_1 (array or list): First point.
+        vector_2 (array or list): Second point.
 
     Returns:
-        float: the length of the distance between the two vectors
+        float: Distance between the two points.
     """
     return norm(array(vector_2) - array(vector_1))
 
 
 def nearestpts(involute, undercut):
-    """finds the closest points of a involute and an undercutut
+    """Join involute and undercut polylines at their closest approach.
+
+    Selects the pair of points with minimum distance where the involute point
+    is farther from the origin than the undercut point.
 
     Args:
-        involute (array or list of 2d points ?): the involute section of the tooth
-        undercut (array or list of 2d points ?): the undercut section of the tooth
+        involute (sequence): Involute flank polyline.
+        undercut (sequence): Undercut polyline.
 
     Returns:
-        list of arrays: ????
+        list: ``[merged_undercut_to_involute, involute_from_joint]`` as stacked
+            point arrays.
     """
     ik = 0
     iout = 0
@@ -247,16 +250,17 @@ def nearestpts(involute, undercut):
 
 
 def intersection_line_circle(point_1, point_2, radius):
-    """return the intersection point of a line from point_1 to point_2 and a sphere of radius 1 and
-    midpoint 0,0,0
+    """Return where a ray from ``point_1`` toward ``point_2`` meets a circle.
+
+    The circle is centered at the origin with the given radius.
 
     Args:
-        point_1 (_type_): start of line
-        point_2 (_type_): end of line
-        radius (float): the radius of the sphere
+        point_1: Ray origin (2D).
+        point_2: Point defining the ray direction (2D).
+        radius (float): Circle radius.
 
     Returns:
-        _type_: _description_
+        numpy.ndarray: Intersection point on the circle.
     """
     diff = point_2 - point_1
     diff /= norm(diff)
@@ -267,18 +271,16 @@ def intersection_line_circle(point_1, point_2, radius):
 
 
 def arc_from_points_and_center(point_1, point_2, center):
-    """
-    returns 3 points (point_1, point_12, point_2) which are on the arc with
-    given center
+    """Return three collinear arc sample points between two endpoints.
 
     Args:
-        point_1 (np.array with length 2): the start point of the arc
-        point_2 (np.array with length 2): the end point of the arc
-        center (np.array with length 2): the center of the arc
+        point_1 (numpy.ndarray): Arc start point (2D).
+        point_2 (numpy.ndarray): Arc end point (2D).
+        center (numpy.ndarray): Arc center (2D).
 
     Returns:
-        [point_1, point_12, point_2]: returns the input points + the computed point
-        which is on the arc and between the input points
+        tuple: ``(point_1, point_12, point_2)`` where ``point_12`` lies on the
+            arc midway between the endpoints.
     """
     r = (norm(point_1 - center) + norm(point_2 - center)) / 2
     p_12l = (point_1 + point_2) / 2

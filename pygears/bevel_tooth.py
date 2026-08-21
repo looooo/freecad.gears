@@ -16,6 +16,8 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Bevel gear tooth geometry on the z=1 projection plane."""
+
 from numpy import (
     cos,
     sin,
@@ -32,6 +34,8 @@ from ._functions import rotation3D, reflection3D, intersection_line_circle
 
 
 class BevelTooth(object):
+    """Single bevel gear tooth in 3D, projected onto the z=1 plane."""
+
     def __init__(
         self,
         pressure_angle=70 * pi / 180,
@@ -41,6 +45,16 @@ class BevelTooth(object):
         backlash=0.00,
         module=0.25,
     ):
+        """Initialize bevel tooth parameters and compute sampling limits.
+
+        Args:
+            pressure_angle (float): Normal pressure angle [rad].
+            pitch_angle (float): Pitch cone angle [rad].
+            clearance (float): Clearance factor at the root.
+            z (int): Number of teeth on the bevel gear.
+            backlash (float): Linear backlash at the pitch circle [length].
+            module (float): Module at the large end of the tooth.
+        """
         self.pressure_angle = pressure_angle
         self.pitch_angle = pitch_angle
         self.z = z
@@ -153,6 +167,7 @@ class BevelTooth(object):
         self.add_foot = True
 
     def involute_function_x(self):
+        """Return the x-component of the spherical involute parameterization."""
         def func(s):
             return -(
                 cos(s * 1 / sin(self.pressure_angle) * 1 / sin(self.pitch_angle))
@@ -166,6 +181,7 @@ class BevelTooth(object):
         return func
 
     def involute_function_y(self):
+        """Return the y-component of the spherical involute parameterization."""
         def func(s):
             return cos(s * 1 / sin(self.pressure_angle) * 1 / sin(self.pitch_angle)) * (
                 cos(s) * sin(self.pitch_angle)
@@ -177,6 +193,7 @@ class BevelTooth(object):
         return func
 
     def involute_function_z(self):
+        """Return the z-component of the spherical involute parameterization."""
         def func(s):
             return cos(self.pitch_angle) * cos(s) - cos(self.pressure_angle) * sin(
                 self.pitch_angle
@@ -185,6 +202,14 @@ class BevelTooth(object):
         return func
 
     def get_radius(self, s):
+        """Return the radial distance from the axis at parameter ``s``.
+
+        Args:
+            s (float): Involute parameter.
+
+        Returns:
+            float: Radius in the xy-plane before conical projection.
+        """
         x = self.involute_function_x()
         y = self.involute_function_y()
         rx = x(s)
@@ -192,6 +217,14 @@ class BevelTooth(object):
         return sqrt(rx**2 + ry**2)
 
     def involute_points(self, num=10):
+        """Sample one involute flank, project to z=1 and trim at the root.
+
+        Args:
+            num (int): Number of sample points along the involute.
+
+        Returns:
+            list: 3D points ``[x, y, 1]`` on the z=1 projection plane.
+        """
         pts = linspace(self.involute_start, self.involute_end, num=num)
         fx = self.involute_function_x()
         x = array(list(map(fx, pts)))
@@ -218,6 +251,14 @@ class BevelTooth(object):
         return xyz
 
     def points(self, num=10):
+        """Build the wire segments of one complete bevel tooth.
+
+        Args:
+            num (int): Number of sample points per involute segment.
+
+        Returns:
+            list: Wire segments, each a numpy array of 3D points on z=1.
+        """
         pts = self.involute_points(num=num)
         rot = rotation3D(pi / self.z / 2)
         pts = rot(pts)
@@ -235,6 +276,7 @@ class BevelTooth(object):
             return [pts, array([pts[-1], pts1[0]]), pts1]
 
     def _update(self):
+        """Recalculate tooth geometry after a parameter change."""
         self.__init__(
             z=self.z,
             clearance=self.clearance,

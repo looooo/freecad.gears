@@ -16,6 +16,11 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Full gear profile generation from single-tooth geometry.
+
+Combines tooth geometry classes with rotational assembly to produce closed
+point arrays representing complete gears or racks.
+"""
 
 import numpy as np
 from .involute_tooth import InvoluteTooth, InvoluteRack
@@ -25,9 +30,21 @@ from ._functions import rotation, rotation3D
 
 
 class _GearProfile(object):
+    """Mixin that assembles a full gear profile from a single tooth."""
+
     rot3D = False
 
     def profile(self, num=10):
+        """Build a closed gear profile by rotating one tooth around the origin.
+
+        Args:
+            num (int): Number of sample points per tooth segment (passed to
+                ``points()``).
+
+        Returns:
+            numpy.ndarray: Closed profile as ``(N, 2)`` or ``(N, 3)`` array.
+                The first and last row are identical.
+        """
         tooth = self.points(num=num)
         tooth = [list(point) for wire in tooth for point in wire]
         n_teeth = self.num_teeth if hasattr(self, "num_teeth") else self.z
@@ -44,17 +61,27 @@ class _GearProfile(object):
 
 
 class InvoluteProfile(InvoluteTooth, _GearProfile):
-    pass
+    """Closed 2D involute spur or helical gear profile."""
 
 
 class CycloidProfile(CycloidTooth, _GearProfile):
-    pass
+    """Closed 2D cycloid gear profile."""
 
 
 class BevelProfile(BevelTooth, _GearProfile):
+    """Closed 3D bevel gear profile projected onto the z=1 plane."""
+
     rot3D = True
 
 
 class InvoluteRackProfile(InvoluteRack):
+    """Involute rack profile (all teeth in a single pass, no rotation)."""
+
     def profile(self):
+        """Return the rack profile as a closed point array.
+
+        Returns:
+            numpy.ndarray: Closed profile as ``(N, 2)`` array. The first and
+                last row are identical.
+        """
         return self.points()

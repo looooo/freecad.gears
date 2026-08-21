@@ -16,4 +16,6 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Pure-Python gear geometry library used by the FreeCAD Gears workbench."""
+
 __version__ = "1.4.0"

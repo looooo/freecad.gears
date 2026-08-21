@@ -16,6 +16,8 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Involute tooth and rack geometry for spur and helical gears."""
+
 from numpy import (
     tan,
     cos,
@@ -40,6 +42,8 @@ from ._functions import (
 
 
 class InvoluteTooth:
+    """Single involute tooth geometry for a spur or helical gear."""
+
     def __init__(
         self,
         m=5,
@@ -58,6 +62,26 @@ class InvoluteTooth:
         offset_holesize=10,
         offset_holeoffset = 5,
     ):
+        """Initialize involute tooth parameters and compute gear dimensions.
+
+        Args:
+            m (float): Normal module.
+            num_teeth (int): Number of teeth on the gear.
+            pressure_angle (float): Normal pressure angle [rad].
+            clearance (float): Clearance factor (multiplied by module).
+            shift (float): Profile shift coefficient.
+            beta (float): Helix angle [rad]; 0 for spur gears.
+            undercut (bool): Whether to include undercut geometry.
+            backlash (float): Linear backlash at the pitch circle [length].
+            head (float): Addendum factor (extra tooth height).
+            properties_from_tool (bool): If True, interpret ``m`` and
+                ``pressure_angle`` as normal-system tool values.
+            axle_hole (bool): Reserved for CAD features (not used here).
+            axle_holesize (float): Reserved for CAD features (not used here).
+            offset_hole (bool): Reserved for CAD features (not used here).
+            offset_holesize (float): Reserved for CAD features (not used here).
+            offset_holeoffset (float): Reserved for CAD features (not used here).
+        """
         self.pressure_angle = pressure_angle
         self.beta = beta
         self.m_n = m
@@ -77,6 +101,7 @@ class InvoluteTooth:
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
+        """Compute derived diameters, angles and sampling limits."""
         if self.properties_from_tool:
             self.pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
             self.m = self.m_n / cos(self.beta)
@@ -134,6 +159,14 @@ class InvoluteTooth:
             self.involute_start = sqrt(self.df**2 - self.dg**2) / self.dg
 
     def undercut_points(self, num=10):
+        """Sample the trochoidal undercut curve on one flank.
+
+        Args:
+            num (int): Number of sample points.
+
+        Returns:
+            numpy.ndarray: Undercut points as ``(num, 2)`` array.
+        """
         pts = linspace(0, self.undercut_end, num=num)
         fx = self.undercut_function_x()
         x = array(list(map(fx, pts)))
@@ -147,6 +180,14 @@ class InvoluteTooth:
         return array(xy)
 
     def involute_points(self, num=10):
+        """Sample the involute flank from root to tip.
+
+        Args:
+            num (int): Number of sample points.
+
+        Returns:
+            numpy.ndarray: Involute points as ``(num, 2)`` array.
+        """
         pts = linspace(self.involute_start, self.involute_end, num=num)
         fx = self.involute_function_x()
         x = array(list(map(fx, pts)))
@@ -157,6 +198,15 @@ class InvoluteTooth:
         return xy
 
     def points(self, num=10):
+        """Build the wire segments of one complete tooth.
+
+        Args:
+            num (int): Number of sample points per involute/undercut segment.
+
+        Returns:
+            list: Wire segments, each a numpy array of 2D points. Segments
+                include flanks and connecting edges between them.
+        """
         l1 = self.undercut_points(num=num)
         l2 = self.involute_points(num=num)
         s = trimfunc(l1, l2[::-1])
@@ -185,6 +235,7 @@ class InvoluteTooth:
         return one_tooth
 
     def undercut_function_x(self):
+        """Return the x-component of the trochoid parameterization."""
         def func(psi):
             return cos(psi - (self.df * tan(psi)) / self.dw) * sqrt(
                 self.df**2 / 4 + (self.df**2 * tan(psi) ** 2) / 4.0
@@ -193,6 +244,7 @@ class InvoluteTooth:
         return func
 
     def undercut_function_y(self):
+        """Return the y-component of the trochoid parameterization."""
         def func(psi):
             return sin(psi - (self.df * tan(psi)) / self.dw) * sqrt(
                 self.df**2 / 4 + (self.df**2 * tan(psi) ** 2) / 4.0
@@ -201,24 +253,29 @@ class InvoluteTooth:
         return func
 
     def involute_function_x(self):
+        """Return the x-component of the involute parameterization."""
         def func(phi):
             return self.dg / 2 * cos(phi) + phi * self.dg / 2 * sin(phi)
 
         return func
 
     def involute_function_y(self):
+        """Return the y-component of the involute parameterization."""
         def func(phi):
             return self.dg / 2 * sin(phi) - phi * self.dg / 2 * cos(phi)
 
         return func
 
     def _update(self):
+        """Recalculate gear factors after loading from an older file version."""
         if not hasattr(self, "properties_from_tool"):
             self.properties_from_tool = True
         self._calc_gear_factors()
 
 
 class InvoluteRack(object):
+    """Involute rack geometry (linear teeth along the y-axis)."""
+
     def __init__(
         self,
         m=5,
@@ -232,6 +289,20 @@ class InvoluteRack(object):
         add_endings=False,
         simplified=False,
     ):
+        """Initialize rack parameters.
+
+        Args:
+            m (float): Module.
+            num_teeth (int): Number of teeth along the rack.
+            pressure_angle (float): Pressure angle [rad].
+            thickness (float): Rack body thickness in x direction.
+            beta (float): Helix angle [rad].
+            head (float): Addendum factor.
+            clearance (float): Dedendum clearance factor.
+            properties_from_tool (bool): Use normal-system tool interpretation.
+            add_endings (bool): Extend profile with end-cap segments.
+            simplified (bool): Use a simplified middle section for display.
+        """
         self.pressure_angle = pressure_angle
         self.thickness = thickness
         self.m = m
@@ -243,14 +314,22 @@ class InvoluteRack(object):
         self.add_endings = add_endings
         self.simplified = simplified
 
-    # this is not good. Find better way to stay backward compatible -> versions
     def _update(self):
+        """Apply defaults for attributes missing in older file versions."""
         if not hasattr(self, "add_endings"):
             self.add_endings = True
         if not hasattr(self, "simplified"):
             self.simplified = False
 
     def points(self, num=10):
+        """Build a closed rack profile with all teeth.
+
+        Args:
+            num (int): Unused; kept for API compatibility with gear teeth.
+
+        Returns:
+            numpy.ndarray: Closed profile as ``(N, 2)`` array.
+        """
         m, m_n, pitch, pressure_angle_t = self.compute_properties()
 
         a = (2 + self.head + self.clearance) * m_n * tan(pressure_angle_t)
@@ -299,6 +378,12 @@ class InvoluteRack(object):
         return array(teeth)
 
     def compute_properties(self):
+        """Compute transverse module, normal module, pitch and pressure angle.
+
+        Returns:
+            tuple: ``(m, m_n, pitch, pressure_angle_t)`` where all angles are
+                in radians and lengths share the module unit.
+        """
         if self.properties_from_tool:
             pressure_angle_t = arctan(tan(self.pressure_angle) / cos(self.beta))
             m = self.m / cos(self.beta)

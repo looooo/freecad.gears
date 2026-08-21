@@ -16,12 +16,27 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Cycloid gear tooth geometry from epicycloid and hypocycloid curves."""
+
 from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
 from ._functions import rotation, reflection
 
 
 class CycloidTooth:
+    """Single cycloid gear tooth built from epicycloid and hypocycloid arcs."""
+
     def __init__(self, num_teeth_1=5, num_teeth_2=5, num_teeth=14, m=5, clearance=0.25, backlash=0.00, head=0.0):
+        """Initialize cycloid tooth parameters and compute gear dimensions.
+
+        Args:
+            num_teeth_1 (int): Pin circle tooth count for the hypocycloid.
+            num_teeth_2 (int): Rolling circle tooth count for the epicycloid.
+            num_teeth (int): Number of teeth on the gear.
+            m (float): Module.
+            clearance (float): Dedendum clearance factor.
+            backlash (float): Linear backlash at the pitch circle [length].
+            head (float): Addendum factor.
+        """
         self.m = m
         self.num_teeth = num_teeth
         self.clearance = clearance
@@ -32,6 +47,7 @@ class CycloidTooth:
         self._calc_gear_factors()
 
     def _calc_gear_factors(self):
+        """Compute pitch, addendum/root diameters and angular backlash."""
         self.d1 = self.num_teeth_1 * self.m
         self.d2 = self.num_teeth_2 * self.m
         self.phi = self.m * pi
@@ -42,6 +58,7 @@ class CycloidTooth:
         self.angular_backlash = self.backlash / (self.d / 2)
 
     def epicycloid_x(self):
+        """Return the x-component of the outer epicycloid parameterization."""
         def func(t):
             return ((self.d2 + self.d) * cos(t)) / 2.0 - (
                 self.d2 * cos((1 + self.d / self.d2) * t)
@@ -50,6 +67,7 @@ class CycloidTooth:
         return func
 
     def epicycloid_y(self):
+        """Return the y-component of the outer epicycloid parameterization."""
         def func(t):
             return ((self.d2 + self.d) * sin(t)) / 2.0 - (
                 self.d2 * sin((1 + self.d / self.d2) * t)
@@ -58,6 +76,7 @@ class CycloidTooth:
         return func
 
     def hypocycloid_x(self):
+        """Return the x-component of the inner hypocycloid parameterization."""
         def func(t):
             return (self.d - self.d1) * cos(t) / 2 + self.d1 / 2 * cos(
                 (self.d / self.d1 - 1) * t
@@ -66,6 +85,7 @@ class CycloidTooth:
         return func
 
     def hypocycloid_y(self):
+        """Return the y-component of the inner hypocycloid parameterization."""
         def func(t):
             return (self.d - self.d1) * sin(t) / 2 - self.d1 / 2 * sin(
                 (self.d / self.d1 - 1) * t
@@ -74,6 +94,7 @@ class CycloidTooth:
         return func
 
     def inner_end(self):
+        """Return the parameter value where the hypocycloid meets the root circle."""
         return -(
             (
                 self.d1
@@ -86,6 +107,7 @@ class CycloidTooth:
         )
 
     def outer_end(self):
+        """Return the parameter value where the epicycloid meets the tip circle."""
         return (
             self.d2
             * arccos(
@@ -95,6 +117,14 @@ class CycloidTooth:
         ) / self.d
 
     def points(self, num=10):
+        """Build the wire segments of one complete cycloid tooth.
+
+        Args:
+            num (int): Number of sample points per cycloid segment.
+
+        Returns:
+            list: Wire segments, each a numpy array of 2D points.
+        """
         inner_x = self.hypocycloid_x()
         inner_y = self.hypocycloid_y()
         outer_x = self.epicycloid_x()
@@ -118,6 +148,7 @@ class CycloidTooth:
         return one_tooth
 
     def _update(self):
+        """Recalculate tooth geometry after a parameter change."""
         self.__init__(
             m=self.m,
             num_teeth=self.num_teeth,

@@ -16,22 +16,25 @@
 # *                                                                         *
 # ***************************************************************************
 
+"""Gear-pair computation helpers (center distance, operating pressure angle)."""
+
 import numpy as np
 
 
 def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
-    """Summary
+    """Compute center distance and operating pressure angle for a gear pair.
 
     Args:
-        m (float): common module of both gears [length]
-        alpha (float): pressure-angle [rad]
-        t1 (int): number of teeth of gear1
-        t2 (int): number of teeth of gear2
-        x1 (float): relative profile-shift of gear1
-        x2 (float): relative profile-shift of gear2
+        m (float): Common module of both gears [length].
+        alpha (float): Pressure angle [rad].
+        t1 (int): Number of teeth of gear 1.
+        t2 (int): Number of teeth of gear 2.
+        x1 (float): Relative profile shift of gear 1.
+        x2 (float): Relative profile shift of gear 2.
 
     Returns:
-        (float, float): distance between gears [length], pressure angle of the assembly [rad]
+        tuple: ``(dist, alpha_w)`` — center distance [length] and operating
+            pressure angle [rad] of the assembly.
     """
 
     def inv(x):
@@ -52,6 +55,18 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
 
 
 def find_root(x0, f, df, epsilon=2e-10, max_iter=100):
+    """Find a root of ``f`` near ``x0`` using damped Newton iteration.
+
+    Args:
+        x0 (float): Initial guess.
+        f (callable): Function whose root is sought.
+        df (callable): Derivative of ``f``.
+        epsilon (float): Convergence tolerance on ``|f(x)|``.
+        max_iter (int): Maximum number of iterations.
+
+    Returns:
+        float or None: Root value, or ``None`` if convergence fails.
+    """
     x_n = x0
     for i in range(max_iter):
         f_xn = f(x_n)
