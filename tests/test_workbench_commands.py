@@ -69,10 +69,7 @@ _PROXY = {
 
 def _prepare_for_recompute(command_cls, obj):
     """Default parameters that yield a valid solid/wire in headless OCCT."""
-    if command_cls is CreateWormGear:
-        # 3D helical extrusion of the default worm profile is currently invalid.
-        obj.height = "0 mm"
-    elif command_cls is CreateHypoCycloidGear:
+    if command_cls is CreateHypoCycloidGear:
         obj.teeth_number = 12
         obj.segment_count = 16
         obj.show_pins = False
@@ -114,8 +111,8 @@ def test_create_default_gear_has_valid_shape(doc, command_cls):
     assert not shape.isNull()
     assert shape.isValid()
     if command_cls is CreateWormGear:
-        assert len(shape.Wires) >= 1
-        assert len(shape.Solids) == 0
+        assert len(shape.Solids) >= 1
+        assert shape.Volume > 0
     else:
         assert len(shape.Solids) >= 1
         assert shape.Volume > 0

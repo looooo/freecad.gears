@@ -88,13 +88,14 @@ def test_worm_profile_wire_and_lead_angle(doc):
     assert worm.beta.Value == pytest.approx(expected_beta, rel=1e-6)
 
 
-def test_worm_solid_extrusion_is_currently_invalid(doc):
+def test_worm_solid_extrusion(doc):
     worm = CreateWormGear.create()
     worm.height = "10 mm"
     worm.diameter = "15 mm"
     doc.recompute()
-    with pytest.raises(RuntimeError, match="invalid"):
-        _ = worm.Shape.Volume
+    assert worm.Shape.isValid()
+    assert len(worm.Shape.Solids) == 1
+    assert worm.Shape.Volume > 0
 
 
 def test_timing_gear_types_produce_solids(doc):
