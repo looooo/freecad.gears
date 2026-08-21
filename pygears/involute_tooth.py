@@ -116,12 +116,17 @@ class InvoluteTooth:
         self.involute_rot1 = sqrt(-(self.dg**2) + (self.dw) ** 2) / self.dg - arctan(
             sqrt(-(self.dg**2) + (self.dw) ** 2) / self.dg
         )
-        self.involute_rot2 = (
-            self.m / (self.d) * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
-        )
-        self.involute_rot2 = (
-            1 / self.num_teeth * (pi / 2 + 2 * self.shift * tan(self.pressure_angle_t))
-        )
+        if self.properties_from_tool:
+            # normal system: tool is shifted by x*m_n. In the transverse plane the
+            # tooth-thickness term carries x*cos(beta) (== x_t), see KHK eq. 6-11.
+            self.involute_rot2 = 1 / self.num_teeth * (
+                pi / 2 + 2 * self.shift * cos(self.beta) * tan(self.pressure_angle_t)
+            )
+        else:
+            # transverse/radial system: shift is already the transverse coefficient.
+            self.involute_rot2 = 1 / self.num_teeth * (
+                pi / 2 + 2 * self.shift * tan(self.pressure_angle_t)
+            )
         self.involute_rot = self.involute_rot1 + self.involute_rot2
         self.angular_backlash = self.backlash / (self.d / 2)
         self.involute_start = 0.0
