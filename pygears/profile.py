@@ -30,12 +30,13 @@ class _GearProfile(object):
     def profile(self, num=10):
         tooth = self.points(num=num)
         tooth = [list(point) for wire in tooth for point in wire]
+        n_teeth = self.num_teeth if hasattr(self, "num_teeth") else self.z
         if self.rot3D:
-            rot = rotation3D(np.pi * 2 / self.z)
+            rot = rotation3D(np.pi * 2 / n_teeth)
         else:
-            rot = rotation(np.pi * 2 / self.z)
+            rot = rotation(np.pi * 2 / n_teeth)
         profile = tooth
-        for i in range(self.z - 1):
+        for i in range(n_teeth - 1):
             tooth = rot(tooth).tolist()
             profile = profile + tooth
         profile.append(profile[0])
