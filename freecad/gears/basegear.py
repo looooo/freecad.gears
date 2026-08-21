@@ -140,6 +140,7 @@ class BaseGear:
             obj.removeProperty("teeth")  # Remove the old property
 
         gear_shape = self.generate_gear_shape(obj)
+        self._assign_face_names(gear_shape)
         if hasattr(obj, "BaseFeature") and obj.BaseFeature != None:
             # we're inside a PartDesign Body, thus need to fuse with the base feature
             gear_shape.Placement = (
@@ -152,6 +153,36 @@ class BaseGear:
             obj.Shape = result_shape
         else:
             obj.Shape = gear_shape
+
+    def _assign_face_names(self, shape):
+        top_faces = []
+        bottom_faces = []
+        for i, face in enumerate(shape.Faces):
+            try:
+                n = face.normalAt(0, 0)
+            except Exception:
+                continue
+            if abs(n.z - 1.0) < 0.01:
+                top_faces.append((face.Area, i + 1))
+            elif abs(n.z + 1.0) < 0.01:
+                bottom_faces.append((face.Area, i + 1))
+
+        top_faces.sort(reverse=True)
+        bottom_faces.sort(reverse=True)
+
+        element_map = {}
+        for rank, (_, idx) in enumerate(top_faces):
+            name = "gear_top_face" if rank == 0 else f"gear_top_face_{rank}"
+            element_map[name] = f"Face{idx}"
+        for rank, (_, idx) in enumerate(bottom_faces):
+            name = "gear_bottom_face" if rank == 0 else f"gear_bottom_face_{rank}"
+            element_map[name] = f"Face{idx}"
+
+        if element_map:
+            try:
+                shape.ElementMap = element_map
+            except Exception:
+                pass
 
     def generate_gear_shape(self, obj):
         """
