@@ -25,10 +25,9 @@ def test_minimize_timing_gear_distances_match_scipy():
     tooth_height = 1.2
     alpha = np.deg2rad(40.0)
     backlash = 0.0
-
     r_p = pitch * teeth / 2.0 / np.pi
     gamma_0 = pitch / r_p
-    gamma_1 = gamma_0 / 4.0
+    gamma_1 = gamma_0 / 4.0 - backlash / r_p
     p_A = np.array([np.cos(-gamma_1), np.sin(-gamma_1)]) * (
         r_p - u - tooth_height / 2
     )
