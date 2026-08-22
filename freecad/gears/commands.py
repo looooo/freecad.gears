@@ -38,7 +38,9 @@ from .hypocycloidgear import HypoCycloidGear
 
 # CRITICAL CHANGE: Import both connector types
 from .connector import GearConnector, ViewProviderGearConnector
-from .chainconnector import ChainConnector, Chain 
+from .chainconnector import ChainConnector, Chain
+from .planetarygear import PlanetaryGearAssembly, create_planetary_assembly
+from .planetary_dialog import show_planetary_task_panel
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -286,4 +288,31 @@ class CreateGearConnector(BaseCommand):
         except Exception as e:
             app.Console.PrintError(f"Error: {str(e)}\n")
             return None
+
+
+class CreatePlanetaryGearAssembly(BaseCommand):
+    NAME = "PlanetaryGear"
+    GEAR_FUNCTION = PlanetaryGearAssembly
+    Pixmap = os.path.join(BaseCommand.ICONDIR, "planetarygear.svg")
+    MenuText = QT_TRANSLATE_NOOP(
+        "FCGear_PlanetaryGear", "Planetary Gear Assembly"
+    )
+    ToolTip = QT_TRANSLATE_NOOP(
+        "FCGear_PlanetaryGear",
+        "Calculate and create a planetary gear assembly",
+    )
+
+    @staticmethod
+    def _build(params):
+        create_planetary_assembly(**params)
+        app.ActiveDocument.recompute()
+        gui.SendMsgToActiveView("ViewFit")
+
+    def Activated(self):
+        if not app.GuiUp:
+            create_planetary_assembly()
+            app.ActiveDocument.recompute()
+            return
+
+        show_planetary_task_panel(self._build)
 

@@ -103,6 +103,7 @@ class GearWorkbench(gui.Workbench):
         "FCGear_LanternGear",
         "FCGear_HypoCycloidGear",
         "FCGear_GearConnector",
+        "FCGear_PlanetaryGear",
     ]
 
     def GetClassName(self):
@@ -124,6 +125,7 @@ class GearWorkbench(gui.Workbench):
             CreateHypoCycloidGear,
             CreateCycloidRack,
             CreateGearConnector,
+            CreatePlanetaryGearAssembly,
         )
 
         self.appendToolbar(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)
@@ -141,6 +143,7 @@ class GearWorkbench(gui.Workbench):
         gui.addCommand("FCGear_LanternGear", CreateLanternGear())
         gui.addCommand("FCGear_HypoCycloidGear", CreateHypoCycloidGear())
         gui.addCommand("FCGear_GearConnector", CreateGearConnector())
+        gui.addCommand("FCGear_PlanetaryGear", CreatePlanetaryGearAssembly())
 
     def Activated(self):
         pass
