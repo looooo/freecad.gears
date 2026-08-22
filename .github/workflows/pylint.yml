@@ -22,7 +22,7 @@ jobs:
     - run: pixi run test
     - name: Install xvfb (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get update && sudo apt-get install -y xvfb xauth
+      run: sudo apt-get update && sudo apt-get install -y xvfb xauth libgl1-mesa-dri mesa-utils libegl1 libglx-mesa0
     - name: Visual tests (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: pixi run test-visual-xvfb

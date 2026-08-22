@@ -13,11 +13,11 @@ pytest = "*"
 [tasks]
 lint = "pylint $(git ls-files '*.py')"
 test = "pytest tests/ -v -m 'not visual'"
-test-visual = "pytest tests/ -v -m visual -s"
-test-visual-xvfb = "xvfb-run -a pytest tests/ -v -m visual -s"
-test-all = "pytest tests/ -v -s"
-create-references = "VISUAL_TEST_REFERENCE_MODE=update pytest tests/ -v -m visual -s"
-create-references-xvfb = "xvfb-run -a pixi run create-references"
+test-visual = "pytest tests/test_visual_projects.py -v -s"
+test-visual-xvfb = "python scripts/run_visual_tests_xvfb.py"
+test-all = "pytest tests/ -v -s -m 'not visual' && pytest tests/test_visual_projects.py -v -s"
+create-references = "VISUAL_TEST_REFERENCE_MODE=update pytest tests/test_visual_projects.py -v -s"
+create-references-xvfb = { cmd = "python scripts/run_visual_tests_xvfb.py", env = { VISUAL_TEST_REFERENCE_MODE = "update" } }
 clean-test = "rm -rf tests/data/*/artifacts tests/data/*/references"
 
 [dependencies]

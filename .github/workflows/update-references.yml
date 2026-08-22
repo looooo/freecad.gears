@@ -24,7 +24,7 @@ jobs:
         run: pixi install
 
       - name: Install xvfb
-        run: sudo apt-get update && sudo apt-get install -y xvfb xauth
+        run: sudo apt-get update && sudo apt-get install -y xvfb xauth libgl1-mesa-dri mesa-utils libegl1 libglx-mesa0
 
       - name: Generate reference images (update)
         run: pixi run create-references-xvfb
