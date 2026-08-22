@@ -54,6 +54,235 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     return dist, alpha_w
 
 
+def compute_shifted_internal_gears(m, alpha, z_ring, z_pinion, x_ring, x_pinion):
+    """Compute center distance and operating pressure angle of an internal pair.
+
+    Args:
+        m (float): Common module of both gears [length].
+        alpha (float): Pressure angle [rad].
+        z_ring (int): Number of teeth of the internal (ring) gear.
+        z_pinion (int): Number of teeth of the meshing external gear.
+        x_ring (float): Profile shift coefficient of the ring gear.
+        x_pinion (float): Profile shift coefficient of the external gear.
+
+    Returns:
+        tuple: ``(dist, alpha_w)`` — center distance [length] and operating
+            pressure angle [rad].
+    """
+
+    def inv(x):
+        return np.tan(x) - x
+
+    delta_z = z_ring - z_pinion
+    inv_alpha_w = inv(alpha) + 2 * np.tan(alpha) * (x_ring - x_pinion) / delta_z
+
+    def root_inv(x):
+        return inv(x) - inv_alpha_w
+
+    def d_root_inv(x):
+        return 1.0 / np.cos(x) - 1
+
+    alpha_w = find_root(alpha, root_inv, d_root_inv)
+    dist = m * delta_z / 2 * np.cos(alpha) / np.cos(alpha_w)
+    return dist, alpha_w
+
+
+def root_diameter(module, num_teeth, shift=0.0, clearance=0.25):
+    """Return the root circle diameter of an external involute gear.
+
+    Args:
+        module (float): Module of the gear [length].
+        num_teeth (int): Number of teeth.
+        shift (float): Profile shift coefficient.
+        clearance (float): Clearance between tooth tip and mating root.
+
+    Returns:
+        float: Root circle diameter [length].
+    """
+    return module * (num_teeth - 2.0 * (1.0 + clearance) + 2.0 * shift)
+
+
+def planetary_orbit_angles(z_sun, z_ring, num_planets):
+    """Return orbit angles [deg] at which a planet can mesh with sun and ring.
+
+    A planet only meshes with both the sun and the ring when its orbit angle is
+    a multiple of ``360 / (z_sun + z_ring)``. The ideal equally spaced angles
+    are therefore snapped onto that grid. They coincide exactly when
+    ``(z_sun + z_ring)`` is divisible by ``num_planets``.
+
+    Args:
+        z_sun (int): Number of teeth on the sun gear.
+        z_ring (int): Number of teeth on the ring gear.
+        num_planets (int): Number of planet gears.
+
+    Returns:
+        list[float]: One orbit angle per planet, in degrees.
+    """
+    positions = z_sun + z_ring
+    step = 360.0 / positions
+    angles = []
+    used = set()
+    for index in range(num_planets):
+        slot = int(round(index * positions / num_planets)) % positions
+        while slot in used:
+            slot = (slot + 1) % positions
+        used.add(slot)
+        angles.append(slot * step)
+    return angles
+
+
+def planetary_phase_angles(
+    z_sun, z_planet, z_ring, orbit_angles, carrier_angle=0.0
+):
+    """Return the rotation angles [deg] that make every gear pair mesh.
+
+    Derived from the tooth phase conventions of the generated profiles: an
+    external gear carries a tooth centred on its local +x axis, an internal
+    gear a tooth space. Angles are exact for any carrier position, so the same
+    formulas drive both the initial layout and the animation.
+
+    Args:
+        z_sun (int): Number of teeth on the sun gear.
+        z_planet (int): Number of teeth on each planet gear.
+        z_ring (int): Number of teeth on the ring gear.
+        orbit_angles (list[float]): Planet orbit angles [deg] at carrier zero.
+        carrier_angle (float): Rotation of the carrier [deg], ring held fixed.
+
+    Returns:
+        dict: ``ring_angle``, ``sun_angle``, ``carrier_angle``,
+            ``planet_orbits`` and ``planet_angles`` (all in degrees).
+    """
+    ring_angle = 180.0 * (z_planet + 1) / z_ring
+    sun_angle = carrier_angle * (z_sun + z_ring) / z_sun
+    spin_per_orbit = 1.0 - z_ring / z_planet
+    planet_orbits = [angle + carrier_angle for angle in orbit_angles]
+    planet_angles = [
+        orbit * spin_per_orbit + 180.0 * (z_planet + 1) / z_planet
+        for orbit in planet_orbits
+    ]
+    return {
+        "ring_angle": ring_angle,
+        "sun_angle": sun_angle,
+        "carrier_angle": carrier_angle,
+        "planet_orbits": planet_orbits,
+        "planet_angles": planet_angles,
+    }
+
+
+def compute_planetary_gears(
+    module,
+    alpha,
+    z_sun,
+    z_planet,
+    num_planets=3,
+    x_sun=0.0,
+    x_planet=0.0,
+    x_ring=0.0,
+    head=0.0,
+):
+    """Compute dimensions and validate a planetary gear set.
+
+    The fundamental meshing constraint is ``z_ring = z_sun + 2 * z_planet``.
+    For ``num_planets`` equally spaced planet gears, ``(z_sun + z_ring)`` must
+    be divisible by ``num_planets``, and adjacent planets must not interfere.
+
+    Args:
+        module (float): Normal module [length].
+        alpha (float): Pressure angle [rad].
+        z_sun (int): Number of teeth on the sun gear.
+        z_planet (int): Number of teeth on each planet gear.
+        num_planets (int): Number of planet gears (default 3).
+        x_sun (float): Profile shift coefficient of the sun gear.
+        x_planet (float): Profile shift coefficient of each planet gear.
+        x_ring (float): Profile shift coefficient of the ring gear.
+        head (float): Addendum coefficient used for clearance check.
+
+    Returns:
+        dict: Keys include ``z_ring``, ``sun_planet_distance``,
+            ``planet_ring_distance``, ``orbit_angles``, ``ring_angle``,
+            ``ratio_ring_fixed``, ``ratio_sun_fixed``, ``valid``, and
+            ``messages``.
+    """
+    messages = []
+    z_ring = z_sun + 2 * z_planet
+
+    sun_planet_dist, _ = compute_shifted_gears(
+        module, alpha, z_sun, z_planet, x_sun, x_planet
+    )
+    planet_ring_dist, _ = compute_shifted_internal_gears(
+        module, alpha, z_ring, z_planet, x_ring, x_planet
+    )
+
+    valid = True
+
+    if z_sun < 6:
+        messages.append("Sun gear should have at least 6 teeth.")
+        valid = False
+    if z_planet < 6:
+        messages.append("Planet gear should have at least 6 teeth.")
+        valid = False
+    if z_ring < z_sun + 6:
+        messages.append("Ring gear has too few teeth for this configuration.")
+        valid = False
+    if num_planets < 1:
+        messages.append("At least one planet gear is required.")
+        valid = False
+
+    spacing_sum = z_sun + z_ring
+    if num_planets > 0 and spacing_sum % num_planets != 0:
+        messages.append(
+            f"Assembly condition not met: (z_sun + z_ring) = {spacing_sum} "
+            f"is not divisible by num_planets = {num_planets}."
+        )
+        valid = False
+
+    orbit_angles = (
+        planetary_orbit_angles(z_sun, z_ring, num_planets)
+        if num_planets > 0
+        else []
+    )
+
+    planet_tip_radius = module * (z_planet / 2.0 + 1.0 + head + x_planet)
+    if num_planets > 1 and sun_planet_dist > 0:
+        gaps = [
+            (b - a) % 360.0
+            for a, b in zip(orbit_angles, orbit_angles[1:] + orbit_angles[:1])
+        ]
+        min_gap = min(gaps)
+        clearance = 2.0 * sun_planet_dist * np.sin(np.deg2rad(min_gap) / 2.0)
+        if clearance < 2.0 * planet_tip_radius:
+            messages.append(
+                f"Planet gears interfere: tip-to-tip spacing {clearance:.3f} "
+                f"is below the required {2.0 * planet_tip_radius:.3f}."
+            )
+            valid = False
+
+    if abs(sun_planet_dist - planet_ring_dist) > module * 1e-6:
+        messages.append(
+            f"Sun-planet centre distance {sun_planet_dist:.4f} and planet-ring "
+            f"centre distance {planet_ring_dist:.4f} differ; adjust the profile "
+            "shift values."
+        )
+        valid = False
+
+    ratio_ring_fixed = (z_sun + z_ring) / z_sun
+    ratio_sun_fixed = (z_sun + z_ring) / z_ring
+
+    return {
+        "z_ring": z_ring,
+        "sun_planet_distance": sun_planet_dist,
+        "planet_ring_distance": planet_ring_dist,
+        "orbit_angles": orbit_angles,
+        "ring_angle": 180.0 * (z_planet + 1) / z_ring,
+        # ratios are given as driven speed per carrier (or sun) revolution
+        "ratio_ring_fixed": ratio_ring_fixed,
+        "ratio_sun_fixed": ratio_sun_fixed,
+        "ratio_carrier_fixed": -z_ring / z_sun,
+        "valid": valid,
+        "messages": messages,
+    }
+
+
 def find_root(x0, f, df, epsilon=2e-10, max_iter=100):
     """Find a root of ``f`` near ``x0`` using damped Newton iteration.
 
