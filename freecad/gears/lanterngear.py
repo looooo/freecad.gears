@@ -17,12 +17,12 @@
 # ***************************************************************************
 
 import numpy as np
-import scipy as sp
 
 from freecad import app
 from freecad import part
 
 from pygears._functions import rotation
+from pygears.computation import find_root
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center
 
@@ -100,9 +100,12 @@ class LanternGear(BaseGear):
                 + 2 * r_r * np.sin(phi_min)
             )
 
-        phi_min = sp.optimize.root(find_phi_min, (phi_max + r_r / r_0 * 4) / 5).x[
-            0
-        ]  # , r_r / r_0, phi_max)
+        def d_find_phi_min(phi_min):
+            return 2 * r_0 * (1 - np.cos(phi_min)) * (phi_min * r_0 - r_r)
+
+        phi_min = find_root(
+            (phi_max + r_r / r_0 * 4) / 5, find_phi_min, d_find_phi_min
+        )
 
         # phi_min = 0 # r_r / r_0
         phi = np.linspace(phi_min, phi_max, fp.num_profiles)

@@ -53,6 +53,33 @@ def test_minimize_timing_gear_distances_match_scipy():
     assert s2 == pytest.approx(0.63628363, abs=1e-5)
 
 
+def test_find_root_lantern_gear_phi_min():
+    m = 1.0
+    teeth = 15
+    r_r = 1.0
+    r_0 = m * teeth / 2
+    r_max = r_0 + r_r
+    phi_max = (r_r + np.sqrt(r_max**2 - r_0**2)) / r_0
+    x0 = (phi_max + r_r / r_0 * 4) / 5
+
+    def find_phi_min(phi_min):
+        return r_0 * (
+            phi_min**2 * r_0
+            - 2 * phi_min * r_0 * np.sin(phi_min)
+            - 2 * phi_min * r_r
+            - 2 * r_0 * np.cos(phi_min)
+            + 2 * r_0
+            + 2 * r_r * np.sin(phi_min)
+        )
+
+    def d_find_phi_min(phi_min):
+        return 2 * r_0 * (1 - np.cos(phi_min)) * (phi_min * r_0 - r_r)
+
+    phi_min = find_root(x0, find_phi_min, d_find_phi_min)
+    assert find_phi_min(phi_min) == pytest.approx(0.0, abs=1e-8)
+    assert phi_min == pytest.approx(0.17780902310246768, abs=1e-5)
+
+
 def test_find_root_quadratic():
     root = find_root(1.0, lambda x: x**2 - 2.0, lambda x: 2.0 * x)
     assert root == pytest.approx(np.sqrt(2.0), rel=1e-8)
