@@ -48,7 +48,6 @@ def compute_shifted_gears(m, alpha, t1, t2, x1, x2):
     def d_root_inv(x):
         return 1.0 / np.cos(x) - 1
 
-    # use scipy (sp.optimize.minimize(f, f0, df).x) here (as we depent on scipy anyways)
     alpha_w = find_root(alpha, root_inv, d_root_inv)
     dist = m * (t1 + t2) / 2 * np.cos(alpha) / np.cos(alpha_w)
     return dist, alpha_w
@@ -281,6 +280,90 @@ def compute_planetary_gears(
         "valid": valid,
         "messages": messages,
     }
+
+
+class OptimizeResult:
+    """Minimal result object compatible with ``scipy.optimize.minimize``."""
+
+    def __init__(self, x, fun=None, success=True):
+        self.x = np.atleast_1d(x)
+        self.fun = fun
+        self.success = success
+
+
+def minimize(fun, x0, tol=1e-8, maxiter=500):
+    """Minimize a scalar function of one variable near ``x0``.
+
+    Args:
+        fun (callable): Objective function ``f(x) -> float``.
+        x0 (float): Initial guess.
+        tol (float): Relative bracket width tolerance.
+        maxiter (int): Maximum golden-section iterations.
+
+    Returns:
+        OptimizeResult: ``.x`` holds the minimizer (1-element array).
+    """
+    x0 = float(np.asarray(x0, dtype=float).ravel()[0])
+    xmin, fmin = _minimize_scalar(fun, x0, tol=tol, maxiter=maxiter)
+    return OptimizeResult(xmin, fmin)
+
+
+def _expand_bracket(fun, x0, grow=1.618, maxiter=100):
+    """Return ``(a, b)`` bracketing a local minimum near ``x0``."""
+    step = 1.0
+    a = x0
+    fa = fun(a)
+    b = x0 + step
+    fb = fun(b)
+
+    if fb > fa:
+        b = x0 - step
+        fb = fun(b)
+        step = -step
+        if fb > fa:
+            return x0 - 0.5, x0 + 0.5
+
+    for _ in range(maxiter):
+        c = b + step * grow
+        fc = fun(c)
+        if fc > fb:
+            if a > b:
+                return b, a
+            return a, b
+        a, fa = b, fb
+        b, fb = c, fc
+        step *= grow
+
+    if a > b:
+        return b, a
+    return a, b
+
+
+def _minimize_scalar(fun, x0, tol=1e-8, maxiter=500):
+    """Golden-section search for a scalar minimum."""
+    golden = (1.0 + np.sqrt(5.0)) / 2.0
+    a, b = _expand_bracket(fun, x0, maxiter=min(maxiter, 100))
+
+    c = b - (b - a) / golden
+    d = a + (b - a) / golden
+    fc = fun(c)
+    fd = fun(d)
+
+    for _ in range(maxiter):
+        if abs(b - a) < tol * (abs(a) + abs(b) + tol):
+            x = (a + b) / 2.0
+            return x, fun(x)
+        if fc < fd:
+            b, d, fd = d, c, fc
+            c = b - (b - a) / golden
+            fc = fun(c)
+        else:
+            a, c, fc = c, d, fd
+            d = a + (b - a) / golden
+            fd = fun(d)
+
+    x = (a + b) / 2.0
+    return x, fun(x)
 
 
 def find_root(x0, f, df, epsilon=2e-10, max_iter=100):

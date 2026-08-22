@@ -5,11 +5,52 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from pygears.computation import compute_shifted_gears, find_root
+from pygears.computation import compute_shifted_gears, find_root, minimize
 
 
 def _inv(angle):
     return np.tan(angle) - angle
+
+
+def test_minimize_quadratic():
+    result = minimize(lambda x: (x - 2.0) ** 2, 0.0)
+    assert result.x[0] == pytest.approx(2.0, abs=1e-6)
+    assert result.fun == pytest.approx(0.0, abs=1e-10)
+
+
+def test_minimize_timing_gear_distances_match_scipy():
+    pitch = 5.0
+    teeth = 15
+    u = 0.6
+    tooth_height = 1.2
+    alpha = np.deg2rad(40.0)
+    backlash = 0.0
+
+    r_p = pitch * teeth / 2.0 / np.pi
+    gamma_0 = pitch / r_p
+    gamma_1 = gamma_0 / 4.0
+    p_A = np.array([np.cos(-gamma_1), np.sin(-gamma_1)]) * (
+        r_p - u - tooth_height / 2
+    )
+    direction = np.array(
+        [np.cos(alpha / 2 - gamma_1), np.sin(alpha / 2 - gamma_1)]
+    )
+
+    def line(s):
+        return p_A + direction * s
+
+    def dist_p1(s):
+        return (np.linalg.norm(line(s)) - (r_p - u - tooth_height)) ** 2
+
+    def dist_p2(s):
+        return (np.linalg.norm(line(s)) - (r_p - u)) ** 2
+
+    s1 = minimize(dist_p1, 0.0).x[0]
+    s2 = minimize(dist_p2, 0.0).x[0]
+    assert dist_p1(s1) == pytest.approx(0.0, abs=1e-10)
+    assert dist_p2(s2) == pytest.approx(0.0, abs=1e-10)
+    assert s1 == pytest.approx(-0.64103017, abs=1e-5)
+    assert s2 == pytest.approx(0.63628363, abs=1e-5)
 
 
 def test_find_root_quadratic():

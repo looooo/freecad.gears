@@ -18,12 +18,12 @@
 
 
 import numpy as np
-import scipy as sp
 
 from freecad import app
 from freecad import part
 
 from pygears._functions import rotation, reflection
+from pygears.computation import minimize
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_fillet
 
@@ -143,8 +143,8 @@ class TimingGearT(BaseGear):
         def dist_p2(s):
             return (np.linalg.norm(line(s)) - (r_p - u)) ** 2
 
-        s1 = sp.optimize.minimize(dist_p1, 0.0).x
-        s2 = sp.optimize.minimize(dist_p2, 0.0).x
+        s1 = minimize(dist_p1, 0.0).x
+        s2 = minimize(dist_p2, 0.0).x
 
         p_1 = line(s1)
         p_2 = line(s2)
