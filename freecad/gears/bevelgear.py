@@ -16,15 +16,23 @@
 # *                                                                         *
 # ***************************************************************************
 
-from freecad import app
-from freecad import part
-
 import numpy as np
+import os
+
+from freecad import app
+from freecad import gui
+from freecad import part
 
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation3D
 
-from .basegear import BaseGear, fcvec, make_bspline_wire
+from .basegear import (
+    BaseGear,
+    fcvec,
+    make_bspline_wire,
+    updateTaskTitleIcon,
+    ViewProviderGear,
+)
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -309,3 +317,30 @@ class BevelGear(BaseGear):
     def spherical_rot(self, point, phi):
         new_phi = np.sqrt(np.linalg.norm(point)) * phi
         return rotation3D(-new_phi)(point)
+
+if app.GuiUp:
+
+    from .taskpanels import BevelGearTaskPanel
+
+    class BevelGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "bevelgear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "bevelgear.svg"),
+                )
+
+        def getTaskPanel(self, obj):
+            return BevelGearTaskPanel(obj)

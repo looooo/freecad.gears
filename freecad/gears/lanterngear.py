@@ -18,6 +18,7 @@
 
 import numpy as np
 import scipy as sp
+import os
 
 from freecad import app
 from freecad import part
@@ -25,7 +26,7 @@ from freecad import part
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, fcvec, part_arc_from_points_and_center
+from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, ViewProviderGear
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -148,3 +149,25 @@ class LanternGear(BaseGear):
             return wi
         else:
             return part.Face(wi).extrude(app.Vector(0, 0, fp.height))
+
+if app.GuiUp:
+
+    class LanternGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "lanterngear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "lanterngear.svg"),
+                )

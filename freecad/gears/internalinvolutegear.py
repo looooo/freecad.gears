@@ -17,8 +17,10 @@
 # ***************************************************************************
 
 import numpy as np
+import os
 
 from freecad import app
+from freecad import gui
 from freecad import part
 
 from pygears.involute_tooth import InvoluteTooth
@@ -33,6 +35,8 @@ from .basegear import (
     insert_fillet,
     helical_extrusion,
     rotate_tooth,
+    updateTaskTitleIcon,
+    ViewProviderGear,
 )
 
 
@@ -408,3 +412,30 @@ class InternalInvoluteGear(BaseGear):
             inner_circle.reverse()
             base = part.Face([outer_circle, inner_circle])
             return base.extrude(app.Vector(0, 0, fp.height.Value))
+
+if app.GuiUp:
+
+    from .taskpanels import InternalInvoluteGearTaskPanel
+
+    class InternalInvoluteGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "internalinvolutegear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "internalinvolutegear.svg"),
+                )
+                
+        def getTaskPanel(self, obj):
+            return InternalInvoluteGearTaskPanel(obj)

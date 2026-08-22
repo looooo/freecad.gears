@@ -17,6 +17,7 @@
 # ***************************************************************************
 
 import numpy as np
+import os
 
 from freecad import app
 from freecad import part
@@ -24,7 +25,7 @@ from freecad import part
 from pygears.involute_tooth import InvoluteTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, helical_extrusion, fcvec
+from .basegear import BaseGear, helical_extrusion, fcvec, ViewProviderGear
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -187,3 +188,25 @@ class WormGear(BaseGear):
         else:
             shape = helical_extrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
             return shape
+
+if app.GuiUp:
+
+    class WormGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "wormgear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "wormgear.svg"),
+                )

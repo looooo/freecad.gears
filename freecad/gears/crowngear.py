@@ -18,11 +18,18 @@
 
 
 import numpy as np
+import os
 
 from freecad import app
+from freecad import gui
 from freecad import part
 
-from .basegear import BaseGear, fcvec
+from .basegear import (
+    BaseGear,
+    fcvec,
+    updateTaskTitleIcon,
+    ViewProviderGear,
+)
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -92,6 +99,7 @@ class CrownGear(BaseGear):
                 "Set preview_mode property to false when ready to cut teeth.",
             )
         )
+
 
     def add_accuracy_properties(self, obj):
         obj.addProperty(
@@ -174,3 +182,30 @@ class CrownGear(BaseGear):
             loft = loft.transformGeometry(rot)
             cut_shapes.append(loft)
         return solid.cut(cut_shapes)
+
+if app.GuiUp:
+
+    from .taskpanels import CrownGearTaskPanel
+
+    class CrownGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "crowngear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "crowngear.svg"),
+                )
+
+        def getTaskPanel(self, obj):
+            return CrownGearTaskPanel(obj)

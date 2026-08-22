@@ -19,6 +19,7 @@
 import math
 
 import numpy as np
+import os
 
 from freecad import app
 from freecad import part
@@ -26,7 +27,7 @@ from freecad import part
 from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
-from .basegear import BaseGear, make_bspline_wire
+from .basegear import BaseGear, make_bspline_wire, ViewProviderGear
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -309,3 +310,25 @@ class HypoCycloidGear(BaseGear):
 
         if to_be_fused:
             return part.makeCompound(to_be_fused)
+
+if app.GuiUp:
+
+    class HypoCycloidGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "hypocycloidgear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "hypocycloidgear.svg"),
+                )

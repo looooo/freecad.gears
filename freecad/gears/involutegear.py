@@ -17,8 +17,10 @@
 # ***************************************************************************
 
 import numpy as np
+import os
 
 from freecad import app
+from freecad import gui
 from freecad import part
 
 from pygears.involute_tooth import InvoluteTooth
@@ -32,6 +34,8 @@ from .basegear import (
     insert_fillet,
     helical_extrusion,
     rotate_tooth,
+    updateTaskTitleIcon,
+    ViewProviderGear,
 )
 
 
@@ -466,4 +470,30 @@ class InvoluteGear(BaseGear):
 
         return gear_shape
 
+if app.GuiUp:
 
+    from .taskpanels import InvoluteGearTaskPanel
+
+    class InvoluteGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "involutegear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "involutegear.svg"),
+                )
+        
+        def getTaskPanel(self, obj):
+            return InvoluteGearTaskPanel(obj)
+            

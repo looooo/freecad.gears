@@ -21,10 +21,24 @@ import sys
 import numpy as np
 
 from freecad import app
+from freecad import gui
 from freecad import part
 
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center
+
+from PySide import QtCore
+from PySide import QtGui
+from PySide import QtWidgets
+from PySide.QtGui import (QGroupBox, QMessageBox, QIcon)
+from PySide.QtWidgets import (
+    QGridLayout,
+    QLabel,
+    QCheckBox,
+    QDoubleSpinBox,
+    QPushButton,
+    QLineEdit
+)
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -44,6 +58,35 @@ def fcvec(x):
     else:
         return app.Vector(x[0], x[1], x[2])
 
+def updateTaskTitleIcon(task):
+    from PySide import QtGui
+    if hasattr(task, "form"):
+        if hasattr(task.obj.ViewObject.Proxy, "getIcon"):
+            task.form.setWindowIcon(
+                QtGui.QIcon(task.obj.ViewObject.Proxy.getIcon())
+            )
+    return
+
+def isPartDesign(obj):
+    if isSketchObject(obj):
+        parent = getParentBody(obj)
+        if parent is None:
+            return False
+        return isinstance(parent, Part.BodyBase)
+    return obj.TypeId.startswith("PartDesign::")
+
+def isSketchObject(obj):
+    return obj.TypeId.startswith("Sketcher::")
+
+def getParentBody(obj):
+    if hasattr(obj, "getParent"):
+        return obj.getParent()
+    if hasattr(obj, "getParents"):  # Probably FreeCadLink version.
+        if len(obj.getParents()) == 0:
+            return None
+        return obj.getParents()[0][0]
+    return None
+
 
 class ViewProviderGear:
     """
@@ -53,6 +96,7 @@ class ViewProviderGear:
     def __init__(self, obj, icon_fn=None):
         # Set this object to the proxy object of the actual view provider
         obj.Proxy = self
+        self.Object = obj.Object
         self._check_attr()
         dirname = os.path.dirname(__file__)
         self.icon_fn = icon_fn or os.path.join(dirname, "icons", "involutegear.svg")
@@ -68,12 +112,43 @@ class ViewProviderGear:
                 os.path.join(os.path.dirname(__file__), "icons", "involutegear.svg"),
             )
 
-    def attach(self, vobj):
-        self.vobj = vobj
+    def attach(self, obj):
+        self.Object = obj.Object  # borrowed from SheetMetal
+        #self.vobj = vobj
 
     def getIcon(self):
         self._check_attr()
         return self.icon_fn
+
+    def setupContextMenu(self, viewObject, menu):
+        action = menu.addAction(app.Qt.translate(
+            "QObject", "Edit %1").replace("%1", viewObject.Object.Label))
+        action.triggered.connect(lambda: self.startDefaultEditMode(viewObject))
+        return False
+
+    def startDefaultEditMode(self, viewObject):
+        viewObject.Document.setEdit(viewObject.Object, 0)
+
+    def setEdit(self, vobj, mode):
+        if mode != 0:
+            return None
+        if not hasattr(self, "getTaskPanel"):
+            print("not found: getTaskPanel")
+            return False
+        panel = self.getTaskPanel(vobj.Object)
+        updateTaskTitleIcon(panel)
+        if isPartDesign(vobj.Object): #self.Object):
+            vobj.Object.ViewObject.Visibility = True
+        app.ActiveDocument.openTransaction(vobj.Object.Name) #self.Object.Name)
+        gui.Control.showDialog(panel)
+        return True
+
+    def unsetEdit(self, _vobj, _mode):
+        gui.Control.closeDialog()
+        if hasattr(_vobj.Object, "baseObject"):
+            _vobj.Object.baseObject[0].ViewObject.Visibility = False
+        _vobj.Object.ViewObject.Visibility = True
+        return False
 
     def dumps(self):
         self._check_attr()

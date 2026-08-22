@@ -16,10 +16,13 @@
 # *                                                                         *
 # ***************************************************************************
 
+import numpy as np
+import os
+
 from freecad import app
+from freecad import gui
 from freecad import part
 
-import numpy as np
 from pygears.cycloid_tooth import CycloidTooth
 from pygears._functions import rotation
 
@@ -29,6 +32,8 @@ from .basegear import (
     insert_fillet,
     helical_extrusion,
     rotate_tooth,
+    updateTaskTitleIcon,
+    ViewProviderGear,
 )
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
@@ -92,6 +97,7 @@ class CycloidGear(BaseGear):
         obj.head = 0
         obj.head_fillet = 0
         obj.root_fillet = 0
+        self.obj = obj
         obj.Proxy = self
 
     def onDocumentRestored(self, obj):
@@ -282,3 +288,30 @@ class CycloidGear(BaseGear):
             return helical_extrusion(
                 base, fp.height.Value, twist_angle, fp.double_helix
             )
+
+if app.GuiUp:
+
+    from .taskpanels import CycloidGearTaskPanel
+
+    class CycloidGearViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "cycloidgear.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "cycloidgear.svg"),
+                )
+
+        def getTaskPanel(self, obj):
+            return CycloidGearTaskPanel(obj)

@@ -16,16 +16,24 @@
 # *                                                                         *
 # ***************************************************************************
 
-import os
 import sys
 
+import numpy as np
+import os
+
 from freecad import app
+from freecad import gui
 from freecad import part
 
-import numpy as np
-
 from pygears._functions import reflection
-from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
+from .basegear import (
+    BaseGear,
+    fcvec,
+    points_to_wire,
+    insert_fillet,
+    updateTaskTitleIcon,
+    ViewProviderGear,
+)
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -289,3 +297,30 @@ class CycloidGearRack(BaseGear):
                 fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
             )
             return part.makeLoft([pol, pol2], True)
+
+if app.GuiUp:
+
+    from .taskpanels import CycloidGearRackTaskPanel
+
+    class CycloidGearRackViewProvider(ViewProviderGear):
+
+        def __init__(self, obj, icon_fn=None):
+            # Set this object to the proxy object of the actual view provider
+            obj.Proxy = self
+            self._check_attr()
+            dirname = os.path.dirname(__file__)
+            self.icon_fn = icon_fn or os.path.join(dirname, "icons", "cycloidrack.svg")
+
+        def _check_attr(self):
+            """
+            Check for missing attributes.
+            """
+            if not hasattr(self, "icon_fn"):
+                setattr(
+                    self,
+                    "icon_fn",
+                    os.path.join(os.path.dirname(__file__), "icons", "cycloidrack.svg"),
+                )
+
+        def getTaskPanel(self, obj):
+            return CycloidGearRackTaskPanel(obj)
