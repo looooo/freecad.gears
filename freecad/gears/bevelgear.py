@@ -88,6 +88,12 @@ class BevelGear(BaseGear):
         )
         obj.addProperty(
             "App::PropertyBool",
+            "simple",
+            "precision",
+            QT_TRANSLATE_NOOP("App::Property", "simple"),
+        )
+        obj.addProperty(
+            "App::PropertyBool",
             "reset_origin",
             "base",
             QT_TRANSLATE_NOOP(
@@ -162,6 +168,7 @@ class BevelGear(BaseGear):
         obj.height = "5. mm"
         obj.numpoints = 20
         obj.numpoints_helix = 20
+        obj.simple = False
         obj.backlash = "0.00 mm"
         obj.clearance = 0.1
         obj.beta = "0 deg"
@@ -188,51 +195,59 @@ class BevelGear(BaseGear):
         )
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
-        pts = list(fp.gear.points(num=fp.numpoints))
-        rot = rotation3D(-2 * np.pi / fp.num_teeth)
-        # if fp.beta.Value != 0:
-        #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
-        rotated_pts = pts
-        for _ in range(fp.num_teeth - 1):
-            rotated_pts = list(map(rot, rotated_pts))
-            pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
-            pts += rotated_pts
-        pts.append(np.array([pts[-1][-1], pts[0][0]]))
-        wires = []
         if not "version" in fp.PropertiesList:
             scale_0 = scale - fp.height.Value / 2
             scale_1 = scale + fp.height.Value / 2
         else:  # starting with version 0.0.2
             scale_0 = scale - fp.height.Value
             scale_1 = scale
-        if fp.beta.Value == 0:
-            wires.append(make_bspline_wire([scale_0 * p for p in pts]))
-            wires.append(make_bspline_wire([scale_1 * p for p in pts]))
-        else:
-            for scale_i in np.linspace(scale_0, scale_1, fp.numpoints_helix):
-                # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
-                # rot = rotation3D(- beta_i)
-                # points = [rot(pt) * scale_i for pt in pts]
-                angle = (
-                    fp.beta.Value
-                    * np.pi
-                    / 180.0
-                    * np.sin(np.pi / 4)
-                    / np.sin(fp.pitch_angle.Value * np.pi / 180.0)
-                )
-                points = [
-                    np.array([self.spherical_rot(p, angle) for p in scale_i * pt])
-                    for pt in pts
-                ]
-                wires.append(make_bspline_wire(points))
-        shape = part.makeLoft(wires, True)
-        if fp.reset_origin:
-            mat = app.Matrix()
-            mat.A33 = -1
-            mat.move(fcvec([0, 0, scale_1]))
-            shape = shape.transformGeometry(mat)
 
+        if not fp.simple:
+            pts = list(fp.gear.points(num=fp.numpoints))
+            rot = rotation3D(-2 * np.pi / fp.num_teeth)
+            # if fp.beta.Value != 0:
+            #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
+
+            rotated_pts = pts
+            for _ in range(fp.num_teeth - 1):
+                rotated_pts = list(map(rot, rotated_pts))
+                pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
+                pts += rotated_pts
+            pts.append(np.array([pts[-1][-1], pts[0][0]]))
+            wires = []
+            if fp.beta.Value == 0:
+                wires.append(make_bspline_wire([scale_0 * p for p in pts]))
+                wires.append(make_bspline_wire([scale_1 * p for p in pts]))
+            else:
+                for scale_i in np.linspace(scale_0, scale_1, fp.numpoints_helix):
+                    # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
+                    # rot = rotation3D(- beta_i)
+                    # points = [rot(pt) * scale_i for pt in pts]
+                    angle = (
+                        fp.beta.Value
+                        * np.pi
+                        / 180.0
+                        * np.sin(np.pi / 4)
+                        / np.sin(fp.pitch_angle.Value * np.pi / 180.0)
+                    )
+                    points = [
+                        np.array([self.spherical_rot(p, angle) for p in scale_i * pt])
+                        for pt in pts
+                    ]
+                    wires.append(make_bspline_wire(points))
+            shape = part.makeLoft(wires, True)
+            if fp.reset_origin:
+                mat = app.Matrix()
+                mat.A33 = -1
+                mat.move(fcvec([0, 0, scale_1]))
+                shape = shape.transformGeometry(mat)
+        else:
+            unscaled_pitch_radius = np.tan(fp.gear.pitch_angle)
+            shape = part.makeLoft([
+                part.makeCircle(scale_1 * unscaled_pitch_radius),
+                part.makeCircle(scale_0 * unscaled_pitch_radius, app.Vector(0, 0, fp.height.Value))
+            ], True)
         if fp.trim_perpendicular:
             top_z = fp.height.Value
             unscaled_base_radius = fp.gear.r_f / fp.gear.z_f
