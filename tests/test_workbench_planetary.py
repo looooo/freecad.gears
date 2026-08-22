@@ -74,8 +74,8 @@ def test_planetary_planet_spacing(doc, headless_planetary_viewprovider):
         assert dist == pytest.approx(result["sun_planet_distance"], rel=1e-6)
         expected_angle = 360.0 / assembly.num_planets * index
         direction = planet.Placement.Base - sun_base
-        angle = np.degrees(np.arctan2(direction.y, direction.x)) % 360.0
-        assert angle == pytest.approx(expected_angle, abs=1e-6)
+        angle = np.degrees(np.arctan2(direction.y, direction.x))
+        assert _angle_diff(angle, expected_angle) < 1e-6
 
 
 def test_planetary_ring_is_concentric(doc, headless_planetary_viewprovider):
@@ -88,6 +88,11 @@ def _z_angle(placement):
     rotation = placement.Rotation
     sign = 1.0 if rotation.Axis.z >= 0 else -1.0
     return np.degrees(rotation.Angle) * sign
+
+
+def _angle_diff(a, b):
+    """Return the smallest absolute difference between two angles in degrees."""
+    return abs((a - b + 180.0) % 360.0 - 180.0)
 
 
 def test_planetary_gears_carry_meshing_phase(doc, headless_planetary_viewprovider):
@@ -105,9 +110,7 @@ def test_planetary_gears_carry_meshing_phase(doc, headless_planetary_viewprovide
         phases["ring_angle"]
     )
     for planet, expected in zip(assembly.planet_gears, phases["planet_angles"]):
-        assert _z_angle(planet.Placement) % 360.0 == pytest.approx(
-            expected % 360.0, abs=1e-9
-        )
+        assert _angle_diff(_z_angle(planet.Placement), expected) < 1e-9
 
 
 def test_planetary_carrier_angle_drives_epicyclic_motion(
@@ -122,18 +125,16 @@ def test_planetary_carrier_angle_drives_epicyclic_motion(
     doc.recompute()
 
     ratio = (assembly.z_sun + assembly.z_ring) / assembly.z_sun
-    assert _z_angle(assembly.sun_gear.Placement) % 360.0 == pytest.approx(
-        carrier_angle * ratio % 360.0
-    )
+    assert _angle_diff(_z_angle(assembly.sun_gear.Placement), carrier_angle * ratio) < 1e-6
     # The ring stays put while the planets orbit with the carrier.
     assert _z_angle(assembly.ring_gear.Placement) == pytest.approx(
         180.0 * (assembly.z_planet + 1) / assembly.z_ring
     )
     for index, planet in enumerate(assembly.planet_gears):
         base = planet.Placement.Base
-        angle = np.degrees(np.arctan2(base.y, base.x)) % 360.0
-        expected = (360.0 / assembly.num_planets * index + carrier_angle) % 360.0
-        assert angle == pytest.approx(expected)
+        angle = np.degrees(np.arctan2(base.y, base.x))
+        expected = 360.0 / assembly.num_planets * index + carrier_angle
+        assert _angle_diff(angle, expected) < 1e-6
 
 
 @pytest.mark.skipif(
@@ -285,9 +286,8 @@ def test_preview_planets_sit_on_the_orbit_circle():
     for planet, angle in zip(outlines["planets"], expected):
         center = (planet.min(axis=0) + planet.max(axis=0)) / 2.0
         assert np.hypot(*center) == pytest.approx(distance, abs=1e-6)
-        assert np.degrees(np.arctan2(center[1], center[0])) % 360 == pytest.approx(
-            angle % 360, abs=1e-6
-        )
+        orbit_angle = np.degrees(np.arctan2(center[1], center[0]))
+        assert _angle_diff(orbit_angle, angle) < 1e-6
 
 
 def test_preview_still_draws_an_invalid_configuration():
