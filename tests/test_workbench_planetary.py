@@ -8,6 +8,7 @@ from freecad import app
 from freecad.gears.assembly_helper import assembly_workbench_available
 from freecad.gears.involutegear import InvoluteGear
 from freecad.gears.internalinvolutegear import InternalInvoluteGear
+from freecad.gears.planetary_preview import PlanetaryPreview, build_outlines
 from freecad.gears.planetarygear import (
     PlanetaryGearAssembly,
     ViewProviderPlanetaryGear,
@@ -218,3 +219,87 @@ def test_planetary_planets_stay_on_the_pitch_circle(
         base = planet.Placement.Base
         assert base.Length == pytest.approx(assembly.sun_planet_distance.Value)
         assert base.z == pytest.approx(0.0)
+
+
+def _outline_points(obj, height, samples=6000):
+    """Sample the gear cross-section evenly, including its straight edges."""
+    points = []
+    for wire in obj.Shape.slice(app.Vector(0, 0, 1), height):
+        points.extend((p.x, p.y) for p in wire.discretize(Number=samples))
+    return np.array(points)
+
+
+def _max_deviation(preview, real):
+    distances = np.linalg.norm(preview[:, None, :] - real[None, :, :], axis=2)
+    return distances.min(axis=1).max()
+
+
+def test_preview_outlines_match_the_built_gears(doc, headless_planetary_viewprovider):
+    """The 2D preview must show the gears that pressing Ok would create."""
+    outlines = build_outlines(
+        module=1.0,
+        pressure_angle=20.0,
+        z_sun=24,
+        z_planet=18,
+        num_planets=3,
+        ring_thickness=4.0,
+    )
+    config = create_planetary_assembly(
+        module="1 mm",
+        pressure_angle="20 deg",
+        height="4 mm",
+        num_planets=3,
+        z_sun=24,
+        z_planet=18,
+        ring_thickness="4 mm",
+        use_assembly=False,
+    )
+    doc.recompute()
+
+    # A tenth of the module is far below what is visible while designing, and
+    # well above the sampling noise of the reference point cloud.
+    tolerance = 0.1 * config.module.Value
+    assert _max_deviation(
+        outlines["sun"][0], _outline_points(config.sun_gear, 2.0)
+    ) < tolerance
+    assert _max_deviation(
+        outlines["ring"][0], _outline_points(config.ring_gear, 2.0)
+    ) < tolerance
+    for preview_planet, planet in zip(outlines["planets"], config.planet_gears):
+        assert _max_deviation(
+            preview_planet, _outline_points(planet, 2.0)
+        ) < tolerance
+
+    rim = np.linalg.norm(outlines["ring"][1], axis=1)
+    assert rim.max() == pytest.approx(config.ring_gear.outside_diameter.Value / 2.0)
+
+
+def test_preview_planets_sit_on_the_orbit_circle():
+    outlines = build_outlines(z_sun=20, z_planet=16, num_planets=4)
+    distance = outlines["result"]["sun_planet_distance"]
+
+    orbit = np.linalg.norm(outlines["guides"][0], axis=1)
+    assert orbit == pytest.approx(distance)
+
+    expected = planetary_orbit_angles(20, outlines["result"]["z_ring"], 4)
+    for planet, angle in zip(outlines["planets"], expected):
+        center = (planet.min(axis=0) + planet.max(axis=0)) / 2.0
+        assert np.hypot(*center) == pytest.approx(distance, abs=1e-6)
+        assert np.degrees(np.arctan2(center[1], center[0])) % 360 == pytest.approx(
+            angle % 360, abs=1e-6
+        )
+
+
+def test_preview_still_draws_an_invalid_configuration():
+    """Users pass through invalid states while typing, so nothing may raise."""
+    outlines = build_outlines(z_sun=25, z_planet=18, num_planets=3)
+    assert not outlines["result"]["valid"]
+    assert len(outlines["planets"]) == 3
+    assert all(len(part) > 0 for part in outlines["sun"] + outlines["ring"])
+
+
+def test_preview_is_a_no_op_without_a_gui():
+    preview = PlanetaryPreview()
+    assert preview.update(z_sun=24, z_planet=18) is False
+    assert not preview.attached
+    preview.remove()

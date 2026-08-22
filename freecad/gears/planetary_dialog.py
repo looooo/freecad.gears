@@ -24,6 +24,8 @@ from freecad import app
 
 from pygears.computation import compute_planetary_gears, root_diameter
 
+from .planetary_preview import PlanetaryPreview
+
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 ICON = os.path.join(os.path.dirname(__file__), "icons", "planetarygear.svg")
@@ -44,6 +46,13 @@ def _qtgui():
         from PySide import QtGui
     return QtGui
 
+
+def _qtcore():
+    try:
+        from PySide6 import QtCore
+    except ImportError:
+        from PySide import QtCore
+    return QtCore
 
 
 def _tr(text):
@@ -121,6 +130,11 @@ class PlanetaryGearTaskPanel:
         self.use_assembly.setChecked(True)
         layout.addWidget(self.use_assembly)
 
+        self.show_preview = QtWidgets.QCheckBox(_tr("Live preview in the 3D view"))
+        self.show_preview.setChecked(True)
+        self.show_preview.toggled.connect(self._refresh_preview)
+        layout.addWidget(self.show_preview)
+
         result = self._group(layout, _tr("Calculation"), form=False)
         self.summary = QtWidgets.QPlainTextEdit()
         self.summary.setReadOnly(True)
@@ -140,10 +154,21 @@ class PlanetaryGearTaskPanel:
             self.shift_ring,
             self.hole_sun,
             self.hole_planets,
+            self.ring_thickness,
+            self.backlash,
         ):
-            widget.valueChanged.connect(self._update_summary)
+            widget.valueChanged.connect(self._on_value_changed)
+
+        # Redrawing takes a few milliseconds, but holding a spin box arrow fires
+        # far faster than that, so the requests are coalesced.
+        self._preview = PlanetaryPreview()
+        self._preview_timer = _qtcore().QTimer()
+        self._preview_timer.setSingleShot(True)
+        self._preview_timer.setInterval(60)
+        self._preview_timer.timeout.connect(self._draw_preview)
 
         self._update_summary()
+        self._refresh_preview()
 
     def _group(self, layout, title, form=True):
         QtWidgets = _widgets()
@@ -252,6 +277,30 @@ class PlanetaryGearTaskPanel:
             lines.extend(result["messages"])
         self.summary.setPlainText("\n".join(lines))
 
+    def _on_value_changed(self):
+        self._update_summary()
+        self._refresh_preview()
+
+    def _refresh_preview(self):
+        if not self.show_preview.isChecked():
+            self._preview.remove()
+            return
+        self._preview_timer.start()
+
+    def _draw_preview(self):
+        self._preview.update(
+            module=self.module.value(),
+            pressure_angle=self.pressure_angle.value(),
+            z_sun=self.z_sun.value(),
+            z_planet=self.z_planet.value(),
+            num_planets=self.num_planets.value(),
+            shift_sun=self.shift_sun.value(),
+            shift_planet=self.shift_planet.value(),
+            shift_ring=self.shift_ring.value(),
+            ring_thickness=self.ring_thickness.value(),
+            backlash=self.backlash.value(),
+        )
+
     def parameters(self):
         """Return the current settings as keyword arguments for the factory."""
         return {
@@ -288,6 +337,10 @@ class PlanetaryGearTaskPanel:
             )
             return False
 
+        # Drop the preview before building, so the real gears are not drawn
+        # over by their own outlines.
+        self._stop_preview()
+
         if self._on_accept is not None:
             try:
                 self._on_accept(self.parameters())
@@ -301,8 +354,13 @@ class PlanetaryGearTaskPanel:
         return True
 
     def reject(self):
+        self._stop_preview()
         self._close()
         return True
+
+    def _stop_preview(self):
+        self._preview_timer.stop()
+        self._preview.remove()
 
     def _close(self):
         try:
