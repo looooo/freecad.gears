@@ -81,6 +81,12 @@ class BevelGear(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
+            "App::PropertyInteger",
+            "numpoints_helix",
+            "precision",
+            QT_TRANSLATE_NOOP("App::Property", "number of points for helix curve"),
+        )
+        obj.addProperty(
             "App::PropertyBool",
             "reset_origin",
             "base",
@@ -155,6 +161,7 @@ class BevelGear(BaseGear):
         obj.pitch_angle = "45. deg"
         obj.height = "5. mm"
         obj.numpoints = 20
+        obj.numpoints_helix = 20
         obj.backlash = "0.00 mm"
         obj.clearance = 0.1
         obj.beta = "0 deg"
@@ -203,7 +210,7 @@ class BevelGear(BaseGear):
             wires.append(make_bspline_wire([scale_0 * p for p in pts]))
             wires.append(make_bspline_wire([scale_1 * p for p in pts]))
         else:
-            for scale_i in np.linspace(scale_0, scale_1, 20):
+            for scale_i in np.linspace(scale_0, scale_1, fp.numpoints_helix):
                 # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
                 # rot = rotation3D(- beta_i)
                 # points = [rot(pt) * scale_i for pt in pts]
