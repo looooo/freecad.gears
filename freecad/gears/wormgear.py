@@ -21,9 +21,6 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from pygears.involute_tooth import InvoluteTooth
-from pygears._functions import rotation
-
 from .basegear import BaseGear, helical_extrusion, fcvec
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
@@ -178,12 +175,10 @@ class WormGear(BaseGear):
 
         rot = app.Matrix()
         rot.rotateZ(2 * np.pi / t)
-        for i in range(1, t):
+        for _ in range(1, t):
             w_all.append(w_all[-1].transformGeometry(rot))
 
         full_wire = part.Wire(w_all)
         if h == 0:
             return full_wire
-        else:
-            shape = helical_extrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)
-            return shape
+        return helical_extrusion(part.Face(full_wire), h, h * np.tan(beta) * 2 / d)

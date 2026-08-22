@@ -330,7 +330,7 @@ class InvoluteRack(object):
         Returns:
             numpy.ndarray: Closed profile as ``(N, 2)`` array.
         """
-        m, m_n, pitch, pressure_angle_t = self.compute_properties()
+        _, m_n, pitch, pressure_angle_t = self.compute_properties()
 
         a = (2 + self.head + self.clearance) * m_n * tan(pressure_angle_t)
         b = pitch / 4 - (1 + self.head) * m_n * tan(pressure_angle_t)

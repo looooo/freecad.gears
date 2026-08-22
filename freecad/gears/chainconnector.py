@@ -51,7 +51,7 @@ class Chain(object):
 
 class ChainConnector(object):
     def __init__(self, obj, master_connector, slave_gear):
-        
+
         # --- PROPERTY DEFINITIONS ---
         obj.addProperty("App::PropertyString", "version", "version",
                         QT_TRANSLATE_NOOP("App::Property", "freecad.gears-version"), 1)
@@ -63,12 +63,12 @@ class ChainConnector(object):
                         QT_TRANSLATE_NOOP("App::Property", "The new slave gear (G3)"), 1)
         obj.addProperty("App::PropertyAngle", "input_gear_angle", "GearChain",
                         QT_TRANSLATE_NOOP("App::Property", "Calculated rotation angle of the shared gear (G2)"), 8)
-        
+
         obj.version = __version__
         obj.input_connector = master_connector
         obj.slave_gear = slave_gear
         obj.Proxy = self
-        
+
         ViewProviderGearConnector(obj.ViewObject)
 
         obj.setExpression('master_gear', f'{master_connector.Name}.slave_gear')
@@ -87,10 +87,10 @@ class ChainConnector(object):
         # input_gear_angle is linked to Placement.Rotation.Angle, which is in RADIANS
         master_angle_rad = fp.input_gear_angle.Value
         master_angle_deg = np.rad2deg(master_angle_rad) # Convert to degrees
-        
+
         dw_master = fp.master_gear.pitch_diameter.Value
         dw_slave = fp.slave_gear.pitch_diameter.Value
-        
+
         # --- Involute Gear Pair Logic ---
         if isinstance(fp.master_gear.Proxy, InvoluteGear) and isinstance(fp.slave_gear.Proxy, InvoluteGear):
             dist = (dw_master + dw_slave) / 2
@@ -98,11 +98,11 @@ class ChainConnector(object):
 
             # Kinematics: Calculate slave rotation (opposite direction)
             angle_slave_deg = -(dw_master / dw_slave) * master_angle_deg
-            
+
             # Apply rotation and position to G3 (slave_gear)
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot_slave = app.Rotation(app.Vector(0, 0, 1), angle_slave_deg + angle3)
-            
+
             fp.slave_gear.Placement = app.Placement(slave_pos, rot_slave)
             fp.slave_gear.purgeTouched()
 
@@ -110,13 +110,13 @@ class ChainConnector(object):
         elif isinstance(fp.master_gear.Proxy, InternalInvoluteGear) and isinstance(fp.slave_gear.Proxy, InvoluteGear):
             dist = (dw_master - dw_slave) / 2
             slave_pos = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
-            
+
             # Kinematics: Calculate slave rotation (same direction)
             angle_slave_deg = (dw_master / dw_slave) * master_angle_deg
-            
+
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot_slave = app.Rotation(app.Vector(0, 0, 1), angle_slave_deg + angle3)
-            
+
             fp.slave_gear.Placement = app.Placement(slave_pos, rot_slave)
             fp.slave_gear.purgeTouched()
 
@@ -127,11 +127,11 @@ class ChainConnector(object):
 
             # Kinematics: Calculate slave rotation (opposite direction)
             angle_slave_deg = -(dw_master / dw_slave) * master_angle_deg
-            
+
             # Apply rotation and position to G3 (slave_gear)
             angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
             rot_slave = app.Rotation(app.Vector(0, 0, 1), angle_slave_deg + angle3)
-            
+
             fp.slave_gear.Placement = app.Placement(slave_pos, rot_slave)
             fp.slave_gear.purgeTouched()
 
@@ -140,5 +140,3 @@ class ChainConnector(object):
     def execute(self, fp):
         # When executed, simply trigger the onChanged to use the current expression-linked value
         self.onChanged(fp, 'input_gear_angle')
-
-

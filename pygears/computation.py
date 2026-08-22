@@ -297,14 +297,12 @@ def find_root(x0, f, df, epsilon=2e-10, max_iter=100):
         float or None: Root value, or ``None`` if convergence fails.
     """
     x_n = x0
-    for i in range(max_iter):
+    for _ in range(max_iter):
         f_xn = f(x_n)
         if abs(f_xn) < epsilon:
             return x_n
-        else:
-            df_xn = df(x_n)
-            if df_xn == 0:
-                return None
-            else:
-                x_n = x_n - f_xn / df_xn / 2  # adding (/ 2) to avoid oscillation
+        df_xn = df(x_n)
+        if df_xn == 0:
+            return None
+        x_n = x_n - f_xn / df_xn / 2  # adding (/ 2) to avoid oscillation
     return None

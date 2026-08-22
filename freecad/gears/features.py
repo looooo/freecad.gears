@@ -23,6 +23,7 @@ from freecad import app
 
 app.Console.PrintWarning(f"{__file__} is deprecated, just saving this file again should fix this warning")
 
+# pylint: disable=unused-import
 from .timinggear_t import TimingGearT
 from .involutegear import InvoluteGear
 from .internalinvolutegear import InternalInvoluteGear

@@ -17,7 +17,7 @@
 # ***************************************************************************
 
 import os
-import sys
+
 import numpy as np
 
 from freecad import app
@@ -41,8 +41,7 @@ def fcvec(x):
     """
     if len(x) == 2:
         return app.Vector(x[0], x[1], 0)
-    else:
-        return app.Vector(x[0], x[1], x[2])
+    return app.Vector(x[0], x[1], x[2])
 
 
 class ViewProviderGear:
@@ -141,7 +140,7 @@ class BaseGear:
 
         gear_shape = self.generate_gear_shape(obj)
         self._assign_face_names(gear_shape)
-        if hasattr(obj, "BaseFeature") and obj.BaseFeature != None:
+        if hasattr(obj, "BaseFeature") and obj.BaseFeature is not None:
             # we're inside a PartDesign Body, thus need to fuse with the base feature
             gear_shape.Placement = (
                 obj.Placement
@@ -263,7 +262,8 @@ def helical_extrusion(face, height, angle, double_helix=False):
     if double_helix:
         origin = app.Vector(0, 0, height / 2.0)
         xy_normal = app.Vector(0, 0, 1)
-        mirror_xy = lambda f: f.mirror(origin, xy_normal)
+        def mirror_xy(face):
+            return face.mirror(origin, xy_normal)
         bottom_faces = list(map(mirror_xy, shell_faces))
         shell_faces.extend(bottom_faces)
         # TODO: why the heck is makeShell from this empty after mirroring?
@@ -315,7 +315,7 @@ def rotate_tooth(base_tooth, num_teeth):
     rot = app.Matrix()
     rot.rotateZ(2 * np.pi / num_teeth)
     flat_shape = [base_tooth]
-    for t in range(num_teeth - 1):
+    for _ in range(num_teeth - 1):
         flat_shape.append(flat_shape[-1].transformGeometry(rot))
     return part.Wire(flat_shape)
 
@@ -337,8 +337,7 @@ def fillet_between_edges(edge_1, edge_2, radius, reversed=False):
         p0 = (p2 + p3) / 2
         fillet, e1, e2 = fillet2d_api.result(p0)
         return part.Wire([e1, fillet, e2]).Edges
-    else:
-        return None
+    return None
 
 
 def insert_fillet(edges, pos, radius, reversed=False):

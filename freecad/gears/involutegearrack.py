@@ -94,7 +94,7 @@ class InvoluteGearRack(BaseGear):
         obj.Proxy = self
 
     def onDocumentRestored(self, obj):
-        """  
+        """
         backward compatibility functions
         """
         # replace beta with helix_angle
@@ -116,7 +116,8 @@ class InvoluteGearRack(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, "
+                "gear parameters are internally recomputed for the rotated gear",
             ),
         )
         obj.addProperty(
@@ -146,7 +147,8 @@ class InvoluteGearRack(BaseGear):
             "base",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
+                "if enabled the total length of the rack is teeth x pitch, "
+                "otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -213,9 +215,8 @@ class InvoluteGearRack(BaseGear):
         if "simplified" in obj.PropertiesList:
             obj.rack.simplified = obj.simplified
         obj.rack._update()
-        m, m_n, pitch, pressure_angle_t = obj.rack.compute_properties()
-        obj.transverse_pitch = "{} mm".format(pitch)
-        t = obj.thickness.Value
+        m, _, pitch, _ = obj.rack.compute_properties()
+        obj.transverse_pitch = f"{pitch} mm"
         c = obj.clearance
         h = obj.head
         alpha = obj.pressure_angle.Value * np.pi / 180.0
@@ -260,7 +261,7 @@ class InvoluteGearRack(BaseGear):
         tooth = part.Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
 
-        for i in range(obj.num_teeth - 1):
+        for _ in range(obj.num_teeth - 1):
             tooth = tooth.copy()
             tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
@@ -288,10 +289,10 @@ class InvoluteGearRack(BaseGear):
 
         if obj.height.Value == 0:
             return pol
-        elif obj.rack.beta == 0:
+        if obj.rack.beta == 0:
             face = part.Face(part.Wire(pol))
             return face.extrude(fcvec([0.0, 0.0, obj.height.Value]))
-        elif obj.double_helix:
+        if obj.double_helix:
             pol2 = part.Wire(pol)
             pol2.translate(
                 fcvec([0.0, np.tan(obj.rack.beta) * obj.height.Value / 2, obj.height.Value / 2])
@@ -299,9 +300,8 @@ class InvoluteGearRack(BaseGear):
             pol3 = part.Wire(pol)
             pol3.translate(fcvec([0.0, 0.0, obj.height.Value]))
             return part.makeLoft([pol, pol2, pol3], True, True)
-        else:
-            pol2 = part.Wire(pol)
-            pol2.translate(
-                fcvec([0.0, np.tan(obj.rack.beta) * obj.height.Value, obj.height.Value])
-            )
-            return part.makeLoft([pol, pol2], True)
+        pol2 = part.Wire(pol)
+        pol2.translate(
+            fcvec([0.0, np.tan(obj.rack.beta) * obj.height.Value, obj.height.Value])
+        )
+        return part.makeLoft([pol, pol2], True)

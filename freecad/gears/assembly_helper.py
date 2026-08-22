@@ -27,9 +27,9 @@ JOINT_PREFIX = "FCGear_"
 def assembly_workbench_available():
     """Return True if the Assembly workbench Python modules can be imported."""
     try:
-        import Assembly  # noqa: F401
-        import UtilsAssembly  # noqa: F401
-        import JointObject  # noqa: F401
+        import Assembly  # pylint: disable=unused-import
+        import UtilsAssembly  # pylint: disable=unused-import
+        import JointObject  # pylint: disable=unused-import
 
         return True
     except ImportError:

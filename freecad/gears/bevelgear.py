@@ -95,7 +95,8 @@ class BevelGear(BaseGear):
             "base",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if value is true the gear's teeth will be cut so that their ends are perpendicular to the cone that defines the gear",
+                "if value is true the gear's teeth will be cut so that their "
+                "ends are perpendicular to the cone that defines the gear",
             ),
         )
         obj.addProperty(
@@ -169,7 +170,7 @@ class BevelGear(BaseGear):
         max_height = fp.gear.module * fp.num_teeth / 2 / np.tan(fp.gear.pitch_angle)
         if fp.height >= max_height:
             app.Console.PrintWarning(
-                "height must be smaller than {}".format(max_height)
+                f"height must be smaller than {max_height}"
             )
         fp.gear.backlash = fp.backlash.Value
         scale = (
@@ -186,7 +187,7 @@ class BevelGear(BaseGear):
         #     pts = [np.array([self.spherical_rot(j, fp.beta.Value * np.pi / 180.) for j in i]) for i in pts]
 
         rotated_pts = pts
-        for i in range(fp.num_teeth - 1):
+        for _ in range(fp.num_teeth - 1):
             rotated_pts = list(map(rot, rotated_pts))
             pts.append(np.array([pts[-1][-1], rotated_pts[0][0]]))
             pts += rotated_pts
@@ -227,13 +228,13 @@ class BevelGear(BaseGear):
 
         if fp.trim_perpendicular:
             top_z = fp.height.Value
-            unscaled_base_radius = (fp.gear.r_f / fp.gear.z_f)
+            unscaled_base_radius = fp.gear.r_f / fp.gear.z_f
             bottom_base_radius = unscaled_base_radius * scale_1
             top_base_radius = unscaled_base_radius * scale_0
 
             # calculate radius for conical mask shape such that its face is perpendicular to the gear's cone
             calculated_radius = bottom_base_radius + (top_z ** 2 / (bottom_base_radius - top_base_radius))
-            
+
             mask = part.makeLoft(
                 [
                     part.makeCircle(bottom_base_radius),
@@ -247,14 +248,15 @@ class BevelGear(BaseGear):
             tip_angle = fp.gear.pitch_angle + addendum_angle
             top_tip_radius = np.tan(tip_angle) * scale_0
 
-            # project top_tip_radius onto the cone defined by bottom_base_radius at z=0 and top_base_radius at z=top_z (fp.height.Value)
+            # project top_tip_radius onto the cone defined by bottom_base_radius
+            # at z=0 and top_base_radius at z=top_z (fp.height.Value)
             tip_vector_x = top_tip_radius - bottom_base_radius # z=top_z
             cone_vector_x = top_base_radius - bottom_base_radius # z=top_z
 
             cone_vector_mag = np.sqrt(cone_vector_x ** 2 + top_z ** 2)
 
             t = (tip_vector_x * cone_vector_x + top_z ** 2) / cone_vector_mag
-            
+
             projected_r = bottom_base_radius + t * (cone_vector_x / cone_vector_mag) # add back the bottom base radius
             projected_z = t * (top_z/cone_vector_mag)
 
@@ -288,7 +290,7 @@ class BevelGear(BaseGear):
         )
         s = [scal1, scal2]
         pts = self.obj.gear.points(num=self.obj.numpoints)
-        for j, pos in enumerate(s):
+        for pos in s:
             w1 = []
 
             def scale(x):

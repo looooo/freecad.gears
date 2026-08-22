@@ -145,7 +145,6 @@ def test_trimfunc_no_intersection():
 
 
 def test_trimfunc_intersection_on_first_segment_of_second_line():
-    # jk == 0 hits a comparison-no-op in trimfunc; second polyline is not truncated.
     line_1 = np.array([[0.0, 0.0], [2.0, 0.0]])
     line_2 = np.array([[1.0, -1.0], [1.0, 1.0]])
     result = trimfunc(line_1, line_2)
@@ -153,7 +152,8 @@ def test_trimfunc_intersection_on_first_segment_of_second_line():
     cut_1, cut_2 = result
     assert_allclose(cut_1[-1], [1.0, 0.0])
     assert_allclose(cut_2[0], [1.0, 0.0])
-    assert cut_2.shape[0] == 1 + line_2.shape[0]
+    assert cut_2.shape[0] == 2
+    assert_allclose(cut_2[1], [1.0, -1.0])
 
 
 # ---------------------------------------------------------------------------

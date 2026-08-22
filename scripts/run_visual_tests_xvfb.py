@@ -49,6 +49,7 @@ def main() -> int:
         ],
         cwd=PROJECT_ROOT,
         env=os.environ,
+        check=False,
     )
 
     saved = None

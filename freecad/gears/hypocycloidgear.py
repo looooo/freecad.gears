@@ -23,9 +23,6 @@ import numpy as np
 from freecad import app
 from freecad import part
 
-from pygears.bevel_tooth import BevelTooth
-from pygears._functions import rotation
-
 from .basegear import BaseGear, make_bspline_wire
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP

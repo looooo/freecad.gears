@@ -83,7 +83,7 @@ def test_backlash_rotates_projected_involute():
 def test_root_radius_on_projected_plane():
     tooth = BevelTooth()
     projected_root = tooth.r_f / tooth.z_f
-    points = tooth.involute_points(num=12)
+    points = np.asarray(tooth.involute_points(num=12))
     radii = np.linalg.norm(points[:, :2], axis=1)
     assert radii.min() == pytest.approx(projected_root, rel=1e-8)
 

@@ -38,7 +38,7 @@ from .hypocycloidgear import HypoCycloidGear
 
 # CRITICAL CHANGE: Import both connector types
 from .connector import GearConnector, ViewProviderGearConnector
-from .chainconnector import ChainConnector, Chain
+from .chainconnector import ChainConnector
 from .planetarygear import PlanetaryGearAssembly, create_planetary_assembly
 from .planetary_dialog import show_planetary_task_panel
 
@@ -56,13 +56,12 @@ class BaseCommand(object):
     def IsActive(self):
         if app.ActiveDocument is None:
             return False
-        else:
-            return True
+        return True
 
     def Activated(self):
         gui.doCommandGui("import freecad.gears.commands")
         gui.doCommandGui(
-            "freecad.gears.commands.{}.create()".format(self.__class__.__name__)
+            f"freecad.gears.commands.{self.__class__.__name__}.create()"
         )
         app.ActiveDocument.recompute()
         gui.SendMsgToActiveView("ViewFit")
@@ -232,7 +231,7 @@ class CreateGearConnector(BaseCommand):
             # Get the proxy types for the two selected objects
             selection0_proxy = selection[0].Proxy if hasattr(selection[0], 'Proxy') else None
             selection1_proxy = selection[1].Proxy if hasattr(selection[1], 'Proxy') else None
-            
+
             # Identify the parent connector and the new slave gear
             parent_connector = None
             slave_gear = None
@@ -241,7 +240,7 @@ class CreateGearConnector(BaseCommand):
             if isinstance(selection0_proxy, GearConnector) and isinstance(selection1_proxy, BaseGear):
                 parent_connector = selection[0]
                 slave_gear = selection[1]
-            
+
             # Case 2: Gear (G3) selected first, Connector (GC1) second
             elif isinstance(selection1_proxy, GearConnector) and isinstance(selection0_proxy, BaseGear):
                 parent_connector = selection[1]
@@ -250,7 +249,7 @@ class CreateGearConnector(BaseCommand):
             # --- CRITICAL DECISION POINT ---
             if parent_connector is not None:
                 # Import the ChainConnector class (we already imported it at the top)
-                
+
                 # Chain Creation: Create the dedicated ChainConnector
                 obj = app.ActiveDocument.addObject("Part::FeaturePython", "ChainConnector")
                 ChainConnector(obj, parent_connector, slave_gear)
@@ -315,4 +314,3 @@ class CreatePlanetaryGearAssembly(BaseCommand):
             return
 
         show_planetary_task_panel(self._build)
-

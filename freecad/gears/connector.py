@@ -122,7 +122,7 @@ class GearConnector(object):
         obj.master_gear_stationary = True
         obj.slave_gear_stationary = True
         obj.Proxy = self
-        
+
         # FIX 1: Attach ViewProvider to ensure visibility (fixes grey-out)
         ViewProviderGearConnector(obj.ViewObject)
 
@@ -142,7 +142,7 @@ class GearConnector(object):
             return
 
         master_angle = fp.angle1.Value
-            
+
         # ====================================================================
         # INVOLUTE GEAR TO INVOLUTE GEAR
         # ====================================================================
@@ -156,7 +156,7 @@ class GearConnector(object):
             dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
-                dist, alpha_w = compute_shifted_gears(
+                dist, _ = compute_shifted_gears(
                     fp.master_gear.module,
                     np.deg2rad(fp.master_gear.pressure_angle.Value),
                     fp.master_gear.num_teeth,
@@ -182,7 +182,7 @@ class GearConnector(object):
                 angle_slave = dw_master / dw_slave * master_angle
                 angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
                 rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
-                
+
                 # 3. Set G2's placement. This triggers the ChainConnector via Expression link.
                 fp.slave_gear.Placement = app.Placement(slave_position, rot_slave)
                 fp.slave_gear.purgeTouched()
@@ -232,7 +232,7 @@ class GearConnector(object):
             dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master - dw_slave) / 2
             if fp.master_gear.shift != 0 or fp.slave_gear.shift != 0:
-                dist, alpha_w = compute_shifted_gears(
+                dist, _ = compute_shifted_gears(
                     fp.master_gear.module,
                     np.deg2rad(fp.master_gear.pressure_angle.Value),
                     fp.master_gear.num_teeth,
@@ -247,12 +247,12 @@ class GearConnector(object):
             if master_stationary and slave_stationary:
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
 
-                # Master rotates by angle1 
+                # Master rotates by angle1
                 rot_master = app.Rotation(app.Vector(0, 0, 1), fp.angle1.Value)
                 fp.master_gear.Placement = app.Placement(fp.master_gear.Placement.Base, rot_master)
                 fp.master_gear.purgeTouched()
 
-                # Slave gets positioned at correct distance and rotates based on gear ratio 
+                # Slave gets positioned at correct distance and rotates based on gear ratio
                 angle_slave = -dw_master / dw_slave * fp.angle1.Value
                 angle3 = abs(fp.slave_gear.num_teeth % 2 - 1) * 180.0 / fp.slave_gear.num_teeth
                 rot_slave = app.Rotation(app.Vector(0, 0, 1), -angle_slave + angle3)
@@ -382,4 +382,3 @@ class GearConnector(object):
 
     def execute(self, fp):
         self.onChanged(fp, 'angle1')
-

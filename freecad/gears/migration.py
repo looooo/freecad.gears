@@ -126,7 +126,7 @@ def _prompt_convert_gui(obj):
             "Please recompute the document to regenerate the gear geometry.",
         )
     )
-    keep = box.addButton(
+    _keep = box.addButton(
         app.Qt.translate("Workbench", "Keep current shift value"),
         QtWidgets.QMessageBox.RejectRole,
     )
@@ -152,8 +152,8 @@ def _prompt_convert_cli(obj):
         "transverse coefficient (x_t)."
     )
     print(
-        "Convert the shift value to x_n = x_t / cos(β=%.3f°) to keep the "
-        "tooth thickness unchanged." % beta_deg
+        f"Convert the shift value to x_n = x_t / cos(β={beta_deg:.3f}°) to keep the "
+        "tooth thickness unchanged."
     )
     print("Afterwards, recompute the document to regenerate the gear geometry.")
     while True:

@@ -16,8 +16,6 @@
 # *                                                                         *
 # ***************************************************************************
 
-import os
-import sys
 
 from freecad import app
 from freecad import part
@@ -97,7 +95,7 @@ class CycloidGearRack(BaseGear):
         obj.Proxy = self
 
     def onDocumentRestored(self, obj):
-        """  
+        """
         backward compatibility functions
         """
         # replace beta with helix_angle
@@ -140,7 +138,8 @@ class CycloidGearRack(BaseGear):
             "base",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if enabled the total length of the rack is teeth x pitch, otherwise the rack starts with a tooth-flank",
+                "if enabled the total length of the rack is teeth x pitch, "
+                "otherwise the rack starts with a tooth-flank",
             ),
         )
 
@@ -203,7 +202,6 @@ class CycloidGearRack(BaseGear):
     def generate_gear_shape(self, obj):
         numpoints = obj.numpoints
         m = obj.module.Value
-        t = obj.thickness.Value
         r_i = obj.inner_diameter / 2 * m
         r_o = obj.outer_diameter / 2 * m
         c = obj.clearance
@@ -242,7 +240,7 @@ class CycloidGearRack(BaseGear):
         tooth = part.Wire(tooth_edges[1:-1] + edge)
         teeth = [tooth]
 
-        for i in range(obj.num_teeth - 1):
+        for _ in range(obj.num_teeth - 1):
             tooth = tooth.copy()
             tooth.translate(app.Vector(0, np.pi * m, 0))
             teeth.append(tooth)
@@ -270,10 +268,10 @@ class CycloidGearRack(BaseGear):
 
         if obj.height.Value == 0:
             return pol
-        elif obj.helix_angle.Value == 0:
+        if obj.helix_angle.Value == 0:
             face = part.Face(part.Wire(pol))
             return face.extrude(fcvec([0.0, 0.0, obj.height.Value]))
-        elif obj.double_helix:
+        if obj.double_helix:
             beta = obj.helix_angle.Value * np.pi / 180.0
             pol2 = part.Wire(pol)
             pol2.translate(
@@ -282,10 +280,9 @@ class CycloidGearRack(BaseGear):
             pol3 = part.Wire(pol)
             pol3.translate(fcvec([0.0, 0.0, obj.height.Value]))
             return part.makeLoft([pol, pol2, pol3], True, True)
-        else:
-            beta = obj.helix_angle.Value * np.pi / 180.0
-            pol2 = part.Wire(pol)
-            pol2.translate(
-                fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
-            )
-            return part.makeLoft([pol, pol2], True)
+        beta = obj.helix_angle.Value * np.pi / 180.0
+        pol2 = part.Wire(pol)
+        pol2.translate(
+            fcvec([0.0, np.tan(beta) * obj.height.Value, obj.height.Value])
+        )
+        return part.makeLoft([pol, pol2], True)

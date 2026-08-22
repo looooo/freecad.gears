@@ -50,26 +50,27 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
         # If we don't have the git version, assume it's OK.
         gitver = FC_COMMIT_REQUIRED
 
-    if major_ver < FC_MAJOR_VER_REQUIRED or (
-        major_ver == FC_MAJOR_VER_REQUIRED
-        and (
-            minor_ver < FC_MINOR_VER_REQUIRED
-            or (
-                minor_ver == FC_MINOR_VER_REQUIRED
-                and (
-                    patch_ver < FC_PATCH_VER_REQUIRED
-                    or (
-                        patch_ver == FC_PATCH_VER_REQUIRED
-                        and gitver < FC_COMMIT_REQUIRED
-                    )
-                )
-            )
-        )
-    ):
+    def _fc_version_too_old(major, minor, patch, commit):
+        if major < FC_MAJOR_VER_REQUIRED:
+            return True
+        if major > FC_MAJOR_VER_REQUIRED:
+            return False
+        if minor < FC_MINOR_VER_REQUIRED:
+            return True
+        if minor > FC_MINOR_VER_REQUIRED:
+            return False
+        if patch < FC_PATCH_VER_REQUIRED:
+            return True
+        if patch > FC_PATCH_VER_REQUIRED:
+            return False
+        return commit < FC_COMMIT_REQUIRED
+
+    if _fc_version_too_old(major_ver, minor_ver, patch_ver, gitver):
         app.Console.PrintWarning(
             app.Qt.translate(
                 "Log",
-                "FreeCAD version (currently {}.{}.{} ({})) must be at least {}.{}.{} ({}) in order to work with Python 3.11 and above\n",
+                "FreeCAD version (currently {}.{}.{} ({})) must be at least "
+                "{}.{}.{} ({}) in order to work with Python 3.11 and above\n",
             ).format(
                 int(ver[0]),
                 minor_ver,

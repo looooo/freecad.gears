@@ -19,7 +19,6 @@
 
 import numpy as np
 import scipy as sp
-from scipy import optimize
 
 from freecad import app
 from freecad import part
@@ -33,6 +32,7 @@ QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 class TimingGearT(BaseGear):
     def __init__(self, obj):
+        super(TimingGearT, self).__init__(obj)
         obj.addProperty(
             "App::PropertyLength",
             "pitch",
@@ -180,12 +180,11 @@ class TimingGearT(BaseGear):
         rot = app.Matrix()
         rot.rotateZ(gamma_0)
         wires = []
-        for i in range(teeth):
+        for _ in range(teeth):
             w = w.transformGeometry(rot)
             wires.append(w.copy())
         contour = part.Wire(wires)
         if height == 0:
             return contour
-        else:
-            face = part.Face(part.Wire(wires))
-            return face.extrude(app.Vector(0.0, 0.0, height))
+        face = part.Face(part.Wire(wires))
+        return face.extrude(app.Vector(0.0, 0.0, height))

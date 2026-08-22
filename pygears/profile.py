@@ -53,7 +53,7 @@ class _GearProfile(object):
         else:
             rot = rotation(np.pi * 2 / n_teeth)
         profile = tooth
-        for i in range(n_teeth - 1):
+        for _ in range(n_teeth - 1):
             tooth = rot(tooth).tolist()
             profile = profile + tooth
         profile.append(profile[0])

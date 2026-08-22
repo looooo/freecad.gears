@@ -95,7 +95,7 @@ class CycloidGear(BaseGear):
         obj.Proxy = self
 
     def onDocumentRestored(self, obj):
-        """  
+        """
         backward compatibility functions
         """
         if hasattr(obj, "dw"):
@@ -274,11 +274,10 @@ class CycloidGear(BaseGear):
         base = part.Face(profile)
         if fp.helix_angle.Value == 0:
             return base.extrude(app.Vector(0, 0, fp.height.Value))
-        else:
-            beta = fp.helix_angle.Value * np.pi / 180
-            twist_angle = (
-                fp.height.Value * np.tan(beta) * 2 / fp.gear.d
-            )
-            return helical_extrusion(
-                base, fp.height.Value, twist_angle, fp.double_helix
-            )
+        beta = fp.helix_angle.Value * np.pi / 180
+        twist_angle = (
+            fp.height.Value * np.tan(beta) * 2 / fp.gear.d
+        )
+        return helical_extrusion(
+            base, fp.height.Value, twist_angle, fp.double_helix
+        )

@@ -149,7 +149,7 @@ class CycloidTooth:
 
     def _update(self):
         """Recalculate tooth geometry after a parameter change."""
-        self.__init__(
+        self.__init__(  # pylint: disable=unnecessary-dunder-call
             m=self.m,
             num_teeth=self.num_teeth,
             num_teeth_1=self.num_teeth_1,

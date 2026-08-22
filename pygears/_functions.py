@@ -142,30 +142,25 @@ def trim(p1, p2, p3, p4):
     if all(a1 == a2) or all(a3 == a4):
         if all(a1 == a3):
             return a1
-        else:
-            return False
-    elif all(a1 == a3):
+        return False
+    if all(a1 == a3):
         if all(a2 == a4):
             return (a1 + a2) / 2
-        else:
-            return a1
-    elif all(a1 == a4):
+        return a1
+    if all(a1 == a4):
         if all(a2 == a3):
             return (a1 + a2) / 2
-        else:
-            return a1
-    elif all(a2 == a3) or all(a2 == a4):
+        return a1
+    if all(a2 == a3) or all(a2 == a4):
         return p2
     try:
         g, h = solve(transpose([-a2 + a1, a4 - a3]), a1 - a3)
     except Exception as e:
         print(e)
         return False
-    else:
-        if 0.0 < g < 1.0 and 0.0 < h < 1.0:
-            return a1 + g * (a2 - a1)
-        else:
-            return False
+    if 0.0 < g < 1.0 and 0.0 < h < 1.0:
+        return a1 + g * (a2 - a1)
+    return False
 
 
 def trimfunc(l1, l2):
@@ -192,7 +187,7 @@ def trimfunc(l1, l2):
                 else:
                     l1 = l1[:ik]
                 if jk == 0:
-                    l2 == [l2[0]]
+                    l2 = [l2[0]]
                 else:
                     l2 = l2[jk::-1]
                 return [vstack([l1, [s]]), vstack([[s], l2])]

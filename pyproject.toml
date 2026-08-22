@@ -31,3 +31,53 @@ markers = [
 filterwarnings = [
     "ignore:builtin type.*__module__:DeprecationWarning",
 ]
+
+[tool.pylint.main]
+py-version = "3.8"
+ignore-paths = ["examples/notebooks_and_scripts"]
+
+[tool.pylint.messages_control]
+disable = [
+    "duplicate-code",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "import-error",
+    "no-name-in-module",
+    "no-member",
+    "import-outside-toplevel",
+    "wrong-import-position",
+    "wrong-import-order",
+    "invalid-name",
+    "unused-argument",
+    "fixme",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "too-many-locals",
+    "too-many-statements",
+    "too-many-branches",
+    "too-many-return-statements",
+    "too-many-instance-attributes",
+    "too-few-public-methods",
+    "broad-exception-caught",
+    "protected-access",
+    "redefined-outer-name",
+    "arguments-renamed",
+    "attribute-defined-outside-init",
+    "useless-object-inheritance",
+    "super-with-arguments",
+    "wildcard-import",
+    "not-callable",
+    "undefined-loop-variable",
+    "inconsistent-return-statements",
+    "redefined-builtin",
+    "cell-var-from-loop",
+    "chained-comparison",
+    "unbalanced-tuple-unpacking",
+]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.design]
+max-args = 12

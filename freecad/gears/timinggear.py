@@ -345,5 +345,4 @@ class TimingGear(BaseGear):
         wi = part.Wire(wires)
         if fp.height.Value == 0:
             return wi
-        else:
-            return part.Face(wi).extrude(app.Vector(0, 0, fp.height))
+        return part.Face(wi).extrude(app.Vector(0, 0, fp.height))

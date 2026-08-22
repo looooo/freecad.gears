@@ -272,12 +272,11 @@ class BevelTooth(object):
                 array(pts1[:-1]),
                 array([pts1[-2], pts1[-1]]),
             ]
-        else:
-            return [pts, array([pts[-1], pts1[0]]), pts1]
+        return [pts, array([pts[-1], pts1[0]]), pts1]
 
     def _update(self):
         """Recalculate tooth geometry after a parameter change."""
-        self.__init__(
+        self.__init__(  # pylint: disable=unnecessary-dunder-call
             z=self.z,
             clearance=self.clearance,
             pressure_angle=self.pressure_angle,

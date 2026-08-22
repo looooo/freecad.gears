@@ -22,7 +22,6 @@ import scipy as sp
 from freecad import app
 from freecad import part
 
-from pygears.bevel_tooth import BevelTooth
 from pygears._functions import rotation
 
 from .basegear import BaseGear, fcvec, part_arc_from_points_and_center
@@ -146,5 +145,4 @@ class LanternGear(BaseGear):
         wi = part.Wire(wires)
         if fp.height.Value == 0:
             return wi
-        else:
-            return part.Face(wi).extrude(app.Vector(0, 0, fp.height))
+        return part.Face(wi).extrude(app.Vector(0, 0, fp.height))

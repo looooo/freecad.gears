@@ -100,14 +100,14 @@ def test_worm_solid_extrusion(doc):
 
 def test_timing_gear_types_produce_solids(doc):
     volumes = {}
-    for tooth_type in TimingGear.data:
+    for tooth_type, data in TimingGear.data.items():
         gear = CreateTimingGear.create()
         gear.type = tooth_type
         gear.num_teeth = 16
         doc.recompute()
         assert gear.Shape.isValid(), tooth_type
         assert gear.Shape.Volume > 0
-        assert gear.pitch.Value == pytest.approx(TimingGear.data[tooth_type]["pitch"])
+        assert gear.pitch.Value == pytest.approx(data["pitch"])
         volumes[tooth_type] = gear.Shape.Volume
     assert volumes["gt8"] > volumes["gt2"]
 
@@ -129,7 +129,10 @@ def test_lantern_gear_solid(doc):
     assert gear.Shape.isValid()
     assert gear.Shape.Volume > 0
     pitch_radius = gear.module.Value * gear.num_teeth / 2
-    assert gear.Shape.BoundBox.XLength == pytest.approx(2 * (pitch_radius + gear.bolt_radius.Value + gear.head * gear.module.Value), rel=0.15)
+    expected_width = 2 * (
+        pitch_radius + gear.bolt_radius.Value + gear.head * gear.module.Value
+    )
+    assert gear.Shape.BoundBox.XLength == pytest.approx(expected_width, rel=0.15)
 
 
 def test_hypocycloid_cam_disk(doc):

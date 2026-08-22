@@ -84,7 +84,7 @@ class InvoluteGear(BaseGear):
         self.compute_traverse_properties(obj)
 
     def onDocumentRestored(self, obj):
-        """  
+        """
         backward compatibility functions
         """
         from .migration import migrate_shift
@@ -246,7 +246,8 @@ class InvoluteGear(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, "
+                "gear parameters are internally recomputed for the rotated gear",
             ),
         )
         obj.addProperty(
@@ -364,7 +365,8 @@ class InvoluteGear(BaseGear):
         )
 
     def compute_traverse_properties(self, obj):
-        # traverse_module added recently, if old freecad doc is loaded without it, it will not exist when generate_gear_shape() is called
+        # traverse_module added recently; if an old document is loaded without it,
+        # it will not exist when generate_gear_shape() is called
         if not hasattr(obj, "traverse_module"):
             self.add_traverse_module_property(obj)
         if obj.properties_from_tool:
@@ -372,10 +374,10 @@ class InvoluteGear(BaseGear):
         else:
             obj.traverse_module = obj.module
 
-        obj.transverse_pitch = "{}mm".format(obj.gear.pitch)
-        obj.addendum_diameter = "{}mm".format(obj.gear.da)
-        obj.root_diameter = "{}mm".format(obj.gear.df)
-        obj.pitch_diameter = "{}mm".format(obj.gear.dw)
+        obj.transverse_pitch = f"{obj.gear.pitch}mm"
+        obj.addendum_diameter = f"{obj.gear.da}mm"
+        obj.root_diameter = f"{obj.gear.df}mm"
+        obj.pitch_diameter = f"{obj.gear.dw}mm"
 
     def generate_gear_shape(self, obj):
         obj.gear.double_helix = obj.double_helix
@@ -465,5 +467,3 @@ class InvoluteGear(BaseGear):
                 gear_shape = gear_shape.cut(hole)
 
         return gear_shape
-
-

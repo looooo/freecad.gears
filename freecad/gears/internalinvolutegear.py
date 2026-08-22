@@ -121,7 +121,7 @@ class InternalInvoluteGear(BaseGear):
         obj.Proxy = self
 
     def onDocumentRestored(self, obj):
-        """  
+        """
         backward compatibility functions
         """
         from .migration import migrate_shift
@@ -321,7 +321,8 @@ class InternalInvoluteGear(BaseGear):
             "helical",
             QT_TRANSLATE_NOOP(
                 "App::Property",
-                "if helix_angle is given and properties_from_tool is enabled, gear parameters are internally recomputed for the rotated gear",
+                "if helix_angle is given and properties_from_tool is enabled, "
+                "gear parameters are internally recomputed for the rotated gear",
             ),
         )
 
@@ -341,16 +342,16 @@ class InternalInvoluteGear(BaseGear):
         fp.gear.properties_from_tool = fp.properties_from_tool
         fp.gear._update()
 
-        fp.pitch_diameter = "{}mm".format(fp.gear.dw)
+        fp.pitch_diameter = f"{fp.gear.dw}mm"
 
         # computed properties
-        fp.transverse_pitch = "{}mm".format(fp.gear.pitch)
+        fp.transverse_pitch = f"{fp.gear.pitch}mm"
         fp.outside_diameter = fp.pitch_diameter + 2 * fp.thickness
         # checksbackwardcompatibility:
         if not "addendum_diameter" in fp.PropertiesList:
             self.add_limiting_diameter_properties(fp)
-        fp.addendum_diameter = "{}mm".format(fp.gear.df)  # swap addendum and dedendum for "internal"
-        fp.root_diameter = "{}mm".format(fp.gear.da)  # swap addendum and dedendum for "internal"
+        fp.addendum_diameter = f"{fp.gear.df}mm"  # swap addendum and dedendum for "internal"
+        fp.root_diameter = f"{fp.gear.da}mm"  # swap addendum and dedendum for "internal"
 
         outer_circle = part.Wire(part.makeCircle(fp.outside_diameter / 2.0))
         if not fp.simple:
@@ -398,13 +399,12 @@ class InternalInvoluteGear(BaseGear):
             base = part.Face([outer_circle, profile])
             if fp.gear.beta == 0:
                 return base.extrude(app.Vector(0, 0, fp.height.Value))
-            else:
-                twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
-                return helical_extrusion(
-                    base, fp.height.Value, twist_angle, fp.double_helix
-                )
-        else:
-            inner_circle = part.Wire(part.makeCircle(fp.pitch_diameter / 2.0))
-            inner_circle.reverse()
-            base = part.Face([outer_circle, inner_circle])
-            return base.extrude(app.Vector(0, 0, fp.height.Value))
+            twist_angle = fp.height.Value * np.tan(fp.gear.beta) * 2 / fp.gear.d
+            return helical_extrusion(
+                base, fp.height.Value, twist_angle, fp.double_helix
+            )
+
+        inner_circle = part.Wire(part.makeCircle(fp.pitch_diameter / 2.0))
+        inner_circle.reverse()
+        base = part.Face([outer_circle, inner_circle])
+        return base.extrude(app.Vector(0, 0, fp.height.Value))
