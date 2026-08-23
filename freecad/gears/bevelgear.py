@@ -81,6 +81,12 @@ class BevelGear(BaseGear):
             QT_TRANSLATE_NOOP("App::Property", "number of points for spline"),
         )
         obj.addProperty(
+            "App::PropertyInteger",
+            "numpoints_helix",
+            "precision",
+            QT_TRANSLATE_NOOP("App::Property", "number of points for helix curve"),
+        )
+        obj.addProperty(
             "App::PropertyBool",
             "simple",
             "precision",
@@ -161,7 +167,7 @@ class BevelGear(BaseGear):
         obj.pitch_angle = "45. deg"
         obj.height = "5. mm"
         obj.numpoints = 20
-        obj.simple = False
+        obj.numpoints_helix = 20
         obj.backlash = "0.00 mm"
         obj.clearance = 0.1
         obj.beta = "0 deg"
@@ -195,6 +201,32 @@ class BevelGear(BaseGear):
         else:  # starting with version 0.0.2
             scale_0 = scale - fp.height.Value
             scale_1 = scale
+        if fp.beta.Value == 0:
+            wires.append(make_bspline_wire([scale_0 * p for p in pts]))
+            wires.append(make_bspline_wire([scale_1 * p for p in pts]))
+        else:
+            for scale_i in np.linspace(scale_0, scale_1, fp.numpoints_helix):
+                # beta_i = (scale_i - scale_0) * fp.beta.Value * np.pi / 180
+                # rot = rotation3D(- beta_i)
+                # points = [rot(pt) * scale_i for pt in pts]
+                angle = (
+                    fp.beta.Value
+                    * np.pi
+                    / 180.0
+                    * np.sin(np.pi / 4)
+                    / np.sin(fp.pitch_angle.Value * np.pi / 180.0)
+                )
+                points = [
+                    np.array([self.spherical_rot(p, angle) for p in scale_i * pt])
+                    for pt in pts
+                ]
+                wires.append(make_bspline_wire(points))
+        shape = part.makeLoft(wires, True)
+        if fp.reset_origin:
+            mat = app.Matrix()
+            mat.A33 = -1
+            mat.move(fcvec([0, 0, scale_1]))
+            shape = shape.transformGeometry(mat)
 
         if not fp.simple:
             pts = list(fp.gear.points(num=fp.numpoints))
