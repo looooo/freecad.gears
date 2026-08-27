@@ -13,6 +13,8 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">FreeCAD Gear Workbench</title>
   <defs
      id="defs2871">
     <linearGradient
@@ -108,6 +110,7 @@
           </cc:Agent>
         </dc:rights>
         <dc:date>2024</dc:date>
+        <dc:title>FreeCAD Gear Workbench</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

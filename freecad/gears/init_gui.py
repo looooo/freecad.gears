@@ -89,7 +89,7 @@ class GearWorkbench(gui.Workbench):
 
     MenuText = app.Qt.translate("Workbench", "Gear")
     ToolTip = app.Qt.translate("Workbench", "Gear Workbench")
-    Icon = os.path.join(__dirname__, "icons", "gearworkbench.svg")
+    Icon = os.path.join(__dirname__, "icons", "FCGearWorkbench.svg")
     commands = [
         "FCGear_InvoluteGear",
         "FCGear_InternalInvoluteGear",
@@ -128,6 +128,8 @@ class GearWorkbench(gui.Workbench):
             CreateGearConnector,
             CreatePlanetaryGearAssembly,
         )
+
+        gui.addIconPath(os.path.join(__dirname__, "icons"))
 
         self.appendToolbar(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)
         self.appendMenu(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)
