@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -16,13 +15,11 @@
 # *                                                                         *
 # ***************************************************************************
 
-from freecad import app
-from freecad import part
-
 import numpy as np
 
-from pygears.bevel_tooth import BevelTooth
+from freecad import app, part
 from pygears._functions import rotation3D
+from pygears.bevel_tooth import BevelTooth
 
 from .basegear import BaseGear, fcvec, make_bspline_wire
 
@@ -36,7 +33,7 @@ class BevelGear(BaseGear):
     """
 
     def __init__(self, obj):
-        super(BevelGear, self).__init__(obj)
+        super().__init__(obj)
         self.bevel_tooth = BevelTooth()
         obj.addProperty(
             "App::PropertyIntegerConstraint",
@@ -196,7 +193,7 @@ class BevelGear(BaseGear):
         fp.gear.clearance = fp.clearance / scale
         fp.gear._update()
 
-        if not "version" in fp.PropertiesList:
+        if "version" not in fp.PropertiesList:
             scale_0 = scale - fp.height.Value / 2
             scale_1 = scale + fp.height.Value / 2
         else:  # starting with version 0.0.2

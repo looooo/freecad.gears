@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -19,8 +18,7 @@
 
 import numpy as np
 
-from freecad import app
-from freecad import part
+from freecad import app, part
 
 from .basegear import BaseGear, fcvec
 
@@ -36,7 +34,7 @@ class CrownGear(BaseGear):
     """
 
     def __init__(self, obj):
-        super(CrownGear, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyIntegerConstraint",
             "num_teeth",

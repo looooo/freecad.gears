@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -16,23 +15,22 @@
 # *                                                                         *
 # ***************************************************************************
 
-
 # this file is only for backwards compatibility, and will be deleted in the future
 
 from freecad import app
 
-app.Console.PrintWarning(f"{__file__} is deprecated, just saving this file again should fix this warning")
-
 # pylint: disable=unused-import
-from .timinggear_t import TimingGearT
-from .involutegear import InvoluteGear
-from .internalinvolutegear import InternalInvoluteGear
-from .involutegearrack import InvoluteGearRack
-from .cycloidgearrack import CycloidGearRack
+from .basegear import BaseGear, ViewProviderGear
+from .bevelgear import BevelGear
 from .crowngear import CrownGear
 from .cycloidgear import CycloidGear
-from .bevelgear import BevelGear
-from .wormgear import WormGear
-from .timinggear import TimingGear
+from .cycloidgearrack import CycloidGearRack
+from .internalinvolutegear import InternalInvoluteGear
+from .involutegear import InvoluteGear
+from .involutegearrack import InvoluteGearRack
 from .lanterngear import LanternGear
-from .basegear import ViewProviderGear, BaseGear
+from .timinggear import TimingGear
+from .timinggear_t import TimingGearT
+from .wormgear import WormGear
+
+app.Console.PrintWarning(f"{__file__} is deprecated, just saving this file again should fix this warning")

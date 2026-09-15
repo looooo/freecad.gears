@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for pygears._functions (2D/3D transforms and geometry helpers)."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from pygears import __version__
 from pygears._functions import (

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # * *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,23 +17,23 @@
 
 import os
 import sys
+
 import numpy as np
 
 from freecad import app
-
 from pygears import __version__
 from pygears.computation import compute_shifted_gears
 
-from .involutegear import InvoluteGear
-from .internalinvolutegear import InternalInvoluteGear
-from .involutegearrack import InvoluteGearRack
 from .cycloidgear import CycloidGear
 from .cycloidgearrack import CycloidGearRack
+from .internalinvolutegear import InternalInvoluteGear
+from .involutegear import InvoluteGear
+from .involutegearrack import InvoluteGearRack
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
-class ViewProviderGearConnector(object):
+class ViewProviderGearConnector:
     def __init__(self, vobj, icon_fn=None):
         # Set this object to the proxy object of the actual view provider
         vobj.Proxy = self
@@ -63,7 +62,7 @@ class ViewProviderGearConnector(object):
             self.icon_fn = state["icon_fn"]
 
 
-class GearConnector(object):
+class GearConnector:
     def __init__(self, obj, master_gear, slave_gear):
         obj.addProperty(
             "App::PropertyString",
@@ -128,7 +127,7 @@ class GearConnector(object):
 
 
     def onChanged(self, fp, prop):
-        if not hasattr(fp, 'master_gear') or not hasattr(fp, 'slave_gear'):
+        if not hasattr(fp, "master_gear") or not hasattr(fp, "slave_gear"):
             return
         if fp.master_gear is None or fp.slave_gear is None:
             return
@@ -138,7 +137,7 @@ class GearConnector(object):
         # app.ActiveDocument.recompute() during document restore, which would
         # attempt to recompute partially-loaded objects and cause a SIGSEGV in
         # App::LocalCoordinateSystem::getAxis().
-        if prop not in ('angle1', 'master_gear_stationary', 'slave_gear_stationary'):
+        if prop not in ("angle1", "master_gear_stationary", "slave_gear_stationary"):
             return
 
         master_angle = fp.angle1.Value
@@ -166,8 +165,8 @@ class GearConnector(object):
                 )
 
             # Check if we have the stationary properties (for backward compatibility)
-            master_stationary = getattr(fp, 'master_gear_stationary', True)
-            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+            master_stationary = getattr(fp, "master_gear_stationary", True)
+            slave_stationary = getattr(fp, "slave_gear_stationary", False)
 
             if master_stationary and slave_stationary:
                 # Both gears stay at their positions, only rotate in place
@@ -241,8 +240,8 @@ class GearConnector(object):
                     fp.slave_gear.shift,
                 )
 
-            master_stationary = getattr(fp, 'master_gear_stationary', True)
-            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+            master_stationary = getattr(fp, "master_gear_stationary", True)
+            slave_stationary = getattr(fp, "slave_gear_stationary", False)
 
             if master_stationary and slave_stationary:
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
@@ -329,8 +328,8 @@ class GearConnector(object):
             dw_slave = fp.slave_gear.pitch_diameter.Value
             dist = (dw_master + dw_slave) / 2
 
-            master_stationary = getattr(fp, 'master_gear_stationary', True)
-            slave_stationary = getattr(fp, 'slave_gear_stationary', False)
+            master_stationary = getattr(fp, "master_gear_stationary", True)
+            slave_stationary = getattr(fp, "slave_gear_stationary", False)
 
             if master_stationary and slave_stationary:
                 slave_position = fp.master_gear.Placement.Base + app.Vector(dist, 0, 0)
@@ -381,4 +380,4 @@ class GearConnector(object):
                 fp.master_gear.purgeTouched()
 
     def execute(self, fp):
-        self.onChanged(fp, 'angle1')
+        self.onChanged(fp, "angle1")

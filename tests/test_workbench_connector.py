@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for GearConnector and ChainConnector kinematics."""
 
 import numpy as np

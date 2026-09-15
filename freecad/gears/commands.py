@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # * *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -17,35 +16,33 @@
 # ***************************************************************************
 
 import os
-from freecad import app
-from freecad import gui
 
-from .basegear import ViewProviderGear, BaseGear
+from freecad import app, gui
 
-from .timinggear_t import TimingGearT
-from .involutegear import InvoluteGear
-from .internalinvolutegear import InternalInvoluteGear
-from .involutegearrack import InvoluteGearRack
-from .cycloidgearrack import CycloidGearRack
-from .crowngear import CrownGear
-from .cycloidgear import CycloidGear
+from .basegear import BaseGear, ViewProviderGear
 from .bevelgear import BevelGear
-from .wormgear import WormGear
-from .timinggear import TimingGear
-from .lanterngear import LanternGear
-from .hypocycloidgear import HypoCycloidGear
-
+from .chainconnector import ChainConnector
 
 # CRITICAL CHANGE: Import both connector types
 from .connector import GearConnector, ViewProviderGearConnector
-from .chainconnector import ChainConnector
-from .planetarygear import PlanetaryGearAssembly, create_planetary_assembly
+from .crowngear import CrownGear
+from .cycloidgear import CycloidGear
+from .cycloidgearrack import CycloidGearRack
+from .hypocycloidgear import HypoCycloidGear
+from .internalinvolutegear import InternalInvoluteGear
+from .involutegear import InvoluteGear
+from .involutegearrack import InvoluteGearRack
+from .lanterngear import LanternGear
 from .planetary_dialog import show_planetary_task_panel
+from .planetarygear import PlanetaryGearAssembly, create_planetary_assembly
+from .timinggear import TimingGear
+from .timinggear_t import TimingGearT
+from .wormgear import WormGear
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
-class BaseCommand(object):
+class BaseCommand:
     NAME = ""
     GEAR_FUNCTION = None
     ICONDIR = os.path.join(os.path.dirname(__file__), "icons")
@@ -229,8 +226,8 @@ class CreateGearConnector(BaseCommand):
                 )
 
             # Get the proxy types for the two selected objects
-            selection0_proxy = selection[0].Proxy if hasattr(selection[0], 'Proxy') else None
-            selection1_proxy = selection[1].Proxy if hasattr(selection[1], 'Proxy') else None
+            selection0_proxy = selection[0].Proxy if hasattr(selection[0], "Proxy") else None
+            selection1_proxy = selection[1].Proxy if hasattr(selection[1], "Proxy") else None
 
             # Identify the parent connector and the new slave gear
             parent_connector = None
@@ -285,7 +282,7 @@ class CreateGearConnector(BaseCommand):
             app.ActiveDocument.recompute()
             return obj
         except Exception as e:
-            app.Console.PrintError(f"Error: {str(e)}\n")
+            app.Console.PrintError(f"Error: {e!s}\n")
             return None
 
 

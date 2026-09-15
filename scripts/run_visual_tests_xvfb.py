@@ -10,9 +10,9 @@ Also force X11/GLX software rendering so Wayland env vars cannot leak into xvfb.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STATUS_FILE = PROJECT_ROOT / ".pytest_exitstatus"

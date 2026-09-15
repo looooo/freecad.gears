@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -20,8 +19,7 @@ import math
 
 import numpy as np
 
-from freecad import app
-from freecad import part
+from freecad import app, part
 
 from .basegear import BaseGear, make_bspline_wire
 
@@ -35,7 +33,7 @@ class HypoCycloidGear(BaseGear):
     """
 
     def __init__(self, obj):
-        super(HypoCycloidGear, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyFloat",
             "pin_circle_radius",
@@ -208,7 +206,7 @@ class HypoCycloidGear(BaseGear):
         # Find the pressure angle limit circles
         minAngle = -1.0
         maxAngle = -1.0
-        for i in range(0, 180):
+        for i in range(180):
             x = self.calc_pressure_angle(p, d, n, i * math.pi / 180.0)
             if (x < ang) and (minAngle < 0):
                 minAngle = float(i)
@@ -228,7 +226,7 @@ class HypoCycloidGear(BaseGear):
         y = self.calc_y(p, d, e, n, q * i / n)
         x, y = self.check_limit(x, y, maxRadius, minRadius, c)
         points = [app.Vector(x - e, y, 0)]
-        for i in range(0, s):
+        for i in range(s):
             x = self.calc_x(p, d, e, n, q * (i + 1) / n)
             y = self.calc_y(p, d, e, n, q * (i + 1) / n)
             x, y = self.check_limit(x, y, maxRadius, minRadius, c)
@@ -283,7 +281,7 @@ class HypoCycloidGear(BaseGear):
         if fp.show_pins:
             app.Console.PrintMessage(app.Qt.translate("Log", "Generating pins\n"))
             pins = []
-            for i in range(0, n + 1):
+            for i in range(n + 1):
                 x = p * n * math.cos(2 * math.pi / (n + 1) * i)
                 y = p * n * math.sin(2 * math.pi / (n + 1) * i)
                 pins.append(part.Wire(part.makeCircle(d / 2, app.Vector(x, y, 0))))

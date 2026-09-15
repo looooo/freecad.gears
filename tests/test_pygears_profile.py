@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
 """Unit tests for full-gear profiles in pygears.profile."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
+from pygears.bevel_tooth import BevelTooth
+from pygears.cycloid_tooth import CycloidTooth
+from pygears.involute_tooth import InvoluteRack, InvoluteTooth
 from pygears.profile import (
     BevelProfile,
     CycloidProfile,
     InvoluteProfile,
     InvoluteRackProfile,
 )
-from pygears.bevel_tooth import BevelTooth
-from pygears.cycloid_tooth import CycloidTooth
-from pygears.involute_tooth import InvoluteRack, InvoluteTooth
 
 
 def test_involute_profile_is_closed_and_has_all_teeth():

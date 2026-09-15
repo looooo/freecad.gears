@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for workbench commands: creation, metadata, default shapes."""
 
 import os
@@ -6,6 +5,8 @@ import os
 import pytest
 
 from freecad import app
+from freecad.gears.basegear import BaseGear
+from freecad.gears.bevelgear import BevelGear
 from freecad.gears.commands import (
     CreateBevelGear,
     CreateCrownGear,
@@ -21,8 +22,6 @@ from freecad.gears.commands import (
     CreateTimingGearT,
     CreateWormGear,
 )
-from freecad.gears.basegear import BaseGear
-from freecad.gears.bevelgear import BevelGear
 from freecad.gears.crowngear import CrownGear
 from freecad.gears.cycloidgear import CycloidGear
 from freecad.gears.cycloidgearrack import CycloidGearRack
@@ -34,7 +33,6 @@ from freecad.gears.lanterngear import LanternGear
 from freecad.gears.timinggear import TimingGear
 from freecad.gears.timinggear_t import TimingGearT
 from freecad.gears.wormgear import WormGear
-
 
 GEAR_COMMANDS = [
     CreateInvoluteGear,

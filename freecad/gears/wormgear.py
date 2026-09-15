@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,10 +17,9 @@
 
 import numpy as np
 
-from freecad import app
-from freecad import part
+from freecad import app, part
 
-from .basegear import BaseGear, helical_extrusion, fcvec
+from .basegear import BaseGear, fcvec, helical_extrusion
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -30,7 +28,7 @@ class WormGear(BaseGear):
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
-        super(WormGear, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyIntegerConstraint",
             "num_teeth",

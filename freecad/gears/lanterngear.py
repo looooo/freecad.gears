@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,9 +17,7 @@
 
 import numpy as np
 
-from freecad import app
-from freecad import part
-
+from freecad import app, part
 from pygears._functions import rotation
 from pygears.computation import find_root
 
@@ -31,7 +28,7 @@ QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 class LanternGear(BaseGear):
     def __init__(self, obj):
-        super(LanternGear, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyIntegerConstraint",
             "num_teeth",
@@ -133,11 +130,11 @@ class LanternGear(BaseGear):
 
         rot = rotation(np.pi * 2 / teeth)
         p_3 = rot(np.array([p_2_end]))[0]
-        # l = part.LineSegment(fcvec(p_1_end), fcvec(p_3)).toShape()
-        l = part_arc_from_points_and_center(
+        # line_segment = part.LineSegment(fcvec(p_1_end), fcvec(p_3)).toShape()
+        line_segment = part_arc_from_points_and_center(
             p_1_end, p_3, np.array([0.0, 0.0])
         ).toShape()
-        w = part.Wire([w_2, arc, w_1, l])
+        w = part.Wire([w_2, arc, w_1, line_segment])
         wires = [w]
 
         rot = app.Matrix()

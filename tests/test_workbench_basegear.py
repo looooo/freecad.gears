@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Tests for shared geometry helpers in freecad.gears.basegear."""
 
 import numpy as np
 import pytest
 
-from freecad import app
-from freecad import part
+from freecad import app, part
 from freecad.gears import __version__ as gears_version
 from freecad.gears.basegear import (
     BaseGear,

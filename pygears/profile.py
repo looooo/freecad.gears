@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -23,13 +22,14 @@ point arrays representing complete gears or racks.
 """
 
 import numpy as np
-from .involute_tooth import InvoluteTooth, InvoluteRack
+
+from ._functions import rotation, rotation3D
 from .bevel_tooth import BevelTooth
 from .cycloid_tooth import CycloidTooth
-from ._functions import rotation, rotation3D
+from .involute_tooth import InvoluteRack, InvoluteTooth
 
 
-class _GearProfile(object):
+class _GearProfile:
     """Mixin that assembles a full gear profile from a single tooth."""
 
     rot3D = False

@@ -1,7 +1,8 @@
 """Rigid-body transformations in symbolic and numeric form."""
 
-import sympy as sym
 import numpy as np
+import sympy as sym
+
 
 def symbolic_transformation(angle, axis, translation=np.array([0., 0., 0.])):
     """Build a 4x4 homogeneous transform matrix using sympy.

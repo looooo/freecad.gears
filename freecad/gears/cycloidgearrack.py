@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -17,13 +16,12 @@
 # ***************************************************************************
 
 
-from freecad import app
-from freecad import part
-
 import numpy as np
 
+from freecad import app, part
 from pygears._functions import reflection
-from .basegear import BaseGear, fcvec, points_to_wire, insert_fillet
+
+from .basegear import BaseGear, fcvec, insert_fillet, points_to_wire
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -32,7 +30,7 @@ class CycloidGearRack(BaseGear):
     """FreeCAD gear rack"""
 
     def __init__(self, obj):
-        super(CycloidGearRack, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyIntegerConstraint",
             "num_teeth",
@@ -100,7 +98,7 @@ class CycloidGearRack(BaseGear):
         """
         # replace beta with helix_angle
         if hasattr(obj, "beta"):
-            helix_angle = getattr(obj, "beta")
+            helix_angle = obj.beta
             obj.addProperty(
                 "App::PropertyAngle",
                 "helix_angle",

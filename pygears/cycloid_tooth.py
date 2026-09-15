@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,8 +17,9 @@
 
 """Cycloid gear tooth geometry from epicycloid and hypocycloid curves."""
 
-from numpy import cos, sin, arccos, pi, array, linspace, transpose, vstack
-from ._functions import rotation, reflection
+from numpy import arccos, array, cos, linspace, pi, sin, transpose, vstack
+
+from ._functions import reflection, rotation
 
 
 class CycloidTooth:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,10 +17,10 @@
 
 import os
 import sys
+
 import numpy as np
 
 from freecad import app
-
 from pygears import __version__
 from pygears.computation import (
     compute_planetary_gears,
@@ -37,8 +36,8 @@ from .assembly_helper import (
     warn_if_no_assembly,
 )
 from .basegear import ViewProviderGear
-from .involutegear import InvoluteGear
 from .internalinvolutegear import InternalInvoluteGear
+from .involutegear import InvoluteGear
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
@@ -63,7 +62,7 @@ def _planet_placement(orbit_angle_deg, spin_angle_deg, center_distance):
     return app.Placement(position, app.Rotation(Z_AXIS, spin_angle_deg))
 
 
-class ViewProviderPlanetaryGear(object):
+class ViewProviderPlanetaryGear:
     def __init__(self, vobj, icon_fn=None):
         vobj.Proxy = self
         dirname = os.path.dirname(__file__)
@@ -91,7 +90,7 @@ class ViewProviderPlanetaryGear(object):
             self.icon_fn = state["icon_fn"]
 
 
-class PlanetaryGearAssembly(object):
+class PlanetaryGearAssembly:
     """Container that calculates, creates, and positions a planetary gear set."""
 
     # Changing these alters the layout or the joint set, so the whole assembly

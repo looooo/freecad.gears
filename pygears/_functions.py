@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,8 +17,8 @@
 
 """Pure geometric helpers for 2D/3D point transformations and curve trimming."""
 
-from numpy import sin, cos, dot, array, ndarray, vstack, transpose, sqrt
-from numpy.linalg import solve, norm
+from numpy import array, cos, dot, ndarray, sin, sqrt, transpose, vstack
+from numpy.linalg import norm, solve
 
 
 def reflection(angle):
@@ -232,12 +231,12 @@ def nearestpts(involute, undercut):
     for i in array(involute[1:]):
         jk = 0
         for j in array(undercut[1:]):
-            l = diff_norm(i, j)
-            if l < outmin:
+            distance_l = diff_norm(i, j)
+            if distance_l < outmin:
                 re = diff_norm(i, [0, 0])
                 ru = diff_norm(j, [0, 0])
                 if re > ru:
-                    outmin = l
+                    outmin = distance_l
                     iout, jout = [ik, jk]
             jk += 1
         ik += 1

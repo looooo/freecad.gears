@@ -1,9 +1,9 @@
 # script for bevel-gear animation
 
-from PySide import QtCore
 import FreeCAD as app
 import FreeCADGui as gui
 import numpy as np
+from PySide import QtCore
 
 doc = app.ActiveDocument
 g2 = doc.Common
@@ -19,7 +19,7 @@ def make_pics():
         g1.Placement.Rotation.Angle += phi * 2
         g2.Placement.Rotation.Angle -= phi
         gui.activeDocument().activeView().saveImage(
-            "/home/lo/Schreibtisch/animated_gear/gear_{}.png".format(i),
+            f"/home/lo/Schreibtisch/animated_gear/gear_{i}.png",
             300,
             300,
             "Current",

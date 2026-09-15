@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for involute gear and rack geometry in pygears.involute_tooth."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from pygears.involute_tooth import InvoluteRack, InvoluteTooth
 

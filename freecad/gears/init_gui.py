@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,8 +17,8 @@
 
 import os
 import sys
-from freecad import app
-from freecad import gui
+
+from freecad import app, gui
 
 __dirname__ = os.path.dirname(__file__)
 
@@ -113,20 +112,20 @@ class GearWorkbench(gui.Workbench):
     def Initialize(self):
         QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
         from .commands import (
-            CreateCycloidGear,
-            CreateInvoluteGear,
-            CreateInternalInvoluteGear,
             CreateBevelGear,
-            CreateInvoluteRack,
             CreateCrownGear,
-            CreateWormGear,
-            CreateTimingGearT,
-            CreateTimingGear,
-            CreateLanternGear,
-            CreateHypoCycloidGear,
+            CreateCycloidGear,
             CreateCycloidRack,
             CreateGearConnector,
+            CreateHypoCycloidGear,
+            CreateInternalInvoluteGear,
+            CreateInvoluteGear,
+            CreateInvoluteRack,
+            CreateLanternGear,
             CreatePlanetaryGearAssembly,
+            CreateTimingGear,
+            CreateTimingGearT,
+            CreateWormGear,
         )
 
         self.appendToolbar(QT_TRANSLATE_NOOP("Workbench", "Gear"), self.commands)

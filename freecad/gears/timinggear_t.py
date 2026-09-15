@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -19,20 +18,18 @@
 
 import numpy as np
 
-from freecad import app
-from freecad import part
-
-from pygears._functions import rotation, reflection
+from freecad import app, part
+from pygears._functions import reflection, rotation
 from pygears.computation import minimize
 
-from .basegear import BaseGear, fcvec, part_arc_from_points_and_center, insert_fillet
+from .basegear import BaseGear, fcvec, insert_fillet, part_arc_from_points_and_center
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class TimingGearT(BaseGear):
     def __init__(self, obj):
-        super(TimingGearT, self).__init__(obj)
+        super().__init__(obj)
         obj.addProperty(
             "App::PropertyLength",
             "pitch",

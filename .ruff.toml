@@ -1,0 +1,23 @@
+[lint]
+# Safe, non-breaking rules for auto-fixing
+# These rules can be auto-fixed without causing backward incompatibilities
+select = [
+    "E",      # pycodestyle errors (safe formatting)
+    "W",      # pycodestyle warnings (safe formatting) 
+    "I",      # isort (safe import sorting)
+    "UP004",  # useless-object-inheritance (safe)
+    "UP008",  # super-call-with-temp (safe)
+    "UP009",  # utf8-encoding-declaration (safe)
+    "UP032",  # f-string (safe conversion from format())
+]
+
+# Exclude files we don't want to touch
+exclude = ["examples/notebooks_and_scripts/*"]
+
+[lint.pycodestyle]
+max-line-length = 120
+
+[lint.isort]
+known-first-party = ["freecad", "pygears"]
+combine-as-imports = true
+force-sort-within-sections = true

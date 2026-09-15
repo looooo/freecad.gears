@@ -11,7 +11,7 @@ freecad_gears = { path = ".", editable = true }
 
 [tasks]
 lint = "pylint $(git ls-files '*.py')"
-lint-ruff = "ruff check $(git ls-files '*.py')"
+ruff = "ruff check $(git ls-files '*.py')"
 test = "pytest tests/ -v -m 'not visual'"
 test-visual = "pytest tests/test_visual_projects.py -v -s"
 test-visual-xvfb = "python scripts/run_visual_tests_xvfb.py"

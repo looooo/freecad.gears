@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for cycloid, bevel, crown, worm, timing, lantern and hypocycloid gears."""
 
 import numpy as np

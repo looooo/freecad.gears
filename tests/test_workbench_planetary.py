@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for planetary gear assembly creation and placement."""
 
 import numpy as np
@@ -6,8 +5,8 @@ import pytest
 
 from freecad import app
 from freecad.gears.assembly_helper import assembly_workbench_available
-from freecad.gears.involutegear import InvoluteGear
 from freecad.gears.internalinvolutegear import InternalInvoluteGear
+from freecad.gears.involutegear import InvoluteGear
 from freecad.gears.planetary_preview import PlanetaryPreview, build_outlines
 from freecad.gears.planetarygear import (
     PlanetaryGearAssembly,

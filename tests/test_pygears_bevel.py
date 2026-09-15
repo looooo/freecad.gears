@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for spherical involute bevel teeth in pygears.bevel_tooth."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from pygears.bevel_tooth import BevelTooth
 

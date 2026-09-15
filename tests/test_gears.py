@@ -1,5 +1,4 @@
-from freecad import app
-from freecad import part
+from freecad import app, part
 from freecad.gears.basegear import helical_extrusion
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -20,9 +19,7 @@ import os
 
 import numpy as np
 
-from freecad import app
-from freecad import part
-
+from freecad import app, part
 from pygears import __version__
 from pygears._functions import arc_from_points_and_center
 
@@ -61,11 +58,7 @@ class ViewProviderGear:
         Check for missing attributes.
         """
         if not hasattr(self, "icon_fn"):
-            setattr(
-                self,
-                "icon_fn",
-                os.path.join(os.path.dirname(__file__), "icons", "involutegear.svg"),
-            )
+            self.icon_fn = os.path.join(os.path.dirname(__file__), "icons", "involutegear.svg")
 
     def attach(self, vobj):
         self.vobj = vobj

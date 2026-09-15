@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # * *
 # * This file defines the ChainConnector class for stable multi-gear chains. *
@@ -8,20 +7,21 @@
 # ***************************************************************************
 
 import numpy as np
+
 from freecad import app
-from pygears import __version__ # FIX: Import __version__
+from pygears import __version__  # FIX: Import __version__
+
+# Reuse the standard ViewProvider from the original connector.py
+from .connector import GearConnector, ViewProviderGearConnector
+from .cycloidgear import CycloidGear
+from .internalinvolutegear import InternalInvoluteGear
 
 # Import all gear types the chain might connect
 from .involutegear import InvoluteGear
-from .internalinvolutegear import InternalInvoluteGear
-from .cycloidgear import CycloidGear
-
-# Reuse the standard ViewProvider from the original connector.py
-from .connector import ViewProviderGearConnector, GearConnector
 
 QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
-class Chain(object):
+class Chain:
     def __init__(self, obj, gear_list):
         obj.addProperty("App::PropertyLinkList", "gear_list", "GearChain", "list of gears in the chain")
         obj.addProperty("App::PropertyAngle", "angle", "GearChain", "angle of the first gear")
@@ -45,11 +45,11 @@ class Chain(object):
             master_gear = slave_gear
 
     def onChanged(self, fp, prop):
-        if prop == 'angle':
+        if prop == "angle":
             fp.connector.angle1 = fp.angle
 
 
-class ChainConnector(object):
+class ChainConnector:
     def __init__(self, obj, master_connector, slave_gear):
 
         # --- PROPERTY DEFINITIONS ---
@@ -71,13 +71,13 @@ class ChainConnector(object):
 
         ViewProviderGearConnector(obj.ViewObject)
 
-        obj.setExpression('master_gear', f'{master_connector.Name}.slave_gear')
-        obj.setExpression('input_gear_angle', f'{master_connector.Name}.slave_gear.Placement.Rotation.Angle')
+        obj.setExpression("master_gear", f"{master_connector.Name}.slave_gear")
+        obj.setExpression("input_gear_angle", f"{master_connector.Name}.slave_gear.Placement.Rotation.Angle")
 
 
     def onChanged(self, fp, prop):
         # Only react when the input angle (G2's rotation) or the final slave gear (G3) link changes
-        if prop not in ('input_gear_angle', 'slave_gear'):
+        if prop not in ("input_gear_angle", "slave_gear"):
             return
 
         # Ensure we have both gears before proceeding
@@ -139,4 +139,4 @@ class ChainConnector(object):
 
     def execute(self, fp):
         # When executed, simply trigger the onChanged to use the current expression-linked value
-        self.onChanged(fp, 'input_gear_angle')
+        self.onChanged(fp, "input_gear_angle")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -19,25 +18,26 @@
 """Involute tooth and rack geometry for spur and helical gears."""
 
 from numpy import (
-    tan,
+    arctan,
+    array,
     cos,
+    linspace,
+    ndarray,
+    pi,
     sin,
     sqrt,
-    arctan,
-    pi,
-    array,
-    linspace,
+    tan,
     transpose,
     vstack,
-    ndarray,
 )
+
 from ._functions import (
-    nearestpts,
-    rotation,
-    reflection,
-    trimfunc,
     diff_norm,
+    nearestpts,
+    reflection,
+    rotation,
     translation,
+    trimfunc,
 )
 
 
@@ -273,7 +273,7 @@ class InvoluteTooth:
         self._calc_gear_factors()
 
 
-class InvoluteRack(object):
+class InvoluteRack:
     """Involute rack geometry (linear teeth along the y-axis)."""
 
     def __init__(

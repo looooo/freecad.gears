@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -21,7 +20,6 @@ import os
 import numpy as np
 
 from freecad import app
-
 from pygears.computation import compute_planetary_gears, root_diameter
 
 from .planetary_preview import PlanetaryPreview

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for planetary gear computation."""
 
 import numpy as np

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared fixtures for FreeCAD workbench tests (headless)."""
 
 import pytest

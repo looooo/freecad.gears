@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -19,21 +18,22 @@
 """Bevel gear tooth geometry on the z=1 projection plane."""
 
 from numpy import (
-    cos,
-    sin,
-    tan,
     arccos,
     arctan,
-    pi,
     array,
+    cos,
     linspace,
-    transpose,
+    pi,
+    sin,
     sqrt,
+    tan,
+    transpose,
 )
-from ._functions import rotation3D, reflection3D, intersection_line_circle
+
+from ._functions import intersection_line_circle, reflection3D, rotation3D
 
 
-class BevelTooth(object):
+class BevelTooth:
     """Single bevel gear tooth in 3D, projected onto the z=1 plane."""
 
     def __init__(

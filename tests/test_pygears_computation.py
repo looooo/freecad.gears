@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for pygears.computation (Newton root finder and gear centre distance)."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from pygears.computation import compute_shifted_gears, find_root, minimize
 

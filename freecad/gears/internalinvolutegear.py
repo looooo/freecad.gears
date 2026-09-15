@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,22 +17,19 @@
 
 import numpy as np
 
-from freecad import app
-from freecad import part
-
-from pygears.involute_tooth import InvoluteTooth
+from freecad import app, part
 from pygears._functions import rotation
-
-QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
-
+from pygears.involute_tooth import InvoluteTooth
 
 from .basegear import (
     BaseGear,
-    points_to_wire,
-    insert_fillet,
     helical_extrusion,
+    insert_fillet,
+    points_to_wire,
     rotate_tooth,
 )
+
+QT_TRANSLATE_NOOP = app.Qt.QT_TRANSLATE_NOOP
 
 
 class InternalInvoluteGear(BaseGear):
@@ -44,7 +40,7 @@ class InternalInvoluteGear(BaseGear):
     """
 
     def __init__(self, obj):
-        super(InternalInvoluteGear, self).__init__(obj)
+        super().__init__(obj)
         self.involute_tooth = InvoluteTooth()
         obj.addProperty(
             "App::PropertyBool",
@@ -128,7 +124,7 @@ class InternalInvoluteGear(BaseGear):
 
         migrate_shift(obj)
         if hasattr(obj, "dw"):
-            pitch_diameter = getattr(obj, "dw")
+            pitch_diameter = obj.dw
             obj.addProperty(
                 "App::PropertyLength",
                 "pitch_diameter",
@@ -143,7 +139,7 @@ class InternalInvoluteGear(BaseGear):
             )
         # replace da with addendum_diameter
         if hasattr(obj, "da"):
-            addendum_diameter = getattr(obj, "da")
+            addendum_diameter = obj.da
             obj.addProperty(
                 "App::PropertyLength",
                 "addendum_diameter",
@@ -156,7 +152,7 @@ class InternalInvoluteGear(BaseGear):
 
         # replace df with root_diameter
         if hasattr(obj, "df"):
-            root_diameter = getattr(obj, "df")
+            root_diameter = obj.df
             obj.addProperty(
                 "App::PropertyLength",
                 "root_diameter",
@@ -169,7 +165,7 @@ class InternalInvoluteGear(BaseGear):
 
         # replace beta with helix_angle
         if hasattr(obj, "beta"):
-            helix_angle = getattr(obj, "beta")
+            helix_angle = obj.beta
             obj.addProperty(
                 "App::PropertyAngle",
                 "helix_angle",
@@ -348,7 +344,7 @@ class InternalInvoluteGear(BaseGear):
         fp.transverse_pitch = f"{fp.gear.pitch}mm"
         fp.outside_diameter = fp.pitch_diameter + 2 * fp.thickness
         # checksbackwardcompatibility:
-        if not "addendum_diameter" in fp.PropertiesList:
+        if "addendum_diameter" not in fp.PropertiesList:
             self.add_limiting_diameter_properties(fp)
         fp.addendum_diameter = f"{fp.gear.df}mm"  # swap addendum and dedendum for "internal"
         fp.root_diameter = f"{fp.gear.da}mm"  # swap addendum and dedendum for "internal"

@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for cycloid tooth geometry in pygears.cycloid_tooth."""
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from pygears.cycloid_tooth import CycloidTooth
 

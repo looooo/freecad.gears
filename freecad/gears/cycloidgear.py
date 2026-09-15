@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -16,18 +15,17 @@
 # *                                                                         *
 # ***************************************************************************
 
-from freecad import app
-from freecad import part
-
 import numpy as np
-from pygears.cycloid_tooth import CycloidTooth
+
+from freecad import app, part
 from pygears._functions import rotation
+from pygears.cycloid_tooth import CycloidTooth
 
 from .basegear import (
     BaseGear,
-    points_to_wire,
-    insert_fillet,
     helical_extrusion,
+    insert_fillet,
+    points_to_wire,
     rotate_tooth,
 )
 
@@ -38,7 +36,7 @@ class CycloidGear(BaseGear):
     """FreeCAD gear"""
 
     def __init__(self, obj):
-        super(CycloidGear, self).__init__(obj)
+        super().__init__(obj)
         self.cycloid_tooth = CycloidTooth()
         obj.addProperty(
             "App::PropertyIntegerConstraint",
@@ -99,7 +97,7 @@ class CycloidGear(BaseGear):
         backward compatibility functions
         """
         if hasattr(obj, "dw"):
-            pitch_diameter = getattr(obj, "dw")
+            pitch_diameter = obj.dw
             obj.addProperty(
                 "App::PropertyLength",
                 "pitch_diameter",
@@ -115,7 +113,7 @@ class CycloidGear(BaseGear):
 
         # replace beta with helix_angle
         if hasattr(obj, "beta"):
-            helix_angle = getattr(obj, "beta")
+            helix_angle = obj.beta
             obj.addProperty(
                 "App::PropertyAngle",
                 "helix_angle",

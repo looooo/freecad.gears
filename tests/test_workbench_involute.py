@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for involute, internal involute and involute rack features."""
 
 import os

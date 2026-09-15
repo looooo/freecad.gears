@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for helical profile-shift migration helpers."""
 
 import math

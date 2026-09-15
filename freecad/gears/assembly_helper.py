@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -18,8 +17,7 @@
 
 """Optional helpers for the FreeCAD Assembly workbench."""
 
-from freecad import app
-from freecad import part
+from freecad import app, part
 
 JOINT_PREFIX = "FCGear_"
 
@@ -28,8 +26,8 @@ def assembly_workbench_available():
     """Return True if the Assembly workbench Python modules can be imported."""
     try:
         import Assembly  # pylint: disable=unused-import
-        import UtilsAssembly  # pylint: disable=unused-import
         import JointObject  # pylint: disable=unused-import
+        import UtilsAssembly  # pylint: disable=unused-import
 
         return True
     except ImportError:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ***************************************************************************
 # *                                                                         *
 # * This program is free software: you can redistribute it and/or modify    *
@@ -30,7 +29,6 @@ can be verified without a running GUI.
 import numpy as np
 
 from freecad import app
-
 from pygears._functions import rotation
 from pygears.computation import compute_planetary_gears, planetary_phase_angles
 from pygears.profile import InvoluteProfile
@@ -180,6 +178,7 @@ class PlanetaryPreview:
             return False
         try:
             from pivy import coin
+
             from freecad import gui
         except ImportError:
             return False

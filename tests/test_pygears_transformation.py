@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """Unit tests for Euler-Rodrigues homogeneous transforms in pygears.transformation."""
 
 import numpy as np
+from numpy.testing import assert_allclose
 import pytest
 import sympy as sym
-from numpy.testing import assert_allclose
 
 from pygears.transformation import numeric_transformation, symbolic_transformation
 
