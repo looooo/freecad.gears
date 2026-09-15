@@ -16,6 +16,7 @@ jobs:
           pixi-version: v0.77.0
           cache: false
       - run: pixi run lint
+      - run: pixi run ruff
 
   test:
     strategy:
