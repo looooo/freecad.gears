@@ -29,6 +29,16 @@ class TimingGear(BaseGear):
     """FreeCAD gear rack"""
 
     data = {
+        "gt1.5": {
+            "pitch": 1.5,
+            "u": 0.1905,
+            "h": 0.5625,
+            "H": 1.035,
+            "r0": 0.4163 , # rounded to 4 sig digits, original: 0.41625
+            "r1": 0.75,
+            "rs": 0.1125,
+            "offset": 0.30,
+        },
         "gt2": {
             "pitch": 2.0,
             "u": 0.254,
@@ -174,7 +184,7 @@ class TimingGear(BaseGear):
             1,
         )
         obj.num_teeth = (15, 3, 10000, 1)  # default, min, max, step
-        obj.type = ["gt2", "gt3", "gt5", "gt8", "htd3", "htd5", "htd8"]
+        obj.type = ["gt1.5", "gt2", "gt3", "gt5", "gt8", "htd3", "htd5", "htd8"]
         obj.height = "5. mm"
 
         self.obj = obj
